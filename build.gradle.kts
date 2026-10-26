@@ -1,33 +1,3 @@
-//plugins {
-//    java
-//    id("org.springframework.boot") version "4.1.2"
-//    id("io.spring.dependency-management") version "1.1.7"
-//}
-//
-//group = "com.gateway.llm"
-//version = "0.0.1-SNAPSHOT"
-//description = "json-path-parent"
-//
-//java {
-//    toolchain {
-//        languageVersion = JavaLanguageVersion.of(27)
-//    }
-//}
-//
-//repositories {
-//    mavenCentral()
-//}
-//
-//dependencies {
-//    implementation("org.springframework.boot:spring-boot-starter")
-//    testImplementation("org.springframework.boot:spring-boot-starter-test")
-//    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-//}
-//
-//tasks.withType<Test> {
-//    useJUnitPlatform()
-//}
-
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
@@ -55,7 +25,7 @@ subprojects {
     }
 
     tasks.withType<Test>().configureEach {
-        useJUnit()
+        useJUnitPlatform()
     }
 
     if (rootProject.hasProperty("release")) {
