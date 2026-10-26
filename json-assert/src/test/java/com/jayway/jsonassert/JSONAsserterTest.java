@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+
 import static org.hamcrest.Matchers.*;
 
 public class JSONAsserterTest {
@@ -34,6 +35,18 @@ public class JSONAsserterTest {
     public void a_path_can_be_asserted_with_matcher() throws Exception {
 
         JSONAsserter.with(TEST_DOCUMENT).assertThat("stringField", equalTo("string-field"));
+    }
+
+    @Test
+    public void array_content_can_be_asserted_with_matcher() throws Exception {
+
+        JSONAsserter.with(TEST_DOCUMENT).assertThat("stringList", hasItems("ONE", "TWO"));
+    }
+
+    @Test
+    public void map_content_can_be_asserted_with_matcher() throws Exception {
+
+        JSONAsserter.with(TEST_DOCUMENT).assertThat("subDocument", hasEntry("subField", "sub-field"));
     }
 
     @Test
@@ -68,8 +81,6 @@ public class JSONAsserterTest {
                 .assertEquals("stringField", "string-field");
 
     }
-
-
 
 
 }
