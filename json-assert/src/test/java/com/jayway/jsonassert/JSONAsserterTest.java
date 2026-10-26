@@ -9,8 +9,26 @@ import static org.hamcrest.Matchers.*;
 
 public class JSONAsserterTest {
 
-    private static String TEST_DOCUMENT = "{  \"nullField\" : null, \"stringField\" : \"string-field\" , \"numberField\" : 1234 , \"booleanField\" : true , \"subDocument\" : {\"subField\" : \"sub-field\"} , \"stringList\" : [\"ONE\", \"TWO\"], \"objectList\" : [{\"subField\" : \"sub-field-0\"}, {\"subField\" : \"sub-field-1\"}], \"listList\" : [[\"0.0\", \"0.1\"], [\"1.0\", \"1.1\"]]}";
-
+    private static final String TEST_DOCUMENT = """
+        {
+          "nullField": null,
+          "stringField": "string-field",
+          "numberField": 1234,
+          "booleanField": true,
+          "subDocument": {
+            "subField": "sub-field"
+          },
+          "stringList": ["ONE", "TWO"],
+          "objectList": [
+            {"subField": "sub-field-0"},
+            {"subField": "sub-field-1"}
+          ],
+          "listList": [
+            ["0.0", "0.1"],
+            ["1.0", "1.1"]
+          ]
+        }
+        """;
 
     @Test
     public void a_path_can_be_asserted_with_matcher() throws Exception {

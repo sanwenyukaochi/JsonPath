@@ -9,12 +9,54 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class JSONReaderTest {
 
+    private static final String TEST_DOCUMENT = """
+        {
+          "nullField": null,
+          "stringField": "string-field",
+          "numberField": 1234,
+          "booleanField": true,
+          "subDocument": {
+            "subField": "sub-field"
+          },
+          "stringList": ["ONE", "TWO"],
+          "objectList": [
+            {"subField": "sub-field-0"},
+            {"subField": "sub-field-1"}
+          ],
+          "listList": [
+            ["0.0", "0.1"],
+            ["1.0", "1.1"]
+          ]
+        }
+        """;
 
-    private static final String TEST_DOCUMENT = "{  \"nullField\" : null, \"stringField\" : \"string-field\" , \"numberField\" : 1234 , \"booleanField\" : true , \"subDocument\" : {\"subField\" : \"sub-field\"} , \"stringList\" : [\"ONE\", \"TWO\"], \"objectList\" : [{\"subField\" : \"sub-field-0\"}, {\"subField\" : \"sub-field-1\"}], \"listList\" : [[\"0.0\", \"0.1\"], [\"1.0\", \"1.1\"]]}";
-    private static final String TEST_DOCUMENT_ARRAY = "{  \"listList\" : [[\"0.0\", \"0.1\"], [\"1.0\", \"1.1\"]]}";
-    private static final String TEST_DEEP_PATH_DOCUMENT = "{  \"a\" :  {  \"b\" : {  \"c\" : {  \"say\" : \"hello\" } } }}";
-    private static final String TEST_ARRAY = "[{\"name\" : \"name0\"}, {\"name\" : \"name1\"}]";
+    private static final String TEST_DOCUMENT_ARRAY = """
+        {
+          "listList": [
+            ["0.0", "0.1"],
+            ["1.0", "1.1"]
+          ]
+        }
+        """;
 
+    private static final String TEST_DEEP_PATH_DOCUMENT = """
+        {
+          "a": {
+            "b": {
+              "c": {
+                "say": "hello"
+              }
+            }
+          }
+        }
+        """;
+
+    private static final String TEST_ARRAY = """
+        [
+          {"name": "name0"},
+          {"name": "name1"}
+        ]
+        """;
 
     @Test
     public void invalid_json_not_accepted() throws Exception {
