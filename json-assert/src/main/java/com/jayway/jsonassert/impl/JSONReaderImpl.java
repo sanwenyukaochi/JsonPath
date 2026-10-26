@@ -1,6 +1,7 @@
 package com.jayway.jsonassert.impl;
 
 import com.jayway.jsonassert.InvalidPathException;
+import com.jayway.jsonassert.JSONReader;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -12,7 +13,7 @@ import java.util.Map;
 
 import static org.apache.commons.lang.Validate.notNull;
 
-public class JSONReader {
+public class JSONReaderImpl implements JSONReader {
 
 
     private static final JSONParser JSON_PARSER = new JSONParser();
@@ -22,7 +23,7 @@ public class JSONReader {
 
     public static JSONReader parse(String jsonDoc) throws java.text.ParseException {
         try {
-            return new JSONReader(JSON_PARSER.parse(jsonDoc));
+            return new JSONReaderImpl(JSON_PARSER.parse(jsonDoc));
         } catch (ParseException e) {
             throw new java.text.ParseException(e.getMessage(), e.getPosition());
         }
@@ -72,7 +73,7 @@ public class JSONReader {
     // private methods
     //
     //------------------------------------------------------------
-    private JSONReader(Object root) {
+    private JSONReaderImpl(Object root) {
         notNull(root, "root object can not be null");
         this.root = root;
     }
