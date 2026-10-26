@@ -1,6 +1,8 @@
 package com.jayway.jsonassert.impl;
 
 
+import com.jayway.jsonassert.JSONAsserter;
+import com.jayway.jsonassert.JSONReader;
 import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 
@@ -8,22 +10,24 @@ import java.text.ParseException;
 
 import static org.hamcrest.Matchers.*;
 
-public class JSONAsserter {
+public class JSONAsserterImpl implements JSONAsserter {
 
     private final JSONReader reader;
 
     public static JSONAsserter with(String json) throws ParseException {
-        return new JSONAsserter(JSONReader.parse(json));
+        return new JSONAsserterImpl(JSONReaderImpl.parse(json));
     }
 
-    private JSONAsserter(JSONReader reader) {
+    private JSONAsserterImpl(JSONReader reader) {
         this.reader = reader;
     }
 
+    public JSONReader reader() {
+        return reader;
+    }
+
     public <T> JSONAsserter assertThat(String path, Matcher<T> matcher) {
-
         MatcherAssert.assertThat((T) reader.get(path), matcher);
-
         return this;
     }
 
@@ -31,7 +35,7 @@ public class JSONAsserter {
         return assertThat(path, equalTo(expected));
     }
 
-    public <T> JSONAsserter assertNull(String path) {
+    public JSONAsserter assertNull(String path) {
         return assertThat(path, nullValue());
     }
 
@@ -39,7 +43,7 @@ public class JSONAsserter {
         return assertThat(path, notNullValue());
     }
 
-    public JSONAsserter and(){
+    public JSONAsserter and() {
         return this;
     }
 
