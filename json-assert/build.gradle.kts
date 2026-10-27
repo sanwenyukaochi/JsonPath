@@ -9,7 +9,7 @@ dependencies {
     api("org.hamcrest:hamcrest-all:1.1")
     implementation("commons-beanutils:commons-beanutils:1.11.0")
     implementation("commons-lang:commons-lang:2.5")
-    testImplementation(platform("org.junit:junit-bom:5.11.4"))
+    testImplementation(platform("org.junit:junit-bom:6.1.3"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
