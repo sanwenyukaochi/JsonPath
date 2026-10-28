@@ -2,17 +2,17 @@ package com.jayway.jsonassert;
 
 import org.hamcrest.Matcher;
 
-public interface JSONAsserter {
+public interface JsonAsserter {
 
-    JSONReader reader();
+    JsonPath reader();
 
-    <T> JSONAsserter assertThat(String path, Matcher<T> matcher);
+    <T> JsonAsserter assertThat(String path, Matcher<T> matcher);
 
-    <T> JSONAsserter assertEquals(String path, T expected);
+    <T> JsonAsserter assertEquals(String path, T expected);
 
-    JSONAsserter assertNull(String path);
+    JsonAsserter assertNull(String path);
 
-    <T> JSONAsserter assertNotNull(String path);
+    <T> JsonAsserter assertNotNull(String path);
 
-    JSONAsserter and();
+    JsonAsserter and();
 }

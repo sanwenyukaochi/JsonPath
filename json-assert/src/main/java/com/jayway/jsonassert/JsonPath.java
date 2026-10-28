@@ -3,13 +3,15 @@ package com.jayway.jsonassert;
 import java.util.List;
 import java.util.Map;
 
-public interface JSONReader {
+public interface JsonPath {
+
+    JsonPath getReader(String path);
 
     boolean hasJsonPath(String path);
 
     boolean isNull(String path);
 
-    Object get(String path);
+    <T> T get(String path);
 
     String getString(String path);
 
@@ -21,5 +23,5 @@ public interface JSONReader {
 
     <T> List<T> getList(String path);
 
-    Map getMap(String path);
+    Map<String, Object> getMap(String path);
 }
