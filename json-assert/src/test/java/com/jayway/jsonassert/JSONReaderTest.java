@@ -360,7 +360,8 @@ public class JsonReaderTest {
     public void list_to_string_returns_json() throws Exception {
         JsonPath reader = JsonAssert.parse(TEST_DOCUMENT);
 
-        assertEquals("[\"ONE\",\"TWO\"]", reader.getList("stringList").toString());
+        assertEquals("""
+                ["ONE","TWO"]""", reader.getList("stringList").toString());
     }
 
     @Test

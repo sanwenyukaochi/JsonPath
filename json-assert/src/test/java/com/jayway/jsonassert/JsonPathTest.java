@@ -334,7 +334,8 @@ public class JsonPathTest {
     public void list_to_string_returns_json() throws Exception {
         JsonPath reader = JsonPathImpl.parse(TEST_DOCUMENT);
 
-        assertEquals("[\"ONE\",\"TWO\"]", reader.getList("stringList").toString());
+        assertEquals("""
+                ["ONE","TWO"]""", reader.getList("stringList").toString());
     }
 
     @Test
