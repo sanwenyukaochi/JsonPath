@@ -15,6 +15,8 @@ public interface JSONReader {
 
     Long getLong(String path);
 
+    Double getDouble(String path);
+
     Boolean getBoolean(String path);
 
     <T> List<T> getList(String path);

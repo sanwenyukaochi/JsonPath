@@ -20,6 +20,18 @@ subprojects {
         }
     }
 
+    dependencies {
+        constraints {
+            add("implementation", "com.googlecode.json-simple:json-simple:1.1.1")
+            add("api", "org.hamcrest:hamcrest-all:1.1")
+            add("implementation", "commons-lang:commons-lang:2.5")
+        }
+        add(
+            "testImplementation",
+            platform("org.junit:junit-bom:5.11.4")
+        )
+    }
+
     tasks.withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
     }

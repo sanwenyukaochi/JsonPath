@@ -72,6 +72,10 @@ public class JSONReaderImpl implements JSONReader {
         return getByPath(Long.class, path);
     }
 
+    public Double getDouble(String path) {
+        return getByPath(Double.class, path);
+    }
+
     public Boolean getBoolean(String path) {
         return getByPath(Boolean.class, path);
     }
