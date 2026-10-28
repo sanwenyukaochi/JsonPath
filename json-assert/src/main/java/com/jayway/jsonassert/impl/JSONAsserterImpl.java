@@ -18,7 +18,7 @@ public class JSONAsserterImpl implements JSONAsserter {
         return new JSONAsserterImpl(JSONReaderImpl.parse(json));
     }
 
-    private JSONAsserterImpl(JSONReader reader) {
+    public JSONAsserterImpl(JSONReader reader) {
         this.reader = reader;
     }
 
