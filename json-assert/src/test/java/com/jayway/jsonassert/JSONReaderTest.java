@@ -1,16 +1,13 @@
 package com.jayway.jsonassert;
 
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
-import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
-import java.io.InputStreamReader;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.List;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class JSONReaderTest {
@@ -66,7 +63,7 @@ public class JSONReaderTest {
         """;
 
     @Test
-    public void invalid_json_not_accepted() throws Exception {
+    public void invalid_json_not_accepted() {
         assertThrows(ParseException.class, () -> {
             JSONAssert.parse("not json");
         });
@@ -241,9 +238,9 @@ public class JSONReaderTest {
 
     @Test
     public void exception_is_thrown_when_field_is_not_found() throws Exception {
-        assertThrows(InvalidPathException.class, () -> {
-            JSONReader reader = JSONAssert.parse(TEST_DOCUMENT);
+        JSONReader reader = JSONAssert.parse(TEST_DOCUMENT);
 
+        assertThrows(InvalidPathException.class, () -> {
             String s = reader.getString("invalidProperty");
 
             System.out.println("S= " + s);
