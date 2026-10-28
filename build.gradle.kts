@@ -29,7 +29,7 @@ subprojects {
         }
         add(
             "testImplementation",
-            platform("org.junit:junit-bom:6")
+            platform("org.junit:junit-bom:6.1.3")
         )
     }
 
