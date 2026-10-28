@@ -14,7 +14,21 @@ public class JSONAssert {
     }
 
     public static JSONReader parse(Reader reader) throws ParseException, IOException {
-        return JSONReaderImpl.parse(reader);
+        return parse(reader, false);
+    }
+
+    public static JSONReader parse(Reader reader, boolean closeReader) throws ParseException, IOException {
+        JSONReader jsonReader = null;
+        try {
+            jsonReader = JSONReaderImpl.parse(reader);
+        } finally {
+            if(closeReader){
+                try {
+                    reader.close();
+                } catch (IOException ignore) {}
+            }
+        }
+        return jsonReader;
     }
 
     public static JSONAsserter with(String json) throws ParseException {

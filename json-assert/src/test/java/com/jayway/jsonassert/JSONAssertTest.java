@@ -37,7 +37,7 @@ public class JSONAssertTest {
     }
 
     @Test
-    public void array_content_can_be_asserted_with_matcher() throws Exception {
+    public void list_content_can_be_asserted_with_matcher() throws Exception {
 
         JSONAssert.with(TEST_DOCUMENT).assertThat("stringList", hasItems("ONE", "TWO"));
     }
@@ -46,6 +46,12 @@ public class JSONAssertTest {
     public void map_content_can_be_asserted_with_matcher() throws Exception {
 
         JSONAssert.with(TEST_DOCUMENT).assertThat("subDocument", hasEntry("subField", "sub-field"));
+    }
+
+
+    @Test
+    public void a_sub_document_can_asserted_on__by_path() throws Exception {
+        JSONAssert.with(TEST_DOCUMENT).assertThat("subDocument.subField", is(equalTo("sub-field")));
     }
 
     @Test
@@ -73,10 +79,10 @@ public class JSONAssertTest {
 
         JSONAssert.with(TEST_DOCUMENT)
                 .assertThat("stringField", equalTo("string-field"))
+                .assertThat("numberField", is(notNullValue()))
                 .and()
                 .assertNull("nullField")
                 .and()
-                .assertThat("numberField", is(notNullValue()))
                 .assertEquals("stringField", "string-field");
 
     }

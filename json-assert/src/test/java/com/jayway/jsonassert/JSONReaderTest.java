@@ -1,10 +1,16 @@
 package com.jayway.jsonassert;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 
+import java.io.InputStreamReader;
+import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.List;
 
+import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class JSONReaderTest {
@@ -14,6 +20,7 @@ public class JSONReaderTest {
           "nullField": null,
           "stringField": "string-field",
           "numberField": 1234,
+          "doubleField": 12.34,
           "booleanField": true,
           "subDocument": {
             "subField": "sub-field"
@@ -66,6 +73,16 @@ public class JSONReaderTest {
     }
 
     @Test
+    public void reader_can_be_created_with_input_stream() throws Exception {
+
+        JSONReader reader = JSONAssert.parse(getInputStreamReader("json-test-doc.json"), true);
+
+        assertEquals("donut", reader.getString("type"));
+
+        assertThat(reader.<String>getList("toppings"), Matchers.hasItems("Glazed", "Sugar"));
+    }
+
+    @Test
     public void a_string_field_can_be_accessed() throws Exception {
         JSONReader reader = JSONAssert.parse(TEST_DOCUMENT);
 
@@ -92,6 +109,13 @@ public class JSONReaderTest {
         JSONReader reader = JSONAssert.parse(TEST_DOCUMENT);
 
         assertTrue(1234L == reader.getLong("numberField"));
+    }
+
+    @Test
+    public void a_double_field_can_be_accessed() throws Exception {
+        JSONReader reader = JSONAssert.parse(TEST_DOCUMENT);
+
+        assertEquals(12.34D, reader.getDouble("doubleField"), 0.001);
     }
 
     @Test
@@ -254,5 +278,15 @@ public class JSONReaderTest {
 
 
         assertEquals("[\"ONE\",\"TWO\"]", reader.getList("stringList").toString());
+    }
+
+
+    //----------------------------------------------------------
+    //
+    // helpers
+    //
+    //----------------------------------------------------------
+    private InputStreamReader getInputStreamReader(String resource) {
+        return new InputStreamReader(ClassLoader.getSystemResourceAsStream(resource));
     }
 }
