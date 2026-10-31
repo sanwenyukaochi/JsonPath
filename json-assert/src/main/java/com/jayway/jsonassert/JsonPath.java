@@ -5,6 +5,11 @@ import java.util.Map;
 
 public interface JsonPath {
 
+    public enum ResultType {
+        PATH,
+        JSON
+    }
+
     JsonPath getReader(String path);
 
     boolean hasJsonPath(String path);
