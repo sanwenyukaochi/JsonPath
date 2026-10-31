@@ -23,5 +23,5 @@ public interface JsonPath {
 
     <T> List<T> getList(String path);
 
-    Map<String, Object> getMap(String path);
+    <T> Map<String, T> getMap(String path);
 }
