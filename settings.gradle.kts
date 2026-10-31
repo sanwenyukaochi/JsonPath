@@ -1,3 +1,3 @@
-rootProject.name = "json-assert-parent"
+rootProject.name = "json-path-parent"
 
-include("json-assert", "examples")
+include("json-path", "examples")
