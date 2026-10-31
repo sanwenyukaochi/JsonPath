@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
@@ -48,12 +49,10 @@ public class JsonPathTest {
     @Test
     public void read_document_from_root() throws Exception {
 
+        List<Object> list = JsonPath.read(DOCUMENT, "$.store");
 
-        JsonPath path = JsonPath.compile("$.store");
+        assertEquals(2, ((Map)list.get(0)).values().size());
 
-        List<Object> list = path.read(DOCUMENT);
-
-        System.out.println(list.toString());
 
     }
 
