@@ -3,7 +3,7 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 
 allprojects {
-    group = "com.jayway.jsonassert"
+    group = "com.jayway.jsonpath"
     version = "1.0-SNAPSHOT"
 }
 

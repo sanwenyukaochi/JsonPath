@@ -1,8 +1,5 @@
 package com.jayway.jsonpath;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 public class PathItem {
 
     private final String path;
