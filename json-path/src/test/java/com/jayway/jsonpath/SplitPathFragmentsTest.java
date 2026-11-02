@@ -1,9 +1,7 @@
 package com.jayway.jsonpath;
 
-import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.assertThat;
 
