@@ -1,12 +1,97 @@
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
+import com.diffplug.gradle.spotless.SpotlessExtension
 
 description = "Java JsonPath implementation"
+plugins {
+    id("com.diffplug.spotless") version "8.10.4"
+}
+
+repositories {
+    mavenCentral()
+}
 
 allprojects {
     group = "com.jayway.jsonpath"
     version = "1.0-SNAPSHOT"
+    pluginManager.apply("com.diffplug.spotless")
+
+    pluginManager.withPlugin("com.diffplug.spotless") {
+        extensions.configure<SpotlessExtension> {
+            encoding("UTF-8")
+
+            java {
+                target("**/*.java")
+                targetExclude("**/local/**")
+                forbidWildcardImports()
+                forbidModuleImports()
+                googleJavaFormat()
+                    .aosp()
+                    .reflowLongStrings(false)
+                    .formatJavadoc(true)
+                    .reorderImports(true)
+                importOrder()
+                removeUnusedImports()
+                formatAnnotations()
+                trimTrailingWhitespace()
+                endWithNewline()
+                toggleOffOn()
+            }
+
+            yaml {
+                target("**/*.yaml")
+                trimTrailingWhitespace()
+                endWithNewline()
+                toggleOffOn()
+            }
+
+            kotlin {
+                target("**/*.kt")
+                ktlint()
+                trimTrailingWhitespace()
+                endWithNewline()
+                toggleOffOn()
+            }
+
+            kotlinGradle {
+                target("**/*.gradle.kts")
+                ktlint()
+                trimTrailingWhitespace()
+                endWithNewline()
+                toggleOffOn()
+            }
+
+            gherkin {
+                target("**/*.feature")
+                gherkinUtils()
+                trimTrailingWhitespace()
+                endWithNewline()
+                toggleOffOn()
+            }
+
+            toml {
+                target("**/*.toml")
+                versionCatalog()
+                    .stripQuotedKeys(true)
+                trimTrailingWhitespace()
+                endWithNewline()
+                toggleOffOn()
+            }
+
+            json {
+                target("**/*.json")
+                targetExclude("**/.devcontainer/devcontainer.json")
+                gson()
+                    .indentWithSpaces(4)
+                    .sortByKeys()
+                    .escapeHtml()
+                trimTrailingWhitespace()
+                endWithNewline()
+                toggleOffOn()
+            }
+        }
+    }
 }
 
 subprojects {
