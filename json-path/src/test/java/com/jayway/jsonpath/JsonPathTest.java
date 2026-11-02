@@ -94,8 +94,9 @@ public class JsonPathTest {
     public void all_store_properties() throws Exception {
         List<Object> itemsInStore = JsonPath.read(DOCUMENT, "$.store.*");
 
-        assertEquals(JsonPath.readOne(itemsInStore, "$.[0].[0].author"), "Nigel Rees");
-        assertEquals(JsonPath.readOne(itemsInStore, "$.[0][0].author"), "Nigel Rees");
+        int bookIndex = PathUtil.isArray(itemsInStore.get(0)) ? 0 : 1;
+        assertEquals("Nigel Rees", JsonPath.readOne(itemsInStore, "$.[" + bookIndex + "].[0].author"));
+        assertEquals("Nigel Rees", JsonPath.readOne(itemsInStore, "$.[" + bookIndex + "][0].author"));
     }
 
     @Test
@@ -134,12 +135,16 @@ public class JsonPathTest {
     }
 
     @Test
-    public void all_books_cheapier_than_10() throws Exception {
+    public void all_books_cheaper_than_10() throws Exception {
 
         assertThat(JsonPath.<String>read(DOCUMENT, "$.store.book[?(@.price < 10)].title"), hasItems("Sayings of the Century", "Moby Dick"));
 
 
-        assertThat(JsonPath.<String>read(DOCUMENT, "$.store.book[?(@.category = 'reference')].title"), hasItems("Sayings of the Century"));
+    }
+
+    @Test
+    public void all_books_with_category_reference() throws Exception {
+        assertThat(JsonPath.<String>read(DOCUMENT, "$..book[?(@.category = 'reference')].title"), hasItems("Sayings of the Century"));
 
     }
 
