@@ -1,10 +1,8 @@
 package com.jayway.jsonpath.filter;
 
-import org.json.simple.JSONArray;
-
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import org.json.simple.JSONArray;
 
 public class JsonPathFilterChain {
 

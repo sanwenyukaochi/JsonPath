@@ -1,9 +1,9 @@
 package com.jayway.jsonpath;
 
-import org.junit.Test;
-
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.assertThat;
+
+import org.junit.Test;
 
 public class SplitPathFragmentsTest {
 
@@ -22,13 +22,16 @@ public class SplitPathFragmentsTest {
     12. "$..*"
     */
 
-
     @Test
     public void fragments_are_split_correctly() throws Exception {
 
-        assertThat(PathUtil.splitPath("$..book[-1:].foo.bar"), hasItems("$", "..", "[-1:]", "foo", "bar"));
+        assertThat(
+                PathUtil.splitPath("$..book[-1:].foo.bar"),
+                hasItems("$", "..", "[-1:]", "foo", "bar"));
 
-        assertThat(PathUtil.splitPath("$.store.book[*].author"), hasItems("$", "store", "book", "[*]", "author"));
+        assertThat(
+                PathUtil.splitPath("$.store.book[*].author"),
+                hasItems("$", "store", "book", "[*]", "author"));
 
         assertThat(PathUtil.splitPath("$..author"), hasItems("$", "..", "author"));
 
@@ -36,7 +39,9 @@ public class SplitPathFragmentsTest {
 
         assertThat(PathUtil.splitPath("$.store..price"), hasItems("$", "store", "..", "price"));
 
-        assertThat(PathUtil.splitPath("$..book[(@.length-1)]"), hasItems("$", "..", "book", "[(@.length-1)]"));
+        assertThat(
+                PathUtil.splitPath("$..book[(@.length-1)]"),
+                hasItems("$", "..", "book", "[(@.length-1)]"));
 
         assertThat(PathUtil.splitPath("$..book[-1:]"), hasItems("$", "..", "book", "[-1:]"));
 
@@ -44,9 +49,13 @@ public class SplitPathFragmentsTest {
 
         assertThat(PathUtil.splitPath("$..book[:2]"), hasItems("$", "..", "book", "[:2]"));
 
-        assertThat(PathUtil.splitPath("$..book[?(@.isbn)]"), hasItems("$", "..", "book", "[?(@.isbn)]"));
+        assertThat(
+                PathUtil.splitPath("$..book[?(@.isbn)]"),
+                hasItems("$", "..", "book", "[?(@.isbn)]"));
 
-        assertThat(PathUtil.splitPath("$..book[?(@.price<10)]"), hasItems("$", "..", "book", "[?(@.price<10)]"));
+        assertThat(
+                PathUtil.splitPath("$..book[?(@.price<10)]"),
+                hasItems("$", "..", "book", "[?(@.price<10)]"));
 
         assertThat(PathUtil.splitPath("$..*"), hasItems("$", "..", "*"));
 
@@ -54,7 +63,4 @@ public class SplitPathFragmentsTest {
 
         assertThat(PathUtil.splitPath("$.[0].[1].author"), hasItems("$", "[0]", "[1]", "author"));
     }
-
-
-
 }

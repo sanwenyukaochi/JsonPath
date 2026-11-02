@@ -1,15 +1,15 @@
 package com.jayway.jsonpath;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 import java.util.LinkedList;
 import java.util.List;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 public class PathUtil {
 
     public static boolean isPathDefinite(String jsonPath) {
-        return !jsonPath.replaceAll("\"[^\"\\\\\\n\r]*\"", "").matches(".*(\\.\\.|\\*|\\[[\\\\/]|\\?|,|:|>|\\(|<|=|\\+).*");
+        return !jsonPath.replaceAll("\"[^\"\\\\\\n\r]*\"", "")
+                .matches(".*(\\.\\.|\\*|\\[[\\\\/]|\\?|,|:|>|\\(|<|=|\\+).*");
     }
 
     public static boolean isContainer(Object obj) {
@@ -32,7 +32,6 @@ public class PathUtil {
         return (JSONObject) document;
     }
 
-
     public static List<String> splitPath(String jsonPath) {
 
         LinkedList<String> fragments = new LinkedList<String>();
@@ -41,9 +40,7 @@ public class PathUtil {
             jsonPath = "$." + jsonPath;
         }
 
-        jsonPath = jsonPath.replace("..", ".~.")
-                .replace("[", ".[")
-                .replace("@.", "@");
+        jsonPath = jsonPath.replace("..", ".~.").replace("[", ".[").replace("@.", "@");
 
         String[] split = jsonPath.split("\\.");
 

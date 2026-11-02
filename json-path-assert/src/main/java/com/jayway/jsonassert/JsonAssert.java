@@ -1,11 +1,11 @@
 package com.jayway.jsonassert;
 
-
 import com.jayway.jsonassert.impl.JsonAsserterImpl;
-import com.jayway.jsonassert.impl.matcher.*;
-import org.hamcrest.Matcher;
-import org.json.simple.parser.JSONParser;
-
+import com.jayway.jsonassert.impl.matcher.CollectionMatcher;
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import com.jayway.jsonassert.impl.matcher.IsEmptyCollection;
+import com.jayway.jsonassert.impl.matcher.IsMapContainingKey;
+import com.jayway.jsonassert.impl.matcher.IsMapContainingValue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -13,6 +13,8 @@ import java.io.Reader;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.Map;
+import org.hamcrest.Matcher;
+import org.json.simple.parser.JSONParser;
 
 public class JsonAssert {
 
@@ -44,7 +46,8 @@ public class JsonAssert {
         return new IsMapContainingKey(keyMatcher);
     }
 
-    public static <V> Matcher<? super Map<?, V>> mapContainingValue(Matcher<? super V> valueMatcher) {
+    public static <V> Matcher<? super Map<?, V>> mapContainingValue(
+            Matcher<? super V> valueMatcher) {
         return new IsMapContainingValue<V>(valueMatcher);
     }
 
@@ -56,5 +59,4 @@ public class JsonAssert {
         Reader reader = new InputStreamReader(is);
         return with(reader);
     }
-
 }

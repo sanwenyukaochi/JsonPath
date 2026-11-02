@@ -1,13 +1,20 @@
 package com.jayway.jsonassert;
 
-import org.junit.jupiter.api.Test;
+import static com.jayway.jsonassert.JsonAssert.collectionWithSize;
+import static com.jayway.jsonassert.JsonAssert.emptyCollection;
+import static com.jayway.jsonassert.JsonAssert.mapContainingKey;
+import static com.jayway.jsonassert.JsonAssert.mapContainingValue;
+import static com.jayway.jsonassert.JsonAssert.with;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.is;
 
-import static com.jayway.jsonassert.JsonAssert.*;
-import static org.hamcrest.Matchers.*;
+import org.junit.jupiter.api.Test;
 
 public class JsonAssertTest {
 
-    public final static String JSON =
+    public static final String JSON =
             """
                     { "store": {
                         "book": [\s
@@ -44,35 +51,56 @@ public class JsonAssertTest {
     @Test
     public void a_path_can_be_asserted_with_matcher() throws Exception {
 
-        with(JSON).assertThat("$.store.bicycle.color", equalTo("red"))
-                  .assertThat("$.store.bicycle.price", equalTo(19.95D));
+        with(JSON)
+                .assertThat("$.store.bicycle.color", equalTo("red"))
+                .assertThat("$.store.bicycle.price", equalTo(19.95D));
     }
 
     @Test
     public void list_content_can_be_asserted_with_matcher() throws Exception {
 
-        with(JSON).assertThat("$..book[*].author", hasItems("Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien"));
+        with(JSON)
+                .assertThat(
+                        "$..book[*].author",
+                        hasItems(
+                                "Nigel Rees",
+                                "Evelyn Waugh",
+                                "Herman Melville",
+                                "J. R. R. Tolkien"));
 
-        with(JSON).assertThat("$..author", hasItems("Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien"))
-                  .assertThat("$..author", is(collectionWithSize(equalTo(4))));
+        with(JSON)
+                .assertThat(
+                        "$..author",
+                        hasItems(
+                                "Nigel Rees",
+                                "Evelyn Waugh",
+                                "Herman Melville",
+                                "J. R. R. Tolkien"))
+                .assertThat("$..author", is(collectionWithSize(equalTo(4))));
     }
 
     @Test
     public void list_content_can_be_asserted_with_nested_matcher() throws Exception {
-        with(JSON).assertThat("$..book[*]", hasItems( hasEntry("author", "Nigel Rees"), hasEntry("author", "Evelyn Waugh")) );
+        with(JSON)
+                .assertThat(
+                        "$..book[*]",
+                        hasItems(
+                                hasEntry("author", "Nigel Rees"),
+                                hasEntry("author", "Evelyn Waugh")));
     }
 
     @Test
     public void map_content_can_be_asserted_with_matcher() throws Exception {
 
-        with(JSON).assertThat("$.store.book[0]", hasEntry("category", "reference"))
-                  .assertThat("$.store.book[0]", hasEntry("title", "Sayings of the Century"))
-                  .and()
-                  .assertThat("$..book[0]", hasItems(hasEntry("category", "reference")))
-                  .and()
-                  .assertThat("$.store.book[0]", mapContainingKey(equalTo("category")))
-                  .and()
-                  .assertThat("$.store.book[0]", mapContainingValue(equalTo("reference")));
+        with(JSON)
+                .assertThat("$.store.book[0]", hasEntry("category", "reference"))
+                .assertThat("$.store.book[0]", hasEntry("title", "Sayings of the Century"))
+                .and()
+                .assertThat("$..book[0]", hasItems(hasEntry("category", "reference")))
+                .and()
+                .assertThat("$.store.book[0]", mapContainingKey(equalTo("category")))
+                .and()
+                .assertThat("$.store.book[0]", mapContainingValue(equalTo("reference")));
     }
 
     @Test
@@ -83,8 +111,8 @@ public class JsonAssertTest {
     @Test
     public void a_path_can_be_asserted_equal_to() throws Exception {
 
-        with(JSON).assertEquals("$.store.book[0].title", "Sayings of the Century")
-                  .assertThat("$.store.book[0].title", equalTo("Sayings of the Century"));
+        with(JSON)
+                .assertEquals("$.store.book[0].title", "Sayings of the Century")
+                .assertThat("$.store.book[0].title", equalTo("Sayings of the Century"));
     }
-
 }

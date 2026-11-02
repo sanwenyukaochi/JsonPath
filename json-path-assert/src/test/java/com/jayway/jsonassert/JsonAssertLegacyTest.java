@@ -1,13 +1,18 @@
 package com.jayway.jsonassert;
 
-import org.junit.jupiter.api.Test;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import static org.hamcrest.Matchers.*;
+import org.junit.jupiter.api.Test;
 
 public class JsonAssertLegacyTest {
 
-    private static final String TEST_DOCUMENT = """
+    private static final String TEST_DOCUMENT =
+            """
         {
           "nullField": null,
           "stringField": "string-field",
@@ -56,12 +61,14 @@ public class JsonAssertLegacyTest {
     @Test
     public void map_content_can_be_asserted_with_matcher() throws Exception {
 
-        JsonAssert.with(TEST_DOCUMENT).assertThat("$.subDocument", hasEntry("subField", "sub-field"));
+        JsonAssert.with(TEST_DOCUMENT)
+                .assertThat("$.subDocument", hasEntry("subField", "sub-field"));
     }
 
     @Test
     public void a_sub_document_can_asserted_on__by_path() throws Exception {
-        JsonAssert.with(TEST_DOCUMENT).assertThat("$.subDocument.subField", is(equalTo("sub-field")));
+        JsonAssert.with(TEST_DOCUMENT)
+                .assertThat("$.subDocument.subField", is(equalTo("sub-field")));
     }
 
     @Test
@@ -78,10 +85,12 @@ public class JsonAssertLegacyTest {
 
     @Test
     public void failed_assert_throws() throws Exception {
-        assertThrows(AssertionError.class, () -> {
-
-        JsonAssert.with(TEST_DOCUMENT).assertThat("$.stringField", equalTo("SOME CRAP"));
-        });
+        assertThrows(
+                AssertionError.class,
+                () -> {
+                    JsonAssert.with(TEST_DOCUMENT)
+                            .assertThat("$.stringField", equalTo("SOME CRAP"));
+                });
     }
 
     @Test
@@ -94,7 +103,5 @@ public class JsonAssertLegacyTest {
                 .assertNull("$.nullField")
                 .and()
                 .assertEquals("$.stringField", "string-field");
-
     }
-
 }

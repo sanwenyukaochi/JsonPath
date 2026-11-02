@@ -1,8 +1,7 @@
 package com.jayway.jsonassert.impl.matcher;
 
-import org.hamcrest.BaseMatcher;
-
 import java.util.Map;
+import org.hamcrest.BaseMatcher;
 
 public abstract class MapTypeSafeMatcher<M extends Map<?, ?>> extends BaseMatcher<M> {
     @SuppressWarnings("unchecked")
