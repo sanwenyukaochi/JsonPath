@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import static org.hamcrest.Matchers.*;
 
-public class JsonAssertTest {
+public class JsonAssertLegacyTest {
 
     private static final String TEST_DOCUMENT = """
         {
@@ -44,43 +44,43 @@ public class JsonAssertTest {
     @Test
     public void a_path_can_be_asserted_with_matcher() throws Exception {
 
-        JsonAssert.with(TEST_DOCUMENT).assertThat("stringField", equalTo("string-field"));
+        JsonAssert.with(TEST_DOCUMENT).assertThat("$.stringField", equalTo("string-field"));
     }
 
     @Test
     public void list_content_can_be_asserted_with_matcher() throws Exception {
 
-        JsonAssert.with(TEST_DOCUMENT).assertThat("stringList", hasItems("ONE", "TWO"));
+        JsonAssert.with(TEST_DOCUMENT).assertThat("$.stringList", hasItems("ONE", "TWO"));
     }
 
     @Test
     public void map_content_can_be_asserted_with_matcher() throws Exception {
 
-        JsonAssert.with(TEST_DOCUMENT).assertThat("subDocument", hasEntry("subField", "sub-field"));
+        JsonAssert.with(TEST_DOCUMENT).assertThat("$.subDocument", hasEntry("subField", "sub-field"));
     }
 
     @Test
     public void a_sub_document_can_asserted_on__by_path() throws Exception {
-        JsonAssert.with(TEST_DOCUMENT).assertThat("subDocument.subField", is(equalTo("sub-field")));
+        JsonAssert.with(TEST_DOCUMENT).assertThat("$.subDocument.subField", is(equalTo("sub-field")));
     }
 
     @Test
     public void a_path_can_be_asserted_equal_to() throws Exception {
 
-        JsonAssert.with(TEST_DOCUMENT).assertEquals("stringField", "string-field");
+        JsonAssert.with(TEST_DOCUMENT).assertEquals("$.stringField", "string-field");
     }
 
     @Test
     public void a_path_can_be_asserted_is_null() throws Exception {
 
-        JsonAssert.with(TEST_DOCUMENT).assertNull("nullField");
+        JsonAssert.with(TEST_DOCUMENT).assertNull("$.nullField");
     }
 
     @Test
     public void failed_assert_throws() throws Exception {
         assertThrows(AssertionError.class, () -> {
 
-        JsonAssert.with(TEST_DOCUMENT).assertThat("stringField", equalTo("SOME CRAP"));
+        JsonAssert.with(TEST_DOCUMENT).assertThat("$.stringField", equalTo("SOME CRAP"));
         });
     }
 
@@ -88,12 +88,12 @@ public class JsonAssertTest {
     public void multiple_asserts_can_be_chained() throws Exception {
 
         JsonAssert.with(TEST_DOCUMENT)
-                .assertThat("stringField", equalTo("string-field"))
-                .assertThat("numberField", is(notNullValue()))
+                .assertThat("$.stringField", equalTo("string-field"))
+                .assertThat("$.numberField", is(notNullValue()))
                 .and()
-                .assertNull("nullField")
+                .assertNull("$.nullField")
                 .and()
-                .assertEquals("stringField", "string-field");
+                .assertEquals("$.stringField", "string-field");
 
     }
 

@@ -4,8 +4,6 @@ import org.hamcrest.Matcher;
 
 public interface JsonAsserter {
 
-    JsonPath reader();
-
     <T> JsonAsserter assertThat(String path, Matcher<T> matcher);
 
     <T> JsonAsserter assertEquals(String path, T expected);

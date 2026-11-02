@@ -1,14 +1,15 @@
 package com.jayway.jsonpath;
 
 import org.apache.commons.lang.StringUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class JsonPathTest {
 
@@ -130,6 +131,16 @@ public class JsonPathTest {
 
         assertThat(JsonPath.<String>read(DOCUMENT, "$.store.book[?(@.isbn)].isbn"), hasItems("0-553-21311-3", "0-395-19395-8"));
         assertTrue(JsonPath.<String>read(DOCUMENT, "$.store.book[?(@.isbn)].isbn").size() == 2);
+    }
+
+    @Test
+    public void all_books_cheapier_than_10() throws Exception {
+
+        assertThat(JsonPath.<String>read(DOCUMENT, "$.store.book[?(@.price < 10)].title"), hasItems("Sayings of the Century", "Moby Dick"));
+
+
+        assertThat(JsonPath.<String>read(DOCUMENT, "$.store.book[?(@.category = 'reference')].title"), hasItems("Sayings of the Century"));
+
     }
 
     @Test

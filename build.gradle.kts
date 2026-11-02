@@ -2,6 +2,8 @@ import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 
+description = "Java JsonPath implementation"
+
 allprojects {
     group = "com.jayway.jsonpath"
     version = "1.0-SNAPSHOT"
@@ -25,7 +27,6 @@ subprojects {
             add("implementation", "com.googlecode.json-simple:json-simple:1.1.1")
             add("api", "org.hamcrest:hamcrest-all:1.3")
             add("implementation", "commons-lang:commons-lang:2.6")
-            add("implementation", "commons-jxpath:commons-jxpath:1.4.0")
         }
         add(
             "testImplementation",

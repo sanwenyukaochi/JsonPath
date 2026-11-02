@@ -45,7 +45,7 @@ public class JsonPath {
         return path.read(json);
     }
 
-    public static <T> List<T> read(Object json, String jsonPath) throws java.text.ParseException {
+    public static <T> List<T> read(Object json, String jsonPath) {
         JsonPath path = compile(jsonPath);
 
         return path.read(json);
@@ -63,7 +63,7 @@ public class JsonPath {
         return (T) result.get(0);
     }
 
-    public static <T> T readOne(Object json, String jsonPath) throws java.text.ParseException {
+    public static <T> T readOne(Object json, String jsonPath) {
         JsonPath path = compile(jsonPath);
 
         List<Object> result = read(json, jsonPath);

@@ -10,5 +10,5 @@ dependencies {
     implementation("commons-lang:commons-lang")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    implementation("commons-jxpath:commons-jxpath")
+    runtimeOnly("org.openjdk.nashorn:nashorn-core:15.7")
 }
