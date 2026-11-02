@@ -22,12 +22,13 @@ public class JsonAsserterImpl implements JsonAsserter {
 
     @SuppressWarnings("unchecked")
 	public <T> JsonAsserter assertThat(String path, Matcher<T> matcher) {
+        String reason = "When processing json path: " + path;
 
         if(PathUtil.isPathDefinite(path)){
-            MatcherAssert.assertThat(JsonPath.<T>readOne(jsonObject, path), matcher);
+            MatcherAssert.assertThat(reason, JsonPath.<T>readOne(jsonObject, path), matcher);
         }
         else {
-           MatcherAssert.assertThat((T) JsonPath.<T>read(jsonObject, path), matcher);
+           MatcherAssert.assertThat(reason, (T) JsonPath.<T>read(jsonObject, path), matcher);
         }
         return this;
     }
