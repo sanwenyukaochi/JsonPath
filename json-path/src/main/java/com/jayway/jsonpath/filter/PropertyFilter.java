@@ -6,6 +6,9 @@ import org.json.simple.JSONArray;
 import java.util.List;
 
 public class PropertyFilter extends JsonPathFilterBase {
+
+    private final static String WILDCARD = "*";
+
     private final String pathFragment;
 
     public PropertyFilter(String pathFragment) {
@@ -14,22 +17,24 @@ public class PropertyFilter extends JsonPathFilterBase {
 
     @Override
     public List<Object> apply(List<Object> filter) {
+
         List<Object> result = new JSONArray();
 
-        for (Object current : filter) {
-
-            if ("*".equals(pathFragment)) {
-
+        if (WILDCARD.equals(pathFragment)) {
+            for (Object current : filter) {
                 for (Object value : PathUtil.toDocument(current).values()) {
-                     result.add(value);
+                    result.add(value);
                 }
-
-            } else {
+            }
+        }
+        else {
+            for (Object current : filter) {
                 if (PathUtil.toDocument(current).containsKey(pathFragment)) {
                     result.add(PathUtil.toDocument(current).get(pathFragment));
                 }
             }
         }
+
         return result;
     }
 }

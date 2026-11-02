@@ -6,11 +6,6 @@ import org.json.simple.JSONArray;
 import java.util.List;
 
 public class TraverseFilter extends JsonPathFilterBase {
-    private final String pathFragment;
-
-    public TraverseFilter(String pathFragment) {
-        this.pathFragment = pathFragment;
-    }
 
     @Override
     public List<Object> apply(List<Object> filter) {
