@@ -1,13 +1,12 @@
 package com.jayway.jsonpath.filter;
 
 import com.jayway.jsonpath.PathUtil;
-import org.json.simple.JSONArray;
-
 import java.util.List;
+import org.json.simple.JSONArray;
 
 public class PropertyFilter extends JsonPathFilterBase {
 
-    private final static String WILDCARD = "*";
+    private static final String WILDCARD = "*";
 
     private final String pathFragment;
 
@@ -26,8 +25,7 @@ public class PropertyFilter extends JsonPathFilterBase {
                     result.add(value);
                 }
             }
-        }
-        else {
+        } else {
             for (Object current : filter) {
                 if (PathUtil.toDocument(current).containsKey(pathFragment)) {
                     result.add(PathUtil.toDocument(current).get(pathFragment));

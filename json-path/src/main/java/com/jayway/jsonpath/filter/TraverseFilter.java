@@ -1,9 +1,8 @@
 package com.jayway.jsonpath.filter;
 
 import com.jayway.jsonpath.PathUtil;
-import org.json.simple.JSONArray;
-
 import java.util.List;
+import org.json.simple.JSONArray;
 
 public class TraverseFilter extends JsonPathFilterBase {
 
@@ -35,5 +34,4 @@ public class TraverseFilter extends JsonPathFilterBase {
             }
         }
     }
-
 }

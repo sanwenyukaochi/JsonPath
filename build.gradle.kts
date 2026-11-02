@@ -1,7 +1,7 @@
+import com.diffplug.gradle.spotless.SpotlessExtension
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
-import com.diffplug.gradle.spotless.SpotlessExtension
 
 description = "Java JsonPath implementation"
 plugins {
@@ -115,7 +115,7 @@ subprojects {
         }
         add(
             "testImplementation",
-            platform("org.junit:junit-bom:6.1.3")
+            platform("org.junit:junit-bom:6.1.3"),
         )
     }
 
