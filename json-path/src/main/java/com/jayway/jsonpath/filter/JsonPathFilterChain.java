@@ -1,5 +1,6 @@
 package com.jayway.jsonpath.filter;
 
+import com.jayway.jsonpath.InvalidPathException;
 import java.util.LinkedList;
 import java.util.List;
 import org.json.simple.JSONArray;
@@ -30,6 +31,9 @@ public class JsonPathFilterChain {
         List<Object> result = rootList;
 
         for (JsonPathFilterBase filter : filters) {
+            if (filter == null) {
+                throw new InvalidPathException();
+            }
             result = filter.apply(result);
         }
 

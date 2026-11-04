@@ -1,6 +1,6 @@
 package com.jayway.jsonpath.eval;
 
-public class Expression {
+public class ExpressionEvaluator {
 
     public static <T> boolean eval(T actual, String comparator, String expected) {
 
@@ -29,17 +29,17 @@ public class Expression {
             Integer e = Integer.parseInt(expected.trim());
 
             if ("=".equals(comparator)) {
-                return a.longValue() == e.longValue();
+                return a.intValue() == e.intValue();
             } else if ("!=".equals(comparator) || "<>".equals(comparator)) {
-                return a.longValue() != e.longValue();
+                return a.intValue() != e.intValue();
             } else if (">".equals(comparator)) {
-                return a.longValue() > e.longValue();
+                return a.intValue() > e.intValue();
             } else if (">=".equals(comparator)) {
-                return a.longValue() >= e.longValue();
+                return a.intValue() >= e.intValue();
             } else if ("<".equals(comparator)) {
-                return a.longValue() < e.longValue();
+                return a.intValue() < e.intValue();
             } else if ("<=".equals(comparator)) {
-                return a.longValue() <= e.longValue();
+                return a.intValue() <= e.intValue();
             }
         } else if (actual instanceof Double) {
 

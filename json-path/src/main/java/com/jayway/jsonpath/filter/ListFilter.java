@@ -1,7 +1,7 @@
 package com.jayway.jsonpath.filter;
 
 import com.jayway.jsonpath.JsonUtil;
-import com.jayway.jsonpath.eval.Expression;
+import com.jayway.jsonpath.eval.ExpressionEvaluator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -116,10 +116,12 @@ public class ListFilter extends JsonPathFilterBase {
         List<Object> result = new JSONArray();
 
         for (Object current : items) {
+            List<Object> target = JsonUtil.toList(current);
             Integer[] index = getArrayIndex();
             for (int i : index) {
-
-                result.add(JsonUtil.toList(current).get(i));
+                if (indexIsInRange(target, i)) {
+                    result.add(target.get(i));
+                }
             }
         }
         return result;
@@ -129,10 +131,12 @@ public class ListFilter extends JsonPathFilterBase {
         List<Object> result = new JSONArray();
 
         for (Object current : items) {
+            List<Object> target = JsonUtil.toList(current);
             Integer[] index = getListPullIndex();
             for (int i : index) {
-
-                result.add(JsonUtil.toList(current).get(i));
+                if (indexIsInRange(target, i)) {
+                    result.add(target.get(i));
+                }
             }
         }
         return result;
@@ -164,7 +168,7 @@ public class ListFilter extends JsonPathFilterBase {
             String expression = propertyValue + " " + operator + " " + expected;
             System.out.println("EVAL" + expression);
 
-            return Expression.eval(propertyValue, operator, expected);
+            return ExpressionEvaluator.eval(propertyValue, operator, expected);
         }
         return false;
     }
@@ -226,5 +230,9 @@ public class ListFilter extends JsonPathFilterBase {
             index.add(Integer.parseInt(s));
         }
         return index.toArray(new Integer[0]);
+    }
+
+    private boolean indexIsInRange(List<?> list, int index) {
+        return index >= 0 && index < list.size();
     }
 }
