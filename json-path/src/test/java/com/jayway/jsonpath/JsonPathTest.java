@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -192,6 +193,18 @@ public class JsonPathTest {
     public void access_index_out_of_bounds_does_not_throw_exception() throws Exception {
         assertTrue(JsonPath.read(DOCUMENT, "$.store.book[100].author").isEmpty());
         assertTrue(JsonPath.read(DOCUMENT, "$.store.book[100, 200].author").isEmpty());
+    }
+
+    @Test
+    public void read_one_returns_null_when_path_has_no_matches() throws Exception {
+        assertNull(JsonPath.readOne(DOCUMENT, "$.store.book[1000].title"));
+        assertNull(JsonPath.readOne(DOCUMENT, "$.store.book[0].fooBar"));
+    }
+
+    @Test
+    public void read_one_throws_when_path_matches_multiple_values() {
+        assertThrows(
+                RuntimeException.class, () -> JsonPath.readOne(DOCUMENT, "$.store.book[*].title"));
     }
 
     @Test
