@@ -8,13 +8,14 @@ plugins {
     id("com.diffplug.spotless") version "8.11.0"
 }
 
+version = "0.5.0"
+
 repositories {
     mavenCentral()
 }
 
 allprojects {
     group = "com.jayway.jsonpath"
-    version = "0.5.0"
     pluginManager.apply("com.diffplug.spotless")
 
     pluginManager.withPlugin("com.diffplug.spotless") {
