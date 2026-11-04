@@ -92,7 +92,7 @@ public class JsonPathTest {
     public void all_store_properties() throws Exception {
         List<Object> itemsInStore = JsonPath.read(DOCUMENT, "$.store.*");
 
-        int bookIndex = PathUtil.isArray(itemsInStore.get(0)) ? 0 : 1;
+        int bookIndex = JsonUtil.isList(itemsInStore.get(0)) ? 0 : 1;
         assertEquals(
                 "Nigel Rees", JsonPath.readOne(itemsInStore, "$.[" + bookIndex + "].[0].author"));
         assertEquals(

@@ -17,7 +17,7 @@ public class JsonAssertTest {
     public static final String JSON =
             """
                     { "store": {
-                        "book": [\s
+                        "book": [
                           { "category": "reference",
                             "author": "Nigel Rees",
                             "title": "Sayings of the Century",
