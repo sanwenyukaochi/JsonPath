@@ -3,6 +3,7 @@ plugins {
 }
 
 description = "Java DSL for easy testing and reading of JSON data"
+version = "0.5.0"
 
 dependencies {
     implementation("com.googlecode.json-simple:json-simple")
