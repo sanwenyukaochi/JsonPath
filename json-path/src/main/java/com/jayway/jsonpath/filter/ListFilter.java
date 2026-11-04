@@ -1,19 +1,15 @@
 package com.jayway.jsonpath.filter;
 
 import com.jayway.jsonpath.JsonUtil;
+import com.jayway.jsonpath.eval.Expression;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import org.json.simple.JSONArray;
 
 public class ListFilter extends JsonPathFilterBase {
-
-    private static ScriptEngine SCRIPT_ENGINE = new ScriptEngineManager().getEngineByName("js");
 
     private static final Pattern LIST_INDEX_PATTERN =
             Pattern.compile("\\[(\\s?\\d+\\s?,?)+\\]"); // [1] OR [1,2,3]
@@ -35,7 +31,7 @@ public class ListFilter extends JsonPathFilterBase {
             Pattern.compile("\\[\\s?\\?\\s?\\(\\s?@\\.(\\w+)\\s?\\)\\s?\\]");
     private static final Pattern LIST_ITEM_MATCHES_EVAL =
             Pattern.compile(
-                    "\\[\\s?\\?\\s?\\(\\s?@.(\\w+)\\s?([=<>]+)\\s?(.*)\\s?\\)\\s?\\]"); // [ ?(
+                    "\\[\\s?\\?\\s?\\(\\s?@\\.(\\w+)\\s?([=!<>]+)\\s?(.*)\\s?\\)\\s?\\]"); // [ ?(
     // @.title<
     // 'ko' ) ]
 
@@ -165,22 +161,10 @@ public class ListFilter extends JsonPathFilterBase {
                 return false;
             }
 
-            if (propertyValue instanceof String) {
-                propertyValue = "'" + propertyValue + "'";
-            }
-
-            if (operator.trim().equals("=")) {
-                operator = "===";
-            }
-
             String expression = propertyValue + " " + operator + " " + expected;
             System.out.println("EVAL" + expression);
 
-            try {
-                return (Boolean) SCRIPT_ENGINE.eval(expression);
-            } catch (ScriptException e) {
-                return false;
-            }
+            return Expression.eval(propertyValue, operator, expected);
         }
         return false;
     }

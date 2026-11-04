@@ -18,7 +18,12 @@ public class PathUtil {
             jsonPath = "$." + jsonPath;
         }
 
-        jsonPath = jsonPath.replace("..", ".~.").replace("[", ".[").replace("@.", "@");
+        jsonPath =
+                jsonPath.replace("..", ".~.")
+                        .replace("[", ".[")
+                        .replace("@.", "@")
+                        .replace("['", "")
+                        .replace("']", "");
 
         String[] split = jsonPath.split("\\.");
 
