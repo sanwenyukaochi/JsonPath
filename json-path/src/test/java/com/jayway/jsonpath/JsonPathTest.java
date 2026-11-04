@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.Test;
 
 public class JsonPathTest {
@@ -63,8 +62,6 @@ public class JsonPathTest {
         JsonPath path = JsonPath.compile("$.store.book[1]");
 
         List<Map> list = path.read(DOCUMENT);
-
-        System.out.println(list.toString());
     }
 
     @Test
@@ -72,8 +69,6 @@ public class JsonPathTest {
         JsonPath path = JsonPath.compile("$.store.book[*]");
 
         List<Object> list = path.read(DOCUMENT);
-
-        System.out.println(list.toString());
     }
 
     @Test
@@ -191,9 +186,6 @@ public class JsonPathTest {
     public void all_members_of_all_documents() throws Exception {
 
         List<String> all = JsonPath.read(DOCUMENT, "$..*");
-
-        System.out.println(StringUtils.join(all, "\n"));
-        System.out.println(all.toString());
     }
 
     @Test
