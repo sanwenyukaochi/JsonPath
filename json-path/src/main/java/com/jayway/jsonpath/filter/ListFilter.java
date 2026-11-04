@@ -165,9 +165,6 @@ public class ListFilter extends JsonPathFilterBase {
                 return false;
             }
 
-            String expression = propertyValue + " " + operator + " " + expected;
-            System.out.println("EVAL" + expression);
-
             return ExpressionEvaluator.eval(propertyValue, operator, expected);
         }
         return false;
