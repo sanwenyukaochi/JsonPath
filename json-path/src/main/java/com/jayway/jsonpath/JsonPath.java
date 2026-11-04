@@ -17,10 +17,6 @@ public class JsonPath {
 
     private JsonPathFilterChain filters;
 
-    public static JsonPath compile(String jsonPath) {
-        return new JsonPath(jsonPath);
-    }
-
     private JsonPath(String jsonPath) {
         if (jsonPath == null
                 || jsonPath.trim().isEmpty()
@@ -40,6 +36,9 @@ public class JsonPath {
         return read(parse(json));
     }
 
+    public static JsonPath compile(String jsonPath) {
+        return new JsonPath(jsonPath);
+    }
     public static <T> List<T> read(String json, String jsonPath) throws java.text.ParseException {
         return compile(jsonPath).read(json);
     }
