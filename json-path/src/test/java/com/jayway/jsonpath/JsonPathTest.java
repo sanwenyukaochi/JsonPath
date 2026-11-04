@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -15,37 +16,38 @@ public class JsonPathTest {
 
     public static final String DOCUMENT =
             """
-                    { "store": {
-                        "book": [
-                          { "category": "reference",
-                            "author": "Nigel Rees",
-                            "title": "Sayings of the Century",
-                            "price": 8.95
-                          },
-                          { "category": "fiction",
-                            "author": "Evelyn Waugh",
-                            "title": "Sword of Honour",
-                            "price": 12.99
-                          },
-                          { "category": "fiction",
-                            "author": "Herman Melville",
-                            "title": "Moby Dick",
-                            "isbn": "0-553-21311-3",
-                            "price": 8.99
-                          },
-                          { "category": "fiction",
-                            "author": "J. R. R. Tolkien",
-                            "title": "The Lord of the Rings",
-                            "isbn": "0-395-19395-8",
-                            "price": 22.99
-                          }
-                        ],
-                        "bicycle": {
-                          "color": "red",
-                          "price": 19.95
-                        }
-                      }
-                    }""";
+            { "store": {
+                "book": [
+                  { "category": "reference",
+                    "author": "Nigel Rees",
+                    "title": "Sayings of the Century",
+                    "price": 8.95
+                  },
+                  { "category": "fiction",
+                    "author": "Evelyn Waugh",
+                    "title": "Sword of Honour",
+                    "price": 12.99
+                  },
+                  { "category": "fiction",
+                    "author": "Herman Melville",
+                    "title": "Moby Dick",
+                    "isbn": "0-553-21311-3",
+                    "price": 8.99
+                  },
+                  { "category": "fiction",
+                    "author": "J. R. R. Tolkien",
+                    "title": "The Lord of the Rings",
+                    "isbn": "0-395-19395-8",
+                    "price": 22.99
+                  }
+                ],
+                "bicycle": {
+                  "color": "red",
+                  "price": 19.95
+                }
+              }
+            }\
+            """;
 
     @Test
     public void read_document_from_root() throws Exception {
@@ -60,7 +62,7 @@ public class JsonPathTest {
 
         JsonPath path = JsonPath.compile("$.store.book[1]");
 
-        List<Object> list = path.read(DOCUMENT);
+        List<Map> list = path.read(DOCUMENT);
 
         System.out.println(list.toString());
     }
@@ -192,5 +194,22 @@ public class JsonPathTest {
 
         System.out.println(StringUtils.join(all, "\n"));
         System.out.println(all.toString());
+    }
+
+    @Test
+    public void access_index_out_of_bounds_does_not_throw_exception() throws Exception {
+        assertTrue(JsonPath.read(DOCUMENT, "$.store.book[100].author").isEmpty());
+        assertTrue(JsonPath.read(DOCUMENT, "$.store.book[100, 200].author").isEmpty());
+    }
+
+    @Test
+    public void invalid_space_path_throws_exception() {
+        assertThrows(
+                InvalidPathException.class, () -> JsonPath.read(DOCUMENT, "space is not good"));
+    }
+
+    @Test
+    public void invalid_new_path_throws_exception() {
+        assertThrows(InvalidPathException.class, () -> JsonPath.read(DOCUMENT, "new "));
     }
 }

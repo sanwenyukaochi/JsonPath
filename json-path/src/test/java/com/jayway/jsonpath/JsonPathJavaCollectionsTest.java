@@ -41,10 +41,14 @@ public class JsonPathJavaCollectionsTest {
     static Stream<Arguments> paths() {
         return Stream.of(
                 Arguments.of("$.store.book[0].author", List.of("Nigel Rees")),
+                Arguments.of("$.store.book[2].author", List.of()),
+                Arguments.of("$.store.book[100, 200].author", List.of()),
+                Arguments.of("$.store.book[0,100,1].author", List.of("Nigel Rees", "Evelyn Waugh")),
                 Arguments.of("$.['store'].['book'][0].['author']", List.of("Nigel Rees")),
                 Arguments.of("$.store.book[*].author", List.of("Nigel Rees", "Evelyn Waugh")),
                 Arguments.of("$.store.book[0,1].author", List.of("Nigel Rees", "Evelyn Waugh")),
                 Arguments.of("$.store.book[:2].author", List.of("Nigel Rees", "Evelyn Waugh")),
+                Arguments.of("$.store.book[:100].author", List.of("Nigel Rees", "Evelyn Waugh")),
                 Arguments.of("$.store.book[-1:].author", List.of("Evelyn Waugh")),
                 Arguments.of("$.store.book[(@.length-1)].author", List.of("Evelyn Waugh")),
                 Arguments.of("$.store.book[?(@.isbn)].author", List.of("Evelyn Waugh")),
@@ -61,5 +65,13 @@ public class JsonPathJavaCollectionsTest {
         assertEquals(List.of("Nigel Rees", "Evelyn Waugh"), JsonPath.read(BOOKS, "$.[*].author"));
         assertEquals(List.of("Nigel Rees", "Evelyn Waugh"), JsonPath.read(BOOKS, "$..author"));
         assertEquals("Evelyn Waugh", JsonPath.readOne(BOOKS, "$.[1].author"));
+    }
+
+    @Test
+    public void index_and_pull_queries_on_an_empty_list_return_no_matches() {
+        List<Object> empty = new ArrayList<>();
+        assertEquals(List.of(), JsonPath.read(empty, "$.[0]"));
+        assertEquals(List.of(), JsonPath.read(empty, "$.[0,1]"));
+        assertEquals(List.of(), JsonPath.read(empty, "$.[:2]"));
     }
 }
