@@ -9,6 +9,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import org.junit.jupiter.api.Test;
 
@@ -114,5 +115,15 @@ public class JsonAssertTest {
         with(JSON)
                 .assertEquals("$.store.book[0].title", "Sayings of the Century")
                 .assertThat("$.store.book[0].title", equalTo("Sayings of the Century"));
+    }
+
+    @Test
+    public void no_hit_returns_null() throws Exception {
+        with(JSON).assertThat("$.store.book[1000].title", nullValue());
+    }
+
+    @Test
+    public void invalid_path() throws Exception {
+        with(JSON).assertThat("$.store.book[*].fooBar", emptyCollection());
     }
 }
