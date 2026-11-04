@@ -39,6 +39,7 @@ public class JsonPath {
     public static JsonPath compile(String jsonPath) {
         return new JsonPath(jsonPath);
     }
+
     public static <T> List<T> read(String json, String jsonPath) throws java.text.ParseException {
         return compile(jsonPath).read(json);
     }

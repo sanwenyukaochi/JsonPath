@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 public class JsonPathFilterFactory {
 
     private static final Pattern ROOT_FILTER_PATTERN = Pattern.compile("\\$");
-    private static final Pattern PROPERTY_FILTER_PATTERN = Pattern.compile("\\w+");
+    private static final Pattern PROPERTY_FILTER_PATTERN = Pattern.compile("(\\w+)|\\['(\\w+)'\\]");
     private static final Pattern WILDCARD_PROPERTY_FILTER_PATTERN = Pattern.compile("\\*");
     private static final Pattern LIST_FILTER_PATTERN = Pattern.compile("\\[.*?\\]");
     private static final Pattern TRAVERSE_FILTER_PATTERN = Pattern.compile("\\.\\.");

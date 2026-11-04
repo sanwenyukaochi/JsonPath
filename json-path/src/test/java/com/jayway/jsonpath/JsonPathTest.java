@@ -79,6 +79,9 @@ public class JsonPathTest {
         assertThat(
                 JsonPath.<String>read(DOCUMENT, "$.store.book[*].author"),
                 hasItems("Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien"));
+        assertThat(
+                JsonPath.<String>read(DOCUMENT, "$.['store'].['book'][*].['author']"),
+                hasItems("Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien"));
     }
 
     @Test
@@ -151,6 +154,28 @@ public class JsonPathTest {
         assertThat(
                 JsonPath.<String>read(DOCUMENT, "$.store.book[?(@.price < 10)].title"),
                 hasItems("Sayings of the Century", "Moby Dick"));
+    }
+
+    @Test
+    public void double_comparison_does_not_truncate_book_prices() throws Exception {
+        assertEquals(
+                List.of(
+                        "Sayings of the Century",
+                        "Sword of Honour",
+                        "Moby Dick",
+                        "The Lord of the Rings"),
+                JsonPath.read(DOCUMENT, "$.store.book[?(@.price > 8)].title"));
+    }
+
+    @Test
+    public void reads_books_with_a_different_category() throws Exception {
+        List<String> expected = List.of("Sword of Honour", "Moby Dick", "The Lord of the Rings");
+        assertEquals(
+                expected,
+                JsonPath.read(DOCUMENT, "$.store.book[?(@.category != 'reference')].title"));
+        assertEquals(
+                expected,
+                JsonPath.read(DOCUMENT, "$.store.book[?(@.category <> 'reference')].title"));
     }
 
     @Test

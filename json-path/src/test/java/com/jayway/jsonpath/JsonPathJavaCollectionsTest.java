@@ -41,6 +41,7 @@ public class JsonPathJavaCollectionsTest {
     static Stream<Arguments> paths() {
         return Stream.of(
                 Arguments.of("$.store.book[0].author", List.of("Nigel Rees")),
+                Arguments.of("$.['store'].['book'][0].['author']", List.of("Nigel Rees")),
                 Arguments.of("$.store.book[*].author", List.of("Nigel Rees", "Evelyn Waugh")),
                 Arguments.of("$.store.book[0,1].author", List.of("Nigel Rees", "Evelyn Waugh")),
                 Arguments.of("$.store.book[:2].author", List.of("Nigel Rees", "Evelyn Waugh")),
@@ -48,6 +49,8 @@ public class JsonPathJavaCollectionsTest {
                 Arguments.of("$.store.book[(@.length-1)].author", List.of("Evelyn Waugh")),
                 Arguments.of("$.store.book[?(@.isbn)].author", List.of("Evelyn Waugh")),
                 Arguments.of("$.store.book[?(@.price < 10)].author", List.of("Nigel Rees")),
+                Arguments.of("$.store.book[?(@.price != 8)].author", List.of("Evelyn Waugh")),
+                Arguments.of("$.store.book[?(@.price <> 8)].author", List.of("Evelyn Waugh")),
                 Arguments.of("$..book[?(@.author = 'Nigel Rees')].author", List.of("Nigel Rees")),
                 Arguments.of("$.store.bicycle.*", List.of("red")),
                 Arguments.of("$..author", List.of("Nigel Rees", "Evelyn Waugh")));
