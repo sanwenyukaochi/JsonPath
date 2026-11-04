@@ -14,7 +14,7 @@ repositories {
 
 allprojects {
     group = "com.jayway.jsonpath"
-    version = "1.0-SNAPSHOT"
+    version = "0.5.0"
     pluginManager.apply("com.diffplug.spotless")
 
     pluginManager.withPlugin("com.diffplug.spotless") {
