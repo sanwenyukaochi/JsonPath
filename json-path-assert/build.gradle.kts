@@ -3,7 +3,7 @@ plugins {
 }
 
 description = "json-path-assert"
-version = "0.5.4-SNAPSHOT"
+version = "0.5.4"
 
 dependencies {
     api(project(":json-path"))
