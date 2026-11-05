@@ -6,9 +6,7 @@ description = "Java DSL for easy testing and reading of JSON data"
 version = "0.5.4-SNAPSHOT"
 
 dependencies {
-    implementation("com.googlecode.json-simple:json-simple") {
-        exclude(group = "junit", module = "junit")
-    }
+    implementation("net.minidev:json-smart")
     testImplementation("org.hamcrest:hamcrest-library")
     implementation("commons-lang:commons-lang")
     testImplementation("org.junit.jupiter:junit-jupiter")

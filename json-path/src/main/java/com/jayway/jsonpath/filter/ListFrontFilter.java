@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.json.simple.JSONArray;
+import net.minidev.json.JSONArray;
 
 public class ListFrontFilter extends JsonPathFilterBase {
 

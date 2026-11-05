@@ -3,16 +3,32 @@ package com.jayway.jsonpath;
 import com.jayway.jsonpath.filter.FilterOutput;
 import com.jayway.jsonpath.filter.JsonPathFilterChain;
 import java.util.logging.Logger;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import net.minidev.json.parser.JSONParser;
+import net.minidev.json.parser.ParseException;
 
 public class JsonPath {
 
+    public static final int STRICT_MODE = 0;
+    public static final int SLACK_MODE = -1;
+
+    private static int mode = SLACK_MODE;
+
     private static final Logger log = Logger.getLogger(JsonPath.class.getName());
 
-    private static JSONParser JSON_PARSER = new JSONParser();
+    private static JSONParser JSON_PARSER = new JSONParser(JsonPath.mode);
 
     private JsonPathFilterChain filters;
+
+    public static void setMode(int mode) {
+        if (mode != JsonPath.mode) {
+            JsonPath.mode = mode;
+            JSON_PARSER = new JSONParser(JsonPath.mode);
+        }
+    }
+
+    public static int getMode() {
+        return mode;
+    }
 
     private JsonPath(String jsonPath) {
         if (jsonPath == null
