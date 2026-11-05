@@ -1,18 +1,27 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/debian
+// Default Ubuntu-based DevContainer Template.
+// For more customization options, see https://containers.dev/implementors/json_reference
 {
-  "name": "Development Container",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu"
+  name: "Default",
+  image: "ubuntu:latest",
 
-  // Features to add to the dev container. More info: https://containers.dev/features.
-  // "features": {},
-
-  // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  // "forwardPorts": [],
-
-  // Configure tool-specific properties.
-  // "customizations": {},
-
-  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-  // "remoteUser": "root"
+  customizations : {
+    // Configure JetBrains IDE-specific properties
+    jetbrains : {
+      backend : "IntelliJ",
+      settings : {
+        // IDE settings can be added via “Show context actions”|“Add currently modified settings from IDE”.
+        // A complete list of supported settings is also available through auto-completion
+      },
+      plugins: [
+        // A set of plugin IDs.
+        // Plugin ID can be found on the corresponding plugin’s page at https://plugins.jetbrains.com.
+      ]
+    }
+  },
+  features: {
+    "ghcr.io/devcontainers/features/git" : {},
+    // Add additional features to your project using auto-completion.
+  },
+  // Comment out to connect as the root user.
+  remoteUser: "ubuntu"
 }
