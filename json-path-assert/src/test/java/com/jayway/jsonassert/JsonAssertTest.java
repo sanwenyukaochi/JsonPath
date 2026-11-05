@@ -153,7 +153,7 @@ public class JsonAssertTest {
                 .assertThat("$.store.book[0]", hasEntry("category", "reference"))
                 .assertThat("$.store.book[0]", hasEntry("title", "Sayings of the Century"))
                 .and()
-                .assertThat("$..book[0]", hasItems(hasEntry("category", "reference")))
+                .assertThat("$..book[0]", hasEntry("category", "reference"))
                 .and()
                 .assertThat("$.store.book[0]", mapContainingKey(equalTo("category")))
                 .and()
@@ -163,7 +163,7 @@ public class JsonAssertTest {
                 .assertThat("$.['store'].['book'][0]", hasEntry("category", "reference"))
                 .assertThat("$.['store'].['book'][0]", hasEntry("title", "Sayings of the Century"))
                 .and()
-                .assertThat("$..['book'][0]", hasItems(hasEntry("category", "reference")))
+                .assertThat("$..['book'][0]", hasEntry("category", "reference"))
                 .and()
                 .assertThat("$.['store'].['book'][0]", mapContainingKey(equalTo("category")))
                 .and()
@@ -191,6 +191,13 @@ public class JsonAssertTest {
     @Test
     public void invalid_path() throws Exception {
         with(JSON).assertThat("$.store.book[*].fooBar", emptyCollection());
+    }
+
+    @Test
+    public void path_including_wildcard_path_followed_by_another_path_concatenates_results_to_list()
+            throws Exception {
+        with(getResourceAsStream("lotto.json"))
+                .assertThat("lotto.winners[*].winnerId", hasItems(23L, 54L));
     }
 
     private InputStream getResourceAsStream(String resourceName) {

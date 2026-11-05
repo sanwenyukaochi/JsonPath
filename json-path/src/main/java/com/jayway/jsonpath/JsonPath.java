@@ -1,10 +1,7 @@
 package com.jayway.jsonpath;
 
-import static java.lang.String.format;
-
+import com.jayway.jsonpath.filter.FilterOutput;
 import com.jayway.jsonpath.filter.JsonPathFilterChain;
-import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -28,51 +25,30 @@ public class JsonPath {
         this.filters = new JsonPathFilterChain(PathUtil.splitPath(jsonPath));
     }
 
-    public <T> List<T> read(Object json) {
-        return (List<T>) filters.filter(json);
+    public <T> T read(Object json) {
+        FilterOutput filterOutput = filters.filter(json);
+
+        if (filterOutput == null || filterOutput.getResult() == null) {
+            return null;
+        }
+
+        return (T) filterOutput.getResult();
     }
 
-    public <T> List<T> read(String json) throws java.text.ParseException {
-        return read(parse(json));
+    public <T> T read(String json) throws java.text.ParseException {
+        return (T) read(parse(json));
     }
 
     public static JsonPath compile(String jsonPath) {
         return new JsonPath(jsonPath);
     }
 
-    public static <T> List<T> read(String json, String jsonPath) throws java.text.ParseException {
-        return compile(jsonPath).read(json);
+    public static <T> T read(String json, String jsonPath) throws java.text.ParseException {
+        return (T) compile(jsonPath).read(json);
     }
 
-    public static <T> List<T> read(Object json, String jsonPath) {
-        return compile(jsonPath).read(json);
-    }
-
-    public static <T> T readOne(Object json, String jsonPath) {
-        List<Object> result = compile(jsonPath).read(json, jsonPath);
-
-        if (log.isLoggable(Level.WARNING)) {
-            if (!PathUtil.isPathDefinite(jsonPath)) {
-                log.warning(
-                        "Using readOne() on a not definite json path may give incorrect results. Path : "
-                                + jsonPath);
-            }
-        }
-
-        if (result.size() > 1) {
-            throw new RuntimeException(
-                    format(
-                            "Expected one result when reading path: %s  but was: %d",
-                            jsonPath, result.size()));
-        } else if (result.isEmpty()) {
-            return null;
-        }
-
-        return (T) result.get(0);
-    }
-
-    public static <T> T readOne(String json, String jsonPath) throws java.text.ParseException {
-        return (T) readOne(parse(json), jsonPath);
+    public static <T> T read(Object json, String jsonPath) {
+        return (T) compile(jsonPath).read(json);
     }
 
     private static Object parse(String json) throws java.text.ParseException {
