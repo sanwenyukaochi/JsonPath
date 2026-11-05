@@ -49,11 +49,21 @@ public class JsonPathTest {
                 "bicycle": {
                   "color": "red",
                   "price": 19.95,
-                  "foo:bar": "fooBar"
+                  "foo:bar": "fooBar",
+                  "dot.notation": "new"
                 }
               }
             }\
             """;
+
+    @Test
+    public void bracket_notation_can_be_used_in_path() throws Exception {
+
+        assertEquals("new", JsonPath.read(DOCUMENT, "$.['store'].bicycle.['dot.notation']"));
+        assertEquals("new", JsonPath.read(DOCUMENT, "$['store']['bicycle']['dot.notation']"));
+        assertEquals("new", JsonPath.read(DOCUMENT, "$.['store']['bicycle']['dot.notation']"));
+        assertEquals("new", JsonPath.read(DOCUMENT, "$.['store'].['bicycle'].['dot.notation']"));
+    }
 
     @Test
     public void filter_an_array() throws Exception {
@@ -67,7 +77,7 @@ public class JsonPathTest {
     public void read_path_with_colon() throws Exception {
 
         assertEquals(JsonPath.read(DOCUMENT, "$.store.bicycle.foo:bar"), "fooBar");
-        assertEquals(JsonPath.read(DOCUMENT, "$.['store'].['bicycle'].['foo:bar']"), "fooBar");
+        assertEquals(JsonPath.read(DOCUMENT, "$['store']['bicycle']['foo:bar']"), "fooBar");
     }
 
     @Test
@@ -105,6 +115,12 @@ public class JsonPathTest {
                 hasItems("Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien"));
         assertThat(
                 JsonPath.<List<String>>read(DOCUMENT, "$.['store'].['book'][*].['author']"),
+                hasItems("Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien"));
+        assertThat(
+                JsonPath.<List<String>>read(DOCUMENT, "$['store']['book'][*]['author']"),
+                hasItems("Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien"));
+        assertThat(
+                JsonPath.<List<String>>read(DOCUMENT, "$['store'].book[*]['author']"),
                 hasItems("Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien"));
     }
 

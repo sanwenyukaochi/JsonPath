@@ -19,7 +19,10 @@ public class PathUtil {
         }
 
         jsonPath =
-                jsonPath.replace("..", ".~.")
+                jsonPath.replace("$['", "$.['")
+                        .replaceAll("\\['(\\w+)\\.(\\w+)']", "['$1~$2']")
+                        .replace("']['", "'].['")
+                        .replace("..", ".~~.")
                         .replace("[", ".[")
                         .replace("@.", "@")
                         .replace("['", "")
@@ -31,7 +34,7 @@ public class PathUtil {
             if (split[i].trim().isEmpty()) {
                 continue;
             }
-            fragments.add(split[i].replace("@", "@.").replace("~", ".."));
+            fragments.add(split[i].replace("@", "@.").replace("~", "."));
         }
         return fragments;
     }
