@@ -1,9 +1,9 @@
 package com.jayway.jsonpath;
 
+import org.junit.jupiter.api.Test;
+
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.assertThat;
-
-import org.junit.Test;
 
 public class SplitPathFragmentsTest {
 
