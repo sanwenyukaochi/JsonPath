@@ -10,7 +10,6 @@ dependencies {
         exclude(group = "junit", module = "junit")
     }
     testImplementation("org.hamcrest:hamcrest-library")
-    testImplementation("junit:junit:4.13.2")
     implementation("commons-lang:commons-lang")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
