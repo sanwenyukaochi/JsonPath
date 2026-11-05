@@ -14,6 +14,11 @@ import org.junit.jupiter.api.Test;
 
 public class JsonPathTest {
 
+    public static final String ARRAY =
+            """
+            [{"value": 1},{"value": 2}, {"value": 3},{"value": 4}]\
+            """;
+
     public static final String DOCUMENT =
             """
             { "store": {
@@ -49,6 +54,14 @@ public class JsonPathTest {
               }
             }\
             """;
+
+    @Test
+    public void filter_an_array() throws Exception {
+        List<Object> matches = JsonPath.read(ARRAY, "$.[?(@.value = 1)]");
+
+        assertEquals(1, matches.size());
+        System.out.println(matches);
+    }
 
     @Test
     public void read_path_with_colon() throws Exception {

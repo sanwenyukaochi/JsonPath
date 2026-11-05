@@ -7,9 +7,7 @@ version = "0.5.4-SNAPSHOT"
 
 dependencies {
     api(project(":json-path"))
-    implementation("com.googlecode.json-simple:json-simple") {
-        exclude(group = "junit", module = "junit")
-    }
+    implementation("net.minidev:json-smart")
     api("org.hamcrest:hamcrest-library")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

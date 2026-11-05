@@ -3,7 +3,7 @@ package com.jayway.jsonpath.filter;
 import com.jayway.jsonpath.JsonUtil;
 import java.util.List;
 import java.util.regex.Pattern;
-import org.json.simple.JSONArray;
+import net.minidev.json.JSONArray;
 
 public class PropertyFilter extends JsonPathFilterBase {
 

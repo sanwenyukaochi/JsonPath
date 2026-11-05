@@ -57,7 +57,7 @@ public class JsonAssertTest {
     public void links_document() throws Exception {
 
         with(getResourceAsStream("links.json"))
-                .assertEquals("count", 2L)
+                .assertEquals("count", 2)
                 .assertThat("links.gc:this.href", endsWith("?pageNumber=1&pageSize=2"))
                 .assertNotDefined("links.gc:prev")
                 .assertNotDefined("links.gc:next")
@@ -171,7 +171,7 @@ public class JsonAssertTest {
     public void path_including_wildcard_path_followed_by_another_path_concatenates_results_to_list()
             throws Exception {
         with(getResourceAsStream("lotto.json"))
-                .assertThat("lotto.winners[*].winnerId", hasItems(23L, 54L));
+                .assertThat("lotto.winners[*].winnerId", hasItems(23, 54));
     }
 
     private InputStream getResourceAsStream(String resourceName) {

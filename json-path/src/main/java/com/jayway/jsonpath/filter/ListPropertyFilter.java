@@ -4,7 +4,7 @@ import com.jayway.jsonpath.JsonUtil;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.json.simple.JSONArray;
+import net.minidev.json.JSONArray;
 
 public class ListPropertyFilter extends JsonPathFilterBase {
 

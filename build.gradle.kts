@@ -110,7 +110,7 @@ subprojects {
 
     dependencies {
         constraints {
-            add("implementation", "com.googlecode.json-simple:json-simple:1.1.1")
+            add("implementation", "net.minidev:json-smart:2.6.1")
             add("api", "org.hamcrest:hamcrest-library:3.0")
             add("implementation", "commons-lang:commons-lang:2.6")
         }
