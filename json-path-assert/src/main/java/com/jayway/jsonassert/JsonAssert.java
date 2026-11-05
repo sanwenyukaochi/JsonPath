@@ -38,6 +38,11 @@ public class JsonAssert {
         }
     }
 
+    public static JsonAsserter with(InputStream is) throws ParseException, IOException {
+        Reader reader = new InputStreamReader(is);
+        return with(reader);
+    }
+
     public static CollectionMatcher collectionWithSize(Matcher<? super Integer> sizeMatcher) {
         return new IsCollectionWithSize(sizeMatcher);
     }
@@ -53,10 +58,5 @@ public class JsonAssert {
 
     public static Matcher<Collection<Object>> emptyCollection() {
         return new IsEmptyCollection<Object>();
-    }
-
-    public static JsonAsserter with(InputStream is) throws ParseException, IOException {
-        Reader reader = new InputStreamReader(is);
-        return with(reader);
     }
 }

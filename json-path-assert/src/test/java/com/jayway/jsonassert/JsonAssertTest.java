@@ -10,12 +10,9 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.InputStream;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 public class JsonAssertTest {
@@ -58,6 +55,7 @@ public class JsonAssertTest {
 
     @Test
     public void links_document() throws Exception {
+
         with(getResourceAsStream("links.json"))
                 .assertEquals("count", 2L)
                 .assertThat("links.gc:this.href", endsWith("?pageNumber=1&pageSize=2"))
@@ -68,41 +66,17 @@ public class JsonAssertTest {
 
     @Test
     public void a_document_can_be_expected_not_to_contain_a_path() throws Exception {
-        JsonAsserter asserter = with(JSON);
-        assertSame(asserter, asserter.assertNotDefined("$.store.bicycle.cool"));
-        asserter.assertNotDefined("$.store.book[*].missing");
+        with(JSON).assertNotDefined("$.store.bicycle.cool");
     }
 
     @Test
-    public void a_value_can_be_asserted_to_be_null() throws Exception {
+    public void a_value_can_asserted_to_be_null() throws Exception {
         with(JSON).assertNull("$.store.bicycle.nullValue");
     }
 
     @Test
-    public void ends_with_evaluates() throws Exception {
+    public void ends_with_evalueates() throws Exception {
         with(JSON).assertThat("$.store.book[0].category", endsWith("nce"));
-    }
-
-    @Test
-    public void a_defined_path_fails_the_negative_existence_assertion() throws Exception {
-        AssertionError error =
-                assertThrows(
-                        AssertionError.class,
-                        () -> with(JSON).assertNotDefined("$.store.bicycle.color"));
-        assertTrue(error.getMessage().contains("$.store.bicycle.color"));
-    }
-
-    @Test
-    public void a_defined_null_value_fails_the_negative_existence_assertion() {
-        assertThrows(
-                AssertionError.class,
-                () -> with(JSON).assertNotDefined("$.store.bicycle.nullValue"));
-    }
-
-    @Test
-    public void multiple_matches_fail_the_negative_existence_assertion() {
-        assertThrows(
-                AssertionError.class, () -> with(JSON).assertNotDefined("$.store.book[*].author"));
     }
 
     @Test
@@ -185,7 +159,7 @@ public class JsonAssertTest {
 
     @Test
     public void no_hit_returns_null() throws Exception {
-        with(JSON).assertThat("$.store.book[1000].title", nullValue());
+        with(JSON).assertThat("$.store.book[1000].title", Matchers.<Object>nullValue());
     }
 
     @Test

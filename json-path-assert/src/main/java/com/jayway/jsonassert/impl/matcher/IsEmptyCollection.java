@@ -2,7 +2,6 @@ package com.jayway.jsonassert.impl.matcher;
 
 import java.util.Collection;
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 
 /** Tests if collection is empty. */
@@ -18,7 +17,6 @@ public class IsEmptyCollection<E> extends CollectionMatcher<Collection<E>> {
     }
 
     /** Matches an empty collection. */
-    @Factory
     public static <E> Matcher<Collection<E>> empty() {
         return new IsEmptyCollection<E>();
     }

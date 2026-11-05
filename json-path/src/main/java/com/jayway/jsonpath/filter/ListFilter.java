@@ -31,7 +31,7 @@ public class ListFilter extends JsonPathFilterBase {
             Pattern.compile("\\[\\s?\\?\\s?\\(\\s?@\\.(\\w+)\\s?\\)\\s?\\]");
     private static final Pattern LIST_ITEM_MATCHES_EVAL =
             Pattern.compile(
-                    "\\[\\s?\\?\\s?\\(\\s?@\\.(\\w+)\\s?([=!<>]+)\\s?(.*)\\s?\\)\\s?\\]"); // [ ?(
+                    "\\[\\s?\\?\\s?\\(\\s?@.(\\w+)\\s?([=<>]+)\\s?(.*)\\s?\\)\\s?\\]"); // [ ?(
     // @.title<
     // 'ko' ) ]
 
@@ -177,6 +177,8 @@ public class ListFilter extends JsonPathFilterBase {
                 return false;
             }
 
+            String expression = propertyValue + " " + operator + " " + expected;
+
             return ExpressionEvaluator.eval(propertyValue, operator, expected);
         }
         return false;
@@ -241,7 +243,13 @@ public class ListFilter extends JsonPathFilterBase {
         return index.toArray(new Integer[0]);
     }
 
-    private boolean indexIsInRange(List<?> list, int index) {
-        return index >= 0 && index < list.size();
+    private boolean indexIsInRange(List list, int index) {
+        if (index < 0) {
+            return false;
+        } else if (index > list.size() - 1) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }

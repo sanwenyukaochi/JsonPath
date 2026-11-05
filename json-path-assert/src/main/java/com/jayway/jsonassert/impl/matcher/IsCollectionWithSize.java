@@ -4,7 +4,6 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 import java.util.Collection;
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 
 /** Matches if collection size satisfies a nested matcher. */
@@ -25,7 +24,6 @@ public class IsCollectionWithSize<E> extends CollectionMatcher<Collection<? exte
     }
 
     /** Does collection size satisfy a given matcher? */
-    @Factory
     public static <E> Matcher<? super Collection<? extends E>> hasSize(
             Matcher<? super Integer> size) {
         return new IsCollectionWithSize<E>(size);
@@ -36,7 +34,6 @@ public class IsCollectionWithSize<E> extends CollectionMatcher<Collection<? exte
      *
      * <p>For example, assertThat(hasSize(equal_to(x))) vs. assertThat(hasSize(x))
      */
-    @Factory
     public static <E> Matcher<? super Collection<? extends E>> hasSize(int size) {
         Matcher<? super Integer> matcher = equalTo(size);
         return IsCollectionWithSize.<E>hasSize(matcher);
