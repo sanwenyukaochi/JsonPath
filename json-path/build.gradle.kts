@@ -3,7 +3,7 @@ plugins {
 }
 
 description = "Java DSL for easy testing and reading of JSON data"
-version = "0.5.5-SNAPSHOT"
+version = "0.5.5"
 
 dependencies {
     implementation("net.minidev:json-smart")
