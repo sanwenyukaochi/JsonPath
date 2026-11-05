@@ -62,7 +62,7 @@ public class JsonPath {
         if (result.size() > 1) {
             throw new RuntimeException(
                     format(
-                            "Expected one result when reading path: %s  but was: ",
+                            "Expected one result when reading path: %s  but was: %d",
                             jsonPath, result.size()));
         } else if (result.isEmpty()) {
             return null;
