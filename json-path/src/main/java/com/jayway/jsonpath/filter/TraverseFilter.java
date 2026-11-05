@@ -7,12 +7,12 @@ import org.json.simple.JSONArray;
 public class TraverseFilter extends JsonPathFilterBase {
 
     @Override
-    public List<Object> apply(List<Object> filter) {
+    public FilterOutput apply(FilterOutput filter) {
         List<Object> result = new JSONArray();
 
-        traverse(filter, result);
+        traverse(filter.getResult(), result);
 
-        return result;
+        return new FilterOutput(result);
     }
 
     private void traverse(Object container, List<Object> result) {

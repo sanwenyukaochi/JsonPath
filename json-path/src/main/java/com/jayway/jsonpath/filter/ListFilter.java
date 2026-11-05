@@ -42,31 +42,31 @@ public class ListFilter extends JsonPathFilterBase {
     }
 
     @Override
-    public List<Object> apply(List<Object> items) {
-        List<Object> result = new JSONArray();
+    public FilterOutput apply(FilterOutput items) {
+        Object result = new JSONArray();
 
         if (LIST_INDEX_PATTERN.matcher(pathFragment).matches()) {
-            return filterByListIndex(items);
+            result = filterByListIndex(items.getResultAsList());
         } else if (LIST_WILDCARD_PATTERN.matcher(pathFragment).matches()) {
-            return filterByWildcard(items);
+            result = filterByWildcard(items.getResultAsList());
         } else if (LIST_TAIL_PATTERN.matcher(pathFragment).matches()) {
-            return filterByListTailIndex(items);
+            result = filterByListTailIndex(items.getResultAsList());
         } else if (LIST_PULL_PATTERN.matcher(pathFragment).matches()) {
-            return filterByPullIndex(items);
+            result = filterByPullIndex(items.getResultAsList());
         } else if (LIST_ITEM_HAS_PROPERTY_PATTERN.matcher(pathFragment).matches()) {
-            return filterByItemProperty(items);
+            result = filterByItemProperty(items.getResultAsList());
         } else if (LIST_ITEM_MATCHES_EVAL.matcher(pathFragment).matches()) {
-            return filterByItemEvalMatch(items);
+            result = filterByItemEvalMatch(items.getResultAsList());
         }
 
-        return result;
+        return new FilterOutput(result);
     }
 
     private List<Object> filterByItemEvalMatch(List<Object> items) {
         List<Object> result = new JSONArray();
 
         for (Object current : items) {
-            for (Object item : JsonUtil.toList(current)) {
+            for (Object item : items) {
                 if (isEvalMatch(item)) {
                     result.add(item);
                 }
@@ -80,16 +80,16 @@ public class ListFilter extends JsonPathFilterBase {
 
         String prop = getFilterProperty();
 
-        for (Object current : items) {
-            for (Object item : JsonUtil.toList(current)) {
+        // for (Object current : items) {
+        for (Object item : JsonUtil.toList(items)) {
 
-                if (JsonUtil.isMap(item)) {
-                    if (JsonUtil.toMap(item).containsKey(prop)) {
-                        result.add(item);
-                    }
+            if (JsonUtil.isMap(item)) {
+                if (JsonUtil.toMap(item).containsKey(prop)) {
+                    result.add(item);
                 }
             }
         }
+        // }
         return result;
     }
 
@@ -97,48 +97,60 @@ public class ListFilter extends JsonPathFilterBase {
         List<Object> result = new JSONArray();
 
         for (Object current : items) {
-            result.addAll(JsonUtil.toList(current));
-        }
-        return result;
-    }
-
-    private List<Object> filterByListTailIndex(List<Object> items) {
-        List<Object> result = new JSONArray();
-
-        for (Object current : items) {
-            List array = JsonUtil.toList(current);
-            result.add(array.get(getTailIndex(array.size())));
-        }
-        return result;
-    }
-
-    private List<Object> filterByListIndex(List<Object> items) {
-        List<Object> result = new JSONArray();
-
-        for (Object current : items) {
-            List<Object> target = JsonUtil.toList(current);
-            Integer[] index = getArrayIndex();
-            for (int i : index) {
-                if (indexIsInRange(target, i)) {
-                    result.add(target.get(i));
-                }
+            if (current instanceof List) {
+                result.addAll(JsonUtil.toList(current));
+            } else {
+                result.add(current);
             }
         }
+        return result;
+    }
+
+    private Object filterByListTailIndex(List<Object> items) {
+
+        // for (Object current : items) {
+        //    Map array = JsonUtil.toMap(current);
+
+        int index = getTailIndex(items.size());
+
+        return items.get(index);
+    }
+
+    private Object filterByListIndex(List<Object> items) {
+        Object result = null;
+
+        // for (Object current : items) {
+        // List target = JsonUtil.toList(current);
+        Integer[] index = getArrayIndex();
+        if (index.length > 1) {
+            List<Object> tmp = new JSONArray();
+            for (int i : index) {
+                if (indexIsInRange(items, i)) {
+                    tmp.add(items.get(i));
+                }
+            }
+            return result = tmp;
+        } else {
+            if (indexIsInRange(items, index[0])) {
+                result = items.get(index[0]);
+            }
+        }
+        // }
         return result;
     }
 
     private List<Object> filterByPullIndex(List<Object> items) {
         List<Object> result = new JSONArray();
 
-        for (Object current : items) {
-            List<Object> target = JsonUtil.toList(current);
-            Integer[] index = getListPullIndex();
-            for (int i : index) {
-                if (indexIsInRange(target, i)) {
-                    result.add(target.get(i));
-                }
+        // for (Object current : items) {
+        // List target = JsonUtil.toList(current);
+        Integer[] index = getListPullIndex();
+        for (int i : index) {
+            if (indexIsInRange(items, i)) {
+                result.add(items.get(i));
             }
         }
+        // }
         return result;
     }
 
