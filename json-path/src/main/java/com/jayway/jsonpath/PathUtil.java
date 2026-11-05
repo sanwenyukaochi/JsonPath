@@ -7,7 +7,7 @@ public class PathUtil {
 
     public static boolean isPathDefinite(String jsonPath) {
         return !jsonPath.replaceAll("\"[^\"\\\\\\n\r]*\"", "")
-                .matches(".*(\\.\\.|\\*|\\[[\\\\/]|\\?|,|:|>|\\(|<|=|\\+).*");
+                .matches(".*(\\.\\.|\\*|\\[[\\\\/]|\\?|,|:\\s?\\]|\\[\\s?:|>|\\(|<|=|\\+).*");
     }
 
     public static List<String> splitPath(String jsonPath) {

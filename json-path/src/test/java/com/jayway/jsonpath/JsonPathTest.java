@@ -43,11 +43,18 @@ public class JsonPathTest {
                 ],
                 "bicycle": {
                   "color": "red",
-                  "price": 19.95
+                  "price": 19.95,
+                  "foo:bar": "fooBar"
                 }
               }
             }\
             """;
+
+    @Test
+    public void read_path_with_colon() throws Exception {
+        assertEquals("fooBar", JsonPath.readOne(DOCUMENT, "$.store.bicycle.foo:bar"));
+        assertEquals("fooBar", JsonPath.readOne(DOCUMENT, "$.['store'].['bicycle'].['foo:bar']"));
+    }
 
     @Test
     public void read_document_from_root() throws Exception {
@@ -208,9 +215,11 @@ public class JsonPathTest {
     }
 
     @Test
-    public void invalid_space_path_throws_exception() {
-        assertThrows(
-                InvalidPathException.class, () -> JsonPath.read(DOCUMENT, "space is not good"));
+    public void paths_with_spaces_are_treated_as_property_names() throws Exception {
+        assertTrue(JsonPath.read(DOCUMENT, "space is not good").isEmpty());
+        assertEquals(
+                List.of("value"),
+                JsonPath.read(Map.of("space is not good", "value"), "space is not good"));
     }
 
     @Test

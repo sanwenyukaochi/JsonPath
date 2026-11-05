@@ -1,0 +1,55 @@
+{
+    "count": 2,
+    "links": {
+        "gc:this": {
+            "href": "/rest/account/market/incentives?pageNumber\u003d1\u0026pageSize\u003d2",
+            "rel": "gc:this"
+        }
+    },
+    "pageNumber": 1,
+    "pageSize": 2,
+    "rows": [
+        {
+            "brand": {
+                "id": "8d0280ae-8ea3-4ae1-b46c-f0fc0b293066",
+                "name": "brand.name",
+                "picture": "brand.picture"
+            },
+            "categories": [
+                "cd646745-5834-4244-9126-fa631c32693c"
+            ],
+            "description": "description",
+            "id": "cd646745-5834-4244-9126-fa631c32693c",
+            "links": {
+                "gc:market:incentive": {
+                    "href": "/rest/account/market/incentives/cd646745-5834-4244-9126-fa631c32693c",
+                    "rel": "gc:market:incentive"
+                }
+            },
+            "price": 10,
+            "smallIcon": "small.ico",
+            "title": "A TITLE"
+        },
+        {
+            "brand": {
+                "id": "8d0280ae-8ea3-4ae1-b46c-f0fc0b293066",
+                "name": "brand.name",
+                "picture": "brand.picture"
+            },
+            "categories": [
+                "cd646745-5834-4244-9126-fa631c32693c"
+            ],
+            "description": "description",
+            "id": "cd646745-5834-4244-9126-fa631c32693c2",
+            "links": {
+                "gc:market:incentive": {
+                    "href": "/rest/account/market/incentives/cd646745-5834-4244-9126-fa631c32693c2",
+                    "rel": "gc:market:incentive"
+                }
+            },
+            "price": 10,
+            "smallIcon": "small.ico",
+            "title": "B TITLE"
+        }
+    ]
+}
