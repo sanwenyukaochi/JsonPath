@@ -1,9 +1,9 @@
 package com.jayway.jsonpath;
 
-import org.junit.jupiter.api.Test;
-
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.assertThat;
+
+import org.junit.jupiter.api.Test;
 
 public class SplitPathFragmentsTest {
 
@@ -62,5 +62,7 @@ public class SplitPathFragmentsTest {
         assertThat(PathUtil.splitPath("$.[0][1].author"), hasItems("$", "[0]", "[1]", "author"));
 
         assertThat(PathUtil.splitPath("$.[0].[1].author"), hasItems("$", "[0]", "[1]", "author"));
+
+        assertThat(PathUtil.splitPath("$.foo:bar.author"), hasItems("$", "foo:bar", "author"));
     }
 }

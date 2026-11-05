@@ -8,6 +8,8 @@ public interface JsonAsserter {
 
     <T> JsonAsserter assertEquals(String path, T expected);
 
+    JsonAsserter assertNotDefined(String path);
+
     JsonAsserter assertNull(String path);
 
     <T> JsonAsserter assertNotNull(String path);

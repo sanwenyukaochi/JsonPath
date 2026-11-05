@@ -1,5 +1,6 @@
 package com.jayway.jsonassert.impl;
 
+import static java.lang.String.format;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -32,6 +33,14 @@ public class JsonAsserterImpl implements JsonAsserter {
 
     public <T> JsonAsserter assertEquals(String path, T expected) {
         return assertThat(path, equalTo(expected));
+    }
+
+    public JsonAsserter assertNotDefined(String path) {
+        if (!JsonPath.read(jsonObject, path).isEmpty()) {
+            throw new AssertionError(
+                    format("Document contains the path <%s> but was expected not to.", path));
+        }
+        return this;
     }
 
     public JsonAsserter assertNull(String path) {
