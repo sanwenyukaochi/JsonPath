@@ -2,9 +2,12 @@ package com.jayway.jsonpath.filter;
 
 import com.jayway.jsonpath.JsonUtil;
 import java.util.List;
+import java.util.regex.Pattern;
 import org.json.simple.JSONArray;
 
 public class TraverseFilter extends JsonPathFilterBase {
+
+    public static final Pattern PATTERN = Pattern.compile("\\.\\.");
 
     @Override
     public FilterOutput apply(FilterOutput filter) {
