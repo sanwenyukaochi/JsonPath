@@ -1,17 +1,21 @@
 package com.jayway.jsonpath.reader;
 
-import com.jayway.jsonpath.reader.filter.Filter;
 import com.jayway.jsonpath.reader.filter.FilterFactory;
+import com.jayway.jsonpath.spi.JsonProvider;
 
 public class PathToken {
 
-    private Filter filter;
+    private String fragment;
 
-    public PathToken(String pathFragment) {
-        filter = FilterFactory.createFilter(pathFragment);
+    public PathToken(String fragment) {
+        this.fragment = fragment;
     }
 
-    public Object filter(Object model) {
-        return filter.filter(model);
+    public Object filter(Object model, JsonProvider jsonProvider) {
+        return FilterFactory.createFilter(fragment).filter(model, jsonProvider);
+    }
+
+    public String getFragment() {
+        return fragment;
     }
 }

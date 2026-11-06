@@ -102,7 +102,6 @@ public class JsonPathTest {
 
     @Test
     public void bracket_notation_can_be_used_in_path() throws Exception {
-
         assertEquals("new", JsonPath.read(DOCUMENT, "$.['store'].bicycle.['dot.notation']"));
         assertEquals("new", JsonPath.read(DOCUMENT, "$['store']['bicycle']['dot.notation']"));
         assertEquals("new", JsonPath.read(DOCUMENT, "$.['store']['bicycle']['dot.notation']"));
@@ -186,7 +185,7 @@ public class JsonPathTest {
     @Test
     public void all_store_properties() throws Exception {
         List<Object> itemsInStore = JsonPath.read(DOCUMENT, "$.store.*");
-        int bookIndex = JsonUtil.isList(itemsInStore.get(0)) ? 0 : 1;
+        int bookIndex = itemsInStore.get(0) instanceof List<?> ? 0 : 1;
 
         assertEquals(JsonPath.read(itemsInStore, "$.[" + bookIndex + "].[0].author"), "Nigel Rees");
         assertEquals(JsonPath.read(itemsInStore, "$.[" + bookIndex + "][0].author"), "Nigel Rees");

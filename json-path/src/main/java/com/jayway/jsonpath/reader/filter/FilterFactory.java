@@ -2,19 +2,28 @@ package com.jayway.jsonpath.reader.filter;
 
 public class FilterFactory {
 
+    private static final Filter DOCUMENT_FILTER = new PassThrewFilter("$");
+    private static final Filter ALL_ARRAY_ITEMS_FILTER = new PassThrewFilter("[*]");
+    private static final Filter WILDCARD_FILTER = new WildcardFilter("*");
+    private static final Filter SCAN_FILTER = new ScanFilter("..");
+
     public static Filter createFilter(String pathFragment) {
 
-        if ("$".equals(pathFragment) || "[*]".equals(pathFragment)) {
+        if ("$".equals(pathFragment)) {
 
-            return new PassThrewFilter(pathFragment);
+            return DOCUMENT_FILTER;
+
+        } else if ("[*]".equals(pathFragment)) {
+
+            return ALL_ARRAY_ITEMS_FILTER;
 
         } else if ("*".equals(pathFragment)) {
 
-            return new WildcardFilter(pathFragment);
+            return WILDCARD_FILTER;
 
         } else if (pathFragment.contains("..")) {
 
-            return new ScanFilter(pathFragment);
+            return SCAN_FILTER;
 
         } else if (!pathFragment.contains("[")) {
 

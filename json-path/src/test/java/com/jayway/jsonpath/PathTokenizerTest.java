@@ -6,10 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.jayway.jsonpath.reader.PathToken;
 import com.jayway.jsonpath.reader.PathTokenizer;
+import com.jayway.jsonpath.spi.JsonProvider;
+import com.jayway.jsonpath.spi.impl.DefaultJsonProvider;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class PathTokenizerTest {
+
+    private JsonProvider jsonProvider = new DefaultJsonProvider();
 
     public static final String DOCUMENT =
             """
@@ -56,10 +60,10 @@ public class PathTokenizerTest {
 
     @Test
     public void path_tokens_can_be_read() throws Exception {
-        Object result = JsonPath.parse(DOCUMENT);
+        Object result = jsonProvider.parse(DOCUMENT);
 
-        for (PathToken pathToken : new PathTokenizer("$.store.bicycle.color")) {
-            result = pathToken.filter(result);
+        for (PathToken pathToken : new PathTokenizer("$.store.bicycle.color", jsonProvider)) {
+            result = pathToken.filter(result, jsonProvider);
         }
 
         assertEquals("red", result);
@@ -67,10 +71,10 @@ public class PathTokenizerTest {
 
     @Test
     public void read_an_array_without_filters() throws Exception {
-        Object result = JsonPath.parse(DOCUMENT);
+        Object result = jsonProvider.parse(DOCUMENT);
 
-        for (PathToken pathToken : new PathTokenizer("$.store.book")) {
-            result = pathToken.filter(result);
+        for (PathToken pathToken : new PathTokenizer("$.store.book", jsonProvider)) {
+            result = pathToken.filter(result, jsonProvider);
         }
 
         assertEquals(4, toList(result).size());
@@ -78,10 +82,10 @@ public class PathTokenizerTest {
 
     @Test
     public void read_a_literal_property_from_object_in_array() throws Exception {
-        Object result = JsonPath.parse(DOCUMENT);
+        Object result = jsonProvider.parse(DOCUMENT);
 
-        for (PathToken pathToken : new PathTokenizer("$.store.book[*].title")) {
-            result = pathToken.filter(result);
+        for (PathToken pathToken : new PathTokenizer("$.store.book[*].title", jsonProvider)) {
+            result = pathToken.filter(result, jsonProvider);
         }
 
         assertEquals(4, toList(result).size());
@@ -89,10 +93,10 @@ public class PathTokenizerTest {
 
     @Test
     public void read_a_literal_property_from_position_in_array() throws Exception {
-        Object result = JsonPath.parse(DOCUMENT);
+        Object result = jsonProvider.parse(DOCUMENT);
 
-        for (PathToken pathToken : new PathTokenizer("$.store.book[0].title")) {
-            result = pathToken.filter(result);
+        for (PathToken pathToken : new PathTokenizer("$.store.book[0].title", jsonProvider)) {
+            result = pathToken.filter(result, jsonProvider);
         }
 
         assertEquals("Sayings of the Century", result);
@@ -100,10 +104,10 @@ public class PathTokenizerTest {
 
     @Test
     public void read_a_literal_property_from_two_positions_in_array() throws Exception {
-        Object result = JsonPath.parse(DOCUMENT);
+        Object result = jsonProvider.parse(DOCUMENT);
 
-        for (PathToken pathToken : new PathTokenizer("$.store.book[0, 1].author")) {
-            result = pathToken.filter(result);
+        for (PathToken pathToken : new PathTokenizer("$.store.book[0, 1].author", jsonProvider)) {
+            result = pathToken.filter(result, jsonProvider);
         }
 
         assertThat(this.<String>toList(result), hasItems("Nigel Rees", "Evelyn Waugh"));
@@ -111,10 +115,10 @@ public class PathTokenizerTest {
 
     @Test
     public void read_a_literal_property_from_head_in_array() throws Exception {
-        Object result = JsonPath.parse(DOCUMENT);
+        Object result = jsonProvider.parse(DOCUMENT);
 
-        for (PathToken pathToken : new PathTokenizer("$.store.book[:2].author")) {
-            result = pathToken.filter(result);
+        for (PathToken pathToken : new PathTokenizer("$.store.book[:2].author", jsonProvider)) {
+            result = pathToken.filter(result, jsonProvider);
         }
 
         assertThat(this.<String>toList(result), hasItems("Nigel Rees", "Evelyn Waugh"));
@@ -122,41 +126,43 @@ public class PathTokenizerTest {
 
     @Test
     public void read_a_literal_property_from_tail_in_array() throws Exception {
-        Object result = JsonPath.parse(DOCUMENT);
+        Object result = jsonProvider.parse(DOCUMENT);
 
-        for (PathToken pathToken : new PathTokenizer("$.store.book[-1:].author")) {
-            result = pathToken.filter(result);
+        for (PathToken pathToken : new PathTokenizer("$.store.book[-1:].author", jsonProvider)) {
+            result = pathToken.filter(result, jsonProvider);
         }
         assertEquals("J. R. R. Tolkien", result);
     }
 
     @Test
     public void field_defined_in_array_object() throws Exception {
-        Object result = JsonPath.parse(DOCUMENT);
+        Object result = jsonProvider.parse(DOCUMENT);
 
-        for (PathToken pathToken : new PathTokenizer("$.store.book[?(@.custom)].author")) {
-            result = pathToken.filter(result);
+        for (PathToken pathToken :
+                new PathTokenizer("$.store.book[?(@.custom)].author", jsonProvider)) {
+            result = pathToken.filter(result, jsonProvider);
         }
         assertThat(this.<String>toList(result), hasItems("J. R. R. Tolkien"));
     }
 
     @Test
     public void property_value_in_array_object() throws Exception {
-        Object result = JsonPath.parse(DOCUMENT);
+        Object result = jsonProvider.parse(DOCUMENT);
 
         for (PathToken pathToken :
-                new PathTokenizer("$.store.book[?(@.custom = 'onely this')].author")) {
-            result = pathToken.filter(result);
+                new PathTokenizer(
+                        "$.store.book[?(@.custom = 'onely this')].author", jsonProvider)) {
+            result = pathToken.filter(result, jsonProvider);
         }
         assertThat(this.<String>toList(result), hasItems("J. R. R. Tolkien"));
     }
 
     @Test
     public void deep_scan() throws Exception {
-        Object result = JsonPath.parse(DOCUMENT);
+        Object result = jsonProvider.parse(DOCUMENT);
 
-        for (PathToken pathToken : new PathTokenizer("$..author")) {
-            result = pathToken.filter(result);
+        for (PathToken pathToken : new PathTokenizer("$..author", jsonProvider)) {
+            result = pathToken.filter(result, jsonProvider);
         }
         assertThat(
                 this.<String>toList(result),
