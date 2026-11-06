@@ -19,12 +19,13 @@ public class JsonAsserterImpl implements JsonAsserter {
 
     @SuppressWarnings("unchecked")
     public <T> JsonAsserter assertThat(String path, Matcher<T> matcher) {
-        String reason = "When processing json path: " + path;
+        T obj = JsonPath.<T>read(jsonObject, path);
+        if (!matcher.matches(obj)) {
 
-        if (!matcher.matches(JsonPath.<T>read(jsonObject, path))) {
-            System.out.println(JsonPath.read(jsonObject, path).toString());
-
-            throw new AssertionError(reason + matcher.toString());
+            throw new AssertionError(
+                    String.format(
+                            "JSON doesn't match.\nExpected:\n%s\nActual:\n%s",
+                            matcher.toString(), obj));
         }
         return this;
     }

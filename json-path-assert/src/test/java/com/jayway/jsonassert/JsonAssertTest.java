@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.InputStream;
 import org.hamcrest.Matchers;
@@ -52,6 +53,13 @@ public class JsonAssertTest {
               }
             }\
             """;
+
+    @Test
+    public void failed_error_message() throws Exception {
+        assertThrows(
+                AssertionError.class,
+                () -> with(JSON).assertThat("$.store.book[0].category", endsWith("foobar")));
+    }
 
     @Test
     public void links_document() throws Exception {

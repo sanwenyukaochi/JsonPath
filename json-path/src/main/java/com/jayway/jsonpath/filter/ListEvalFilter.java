@@ -11,7 +11,7 @@ import net.minidev.json.JSONArray;
 public class ListEvalFilter extends JsonPathFilterBase {
 
     public static final Pattern PATTERN =
-            Pattern.compile("\\[\\s?\\?\\s?\\(\\s?@.(\\w+)\\s?([=<>]+)\\s?(.*)\\s?\\)\\s?\\]");
+            Pattern.compile("\\[\\s?\\?\\s?\\(\\s?@.(.*?)\\s?([=<>]+)\\s?(.*)\\s?\\)\\s?\\]");
 
     private final String pathFragment;
 
