@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 
-public class Issues {
+public class IssueTests {
     @Test
     public void issue_7() throws Exception {
 

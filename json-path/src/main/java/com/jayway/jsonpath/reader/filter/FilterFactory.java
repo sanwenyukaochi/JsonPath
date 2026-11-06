@@ -2,8 +2,8 @@ package com.jayway.jsonpath.reader.filter;
 
 public class FilterFactory {
 
-    private static final Filter DOCUMENT_FILTER = new PassThrewFilter("$", false);
-    private static final Filter ALL_ARRAY_ITEMS_FILTER = new PassThrewFilter("[*]", true);
+    private static final Filter DOCUMENT_FILTER = new PassThroughFilter("$", false);
+    private static final Filter ALL_ARRAY_ITEMS_FILTER = new PassThroughFilter("[*]", true);
     private static final Filter WILDCARD_FILTER = new WildcardFilter("*");
     private static final Filter SCAN_FILTER = new ScanFilter("..");
 
@@ -17,7 +17,7 @@ public class FilterFactory {
 
             return ALL_ARRAY_ITEMS_FILTER;
 
-        } else if ("*".equals(pathFragment)) {
+        } else if ("*".equals(pathFragment) || "['*']".equals(pathFragment)) {
 
             return WILDCARD_FILTER;
 
