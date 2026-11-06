@@ -7,13 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.jayway.jsonpath.reader.PathToken;
 import com.jayway.jsonpath.reader.PathTokenizer;
 import com.jayway.jsonpath.spi.JsonProvider;
-import com.jayway.jsonpath.spi.impl.DefaultJsonProvider;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class PathTokenizerTest {
 
-    private JsonProvider jsonProvider = new DefaultJsonProvider();
+    private JsonProvider jsonProvider = JsonProvider.getInstance();
 
     public static final String DOCUMENT =
             """

@@ -6,6 +6,7 @@ description = "Java DSL for easy testing and reading of JSON data"
 version = "0.5.6-SNAPSHOT"
 
 dependencies {
+    implementation("tools.jackson.core:jackson-databind")
     implementation("net.minidev:json-smart")
     testImplementation("org.hamcrest:hamcrest-library")
     implementation("commons-lang:commons-lang")

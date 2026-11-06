@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.jayway.jsonpath.reader.PathTokenizer;
 import com.jayway.jsonpath.spi.JsonProvider;
-import com.jayway.jsonpath.spi.impl.DefaultJsonProvider;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +26,7 @@ public class SplitPathFragmentsTest {
     12. "$..*"
     */
 
-    private JsonProvider jsonProvider = new DefaultJsonProvider();
+    private JsonProvider jsonProvider = JsonProvider.getInstance();
 
     @Test
     public void valid_path_is_split_correctly() throws Exception {
