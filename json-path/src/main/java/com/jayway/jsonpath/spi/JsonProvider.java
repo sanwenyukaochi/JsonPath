@@ -1,7 +1,7 @@
 package com.jayway.jsonpath.spi;
 
 import com.jayway.jsonpath.InvalidJsonException;
-import com.jayway.jsonpath.spi.impl.JacksonProvider;
+import com.jayway.jsonpath.spi.impl.JsonSmartProvider;
 
 import java.util.List;
 import java.util.Map;
@@ -12,12 +12,14 @@ public abstract class JsonProvider {
 
     public abstract Object parse(String json) throws InvalidJsonException;
 
+    public abstract String toJson(Object obj);
+
     public abstract Map<String, Object> createMap();
 
     public abstract List<Object> createList();
 
     public static JsonProvider getInstance() {
-        return new JacksonProvider();
+        return new JsonSmartProvider();
     }
 
     public boolean isContainer(Object obj) {
