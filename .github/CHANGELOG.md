@@ -1,5 +1,5 @@
 ------------------------------------------
-0.5.6
+0.5.6                           2012-02-09
 ------------------------------------------
 - Replaced regexp with custom tokenizer
 - Removed static declaration of JSON_PARSER
