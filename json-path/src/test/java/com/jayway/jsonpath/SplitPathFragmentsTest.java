@@ -87,6 +87,12 @@ public class SplitPathFragmentsTest {
     }
 
     @Test
+    public void dot_ending_ignored() throws Exception {
+
+        assertPath("$..book['something'].", hasItems("$", "..", "something"));
+    }
+
+    @Test
     public void invalid_path_throws_exception() throws Exception {
         assertPathInvalid("$...*");
     }

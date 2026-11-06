@@ -72,7 +72,7 @@ public class PathTokenizer implements Iterable<PathToken> {
 
                 case '.':
                     poll();
-                    if (peek() == '.') {
+                    if (!isEmpty() && peek() == '.') {
                         poll();
                         fragments.add("..");
 
