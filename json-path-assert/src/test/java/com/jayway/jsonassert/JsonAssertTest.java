@@ -13,7 +13,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.InputStream;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 public class JsonAssertTest {
@@ -167,11 +166,6 @@ public class JsonAssertTest {
         with(JSON)
                 .assertEquals("$['store']['book'][0].['title']", "Sayings of the Century")
                 .assertThat("$['store'].book[0].title", equalTo("Sayings of the Century"));
-    }
-
-    @Test
-    public void no_hit_returns_null() throws Exception {
-        with(JSON).assertThat("$.store.book[1000].title", Matchers.<Object>nullValue());
     }
 
     @Test

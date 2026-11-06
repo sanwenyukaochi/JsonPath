@@ -1,6 +1,7 @@
 package com.jayway.jsonpath.reader.filter;
 
-import java.util.LinkedList;
+import com.jayway.jsonpath.spi.JsonProvider;
+
 import java.util.List;
 
 public class WildcardFilter extends Filter {
@@ -10,17 +11,17 @@ public class WildcardFilter extends Filter {
     }
 
     @Override
-    public Object filter(Object obj) {
-        List<Object> result = new LinkedList<Object>();
+    public Object filter(Object obj, JsonProvider jsonProvider) {
+        List<Object> result = jsonProvider.createList();
 
-        if (isList(obj)) {
-            for (Object current : toList(obj)) {
-                for (Object value : toMap(current).values()) {
+        if (jsonProvider.isList(obj)) {
+            for (Object current : jsonProvider.toList(obj)) {
+                for (Object value : jsonProvider.toMap(current).values()) {
                     result.add(value);
                 }
             }
         } else {
-            for (Object value : toMap(obj).values()) {
+            for (Object value : jsonProvider.toMap(obj).values()) {
                 result.add(value);
             }
         }

@@ -6,6 +6,8 @@ import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import com.jayway.jsonassert.impl.matcher.IsEmptyCollection;
 import com.jayway.jsonassert.impl.matcher.IsMapContainingKey;
 import com.jayway.jsonassert.impl.matcher.IsMapContainingValue;
+import com.jayway.jsonpath.spi.JsonProvider;
+import com.jayway.jsonpath.spi.impl.DefaultJsonProvider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -15,43 +17,27 @@ import java.io.Writer;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.Map;
-import net.minidev.json.parser.JSONParser;
 import org.hamcrest.Matcher;
 
 public class JsonAssert {
 
-    private static JSONParser JSON_PARSER = new JSONParser();
+    private static JsonProvider jsonProvider = new DefaultJsonProvider();
 
     public static final int STRICT_MODE = 0;
     public static final int SLACK_MODE = -1;
 
     private static int mode = SLACK_MODE;
 
-    public static void setMode(int mode) {
-        if (mode != JsonAssert.mode) {
-            JsonAssert.mode = mode;
-            JSON_PARSER = new JSONParser(JsonAssert.mode);
-        }
+    public static void setJsonProvider(JsonProvider jsonProvider) {
+        JsonAssert.jsonProvider = jsonProvider;
     }
 
-    public static int getMode() {
-        return mode;
+    public static JsonAsserter with(String json) {
+        return new JsonAsserterImpl(jsonProvider.parse(json));
     }
 
-    public static JsonAsserter with(String json) throws ParseException {
-        try {
-            return new JsonAsserterImpl(JSON_PARSER.parse(json));
-        } catch (net.minidev.json.parser.ParseException e) {
-            throw new ParseException(json, e.getPosition());
-        }
-    }
-
-    public static JsonAsserter with(Reader reader) throws ParseException, IOException {
-        try {
-            return new JsonAsserterImpl(JSON_PARSER.parse(convertReaderToString(reader)));
-        } catch (net.minidev.json.parser.ParseException e) {
-            throw new ParseException(e.toString(), e.getPosition());
-        }
+    public static JsonAsserter with(Reader reader) throws IOException {
+        return new JsonAsserterImpl(jsonProvider.parse(convertReaderToString(reader)));
     }
 
     public static JsonAsserter with(InputStream is) throws ParseException, IOException {

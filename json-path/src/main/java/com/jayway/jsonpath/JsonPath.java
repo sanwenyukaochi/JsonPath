@@ -2,41 +2,27 @@ package com.jayway.jsonpath;
 
 import com.jayway.jsonpath.reader.PathToken;
 import com.jayway.jsonpath.reader.PathTokenizer;
+import com.jayway.jsonpath.spi.JsonProvider;
+import com.jayway.jsonpath.spi.impl.DefaultJsonProvider;
+
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import net.minidev.json.parser.JSONParser;
-import net.minidev.json.parser.ParseException;
 
 public class JsonPath {
-
-    public static final int STRICT_MODE = 0;
-    public static final int SLACK_MODE = -1;
-
-    private static int mode = SLACK_MODE;
-
-    private static final Logger log = Logger.getLogger(JsonPath.class.getName());
-
-    private static JSONParser JSON_PARSER = new JSONParser(JsonPath.mode);
 
     private static Pattern DEFINITE_PATH_PATTERN =
             Pattern.compile(".*(\\.\\.|\\*|\\[[\\\\/]|\\?|,|:\\s?\\]|\\[\\s?:|>|\\(|<|=|\\+).*");
 
     private PathTokenizer tokenizer;
 
-    public static void setMode(int mode) {
-        if (mode != JsonPath.mode) {
-            JsonPath.mode = mode;
-            JSON_PARSER = new JSONParser(JsonPath.mode);
-        }
-    }
-
-    public static int getMode() {
-        return mode;
-    }
+    private JsonProvider jsonProvider;
 
     private JsonPath(String jsonPath) {
+        this(new DefaultJsonProvider(), jsonPath);
+    }
+
+    private JsonPath(JsonProvider jsonProvider, String jsonPath) {
         if (jsonPath == null
                 || jsonPath.trim().isEmpty()
                 || jsonPath.matches("new ")
@@ -44,7 +30,8 @@ public class JsonPath {
 
             throw new InvalidPathException("Invalid path");
         }
-        this.tokenizer = new PathTokenizer(jsonPath);
+        this.jsonProvider = jsonProvider;
+        this.tokenizer = new PathTokenizer(jsonPath, jsonProvider);
     }
 
     public String getPath() {
@@ -59,7 +46,6 @@ public class JsonPath {
     }
 
     public <T> T read(Object container) {
-
         if (!(container instanceof Map) && !(container instanceof List)) {
             throw new IllegalArgumentException("Invalid container object");
         }
@@ -67,32 +53,28 @@ public class JsonPath {
         Object result = container;
 
         for (PathToken pathToken : tokenizer) {
-            result = pathToken.filter(result);
+            result = pathToken.filter(result, jsonProvider);
         }
         return (T) result;
     }
 
-    public <T> T read(String json) throws java.text.ParseException {
-        return (T) read(parse(json));
+    public <T> T read(String json) {
+        return (T) read(jsonProvider.parse(json));
     }
 
     public static JsonPath compile(String jsonPath) {
         return new JsonPath(jsonPath);
     }
 
-    public static <T> T read(String json, String jsonPath) throws java.text.ParseException {
+    public static JsonPath compile(JsonProvider provider, String jsonPath) {
+        return new JsonPath(provider, jsonPath);
+    }
+
+    public static <T> T read(String json, String jsonPath) {
         return (T) compile(jsonPath).read(json);
     }
 
     public static <T> T read(Object json, String jsonPath) {
         return (T) compile(jsonPath).read(json);
-    }
-
-    public static Object parse(String json) throws java.text.ParseException {
-        try {
-            return JSON_PARSER.parse(json);
-        } catch (ParseException e) {
-            throw new java.text.ParseException(json, e.getPosition());
-        }
     }
 }
