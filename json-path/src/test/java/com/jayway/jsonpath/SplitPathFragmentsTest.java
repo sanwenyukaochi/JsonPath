@@ -72,6 +72,8 @@ public class SplitPathFragmentsTest {
 
         assertPath("$.[   'store' ]", hasItems("$", "store"));
 
+        assertPath("$.['store bore']", hasItems("$", "store bore"));
+
         assertPath("$..book[  ?(@.price<10)  ]", hasItems("$", "..", "book", "[?(@.price<10)]"));
 
         assertPath("$..book[?(@.price<10  )]", hasItems("$", "..", "book", "[?(@.price<10)]"));

@@ -67,7 +67,7 @@ public class JsonPath {
         return (T) compile(jsonPath).read(json);
     }
 
-    private static Object parse(String json) throws java.text.ParseException {
+    public static Object parse(String json) throws java.text.ParseException {
         try {
             return JSON_PARSER.parse(json);
         } catch (ParseException e) {
