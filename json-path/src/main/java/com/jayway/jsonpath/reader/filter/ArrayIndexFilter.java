@@ -16,6 +16,12 @@ public class ArrayIndexFilter extends Filter {
 
         String trimmedCondition = trim(condition, 1, 1);
 
+        if (trimmedCondition.contains("@.length")) {
+            trimmedCondition = trim(trimmedCondition, 1, 1);
+            trimmedCondition = trimmedCondition.replace("@.length", "");
+            trimmedCondition = trimmedCondition + ":";
+        }
+
         if (trimmedCondition.startsWith(":")) {
             trimmedCondition = trim(trimmedCondition, 1, 0);
             int get = Integer.parseInt(trimmedCondition);
@@ -28,6 +34,7 @@ public class ArrayIndexFilter extends Filter {
             trimmedCondition = trim(trimmedCondition, 1, 1);
             int get = Integer.parseInt(trimmedCondition);
             return src.get(src.size() - get);
+
         } else {
             String[] indexArr = trimmedCondition.split(",");
 

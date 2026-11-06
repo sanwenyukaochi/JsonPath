@@ -4,9 +4,13 @@ public class FilterFactory {
 
     public static Filter createFilter(String pathFragment) {
 
-        if ("$".equals(pathFragment) || "*".equals(pathFragment) || "[*]".equals(pathFragment)) {
+        if ("$".equals(pathFragment) || "[*]".equals(pathFragment)) {
 
             return new PassThrewFilter(pathFragment);
+
+        } else if ("*".equals(pathFragment)) {
+
+            return new WildcardFilter(pathFragment);
 
         } else if (pathFragment.contains("..")) {
 
@@ -19,7 +23,9 @@ public class FilterFactory {
         } else if (pathFragment.contains("[")) {
 
             if (pathFragment.startsWith("[?")) {
-                if (!pathFragment.contains("=")) {
+                if (!pathFragment.contains("=")
+                        && !pathFragment.contains("<")
+                        && !pathFragment.contains(">")) {
 
                     return new HasFieldFilter(pathFragment);
                 } else {

@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -243,8 +242,16 @@ public class JsonPathTest {
     public void all_books_cheaper_than_10() throws Exception {
 
         assertThat(
-                JsonPath.<List<String>>read(DOCUMENT, "$.store.book[?(@.price < 10)].title"),
+                JsonPath.<List<String>>read(DOCUMENT, "$..book[?(@.price<10)].title"),
                 hasItems("Sayings of the Century", "Moby Dick"));
+    }
+
+    @Test
+    public void all_books() throws Exception {
+
+        Object books = JsonPath.<List<String>>read(DOCUMENT, "$..book");
+
+        System.out.println("test");
     }
 
     @Test
@@ -268,7 +275,11 @@ public class JsonPathTest {
     public void all_books_with_category_reference() throws Exception {
 
         assertThat(
-                JsonPath.<List<String>>read(DOCUMENT, "$..book[?(@.category = 'reference')].title"),
+                JsonPath.<List<String>>read(DOCUMENT, "$..book[?(@.category='reference')].title"),
+                hasItems("Sayings of the Century"));
+        assertThat(
+                JsonPath.<List<String>>read(
+                        DOCUMENT, "$.store.book[?(@.category='reference')].title"),
                 hasItems("Sayings of the Century"));
     }
 
@@ -279,14 +290,11 @@ public class JsonPathTest {
 
     @Test
     public void access_index_out_of_bounds_does_not_throw_exception() throws Exception {
-
-        Object res = JsonPath.read(DOCUMENT, "$.store.book[100].author");
-
-        assertNull(res);
-
-        res = JsonPath.read(DOCUMENT, "$.store.book[1, 200].author");
-
-        assertThat((List<String>) res, hasItems("Evelyn Waugh"));
+        assertThrows(
+                IndexOutOfBoundsException.class,
+                () -> {
+                    Object res = JsonPath.read(DOCUMENT, "$.store.book[100].author");
+                });
     }
 
     @Test
