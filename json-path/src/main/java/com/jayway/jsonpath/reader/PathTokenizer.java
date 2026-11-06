@@ -95,14 +95,22 @@ public class PathTokenizer implements Iterable<PathToken> {
         StringBuilder sb = new StringBuilder();
         while (!isEmpty() && (!isStopChar(peek(), stopChars))) {
 
-            char c = poll();
+            if (peek() == '(') {
+                do {
+                    sb.append(poll());
+                } while (peek() != ')');
+                sb.append(poll());
+            } else {
 
-            if (isStopChar(c, stopChars)) {
-                if (includeSopChar) {
+                char c = poll();
+
+                if (isStopChar(c, stopChars)) {
+                    if (includeSopChar) {
+                        sb.append(c);
+                    }
+                } else {
                     sb.append(c);
                 }
-            } else {
-                sb.append(c);
             }
         }
         if (includeSopChar) {

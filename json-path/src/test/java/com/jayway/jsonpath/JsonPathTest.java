@@ -251,6 +251,9 @@ public class JsonPathTest {
         assertThat(
                 JsonPath.<List<String>>read(DOCUMENT, "$..book[?(@['display-price'] < 10)].title"),
                 hasItems("Sayings of the Century", "Moby Dick"));
+        assertThat(
+                JsonPath.<List<String>>read(DOCUMENT, "$..book[?(@.display-price < 10)].title"),
+                hasItems("Sayings of the Century", "Moby Dick"));
     }
 
     @Test

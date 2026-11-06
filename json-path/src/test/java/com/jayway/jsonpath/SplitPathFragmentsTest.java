@@ -29,6 +29,17 @@ public class SplitPathFragmentsTest {
     private JsonProvider jsonProvider = JsonProvider.getInstance();
 
     @Test
+    public void array_filter_bracket_test() throws Exception {
+
+        PathTokenizer tokenizer =
+                new PathTokenizer("$.store.book[?(@['isbn'])].isbn", jsonProvider);
+
+        for (String fragment : tokenizer.getFragments()) {
+            System.out.println(fragment);
+        }
+    }
+
+    @Test
     public void valid_path_is_split_correctly() throws Exception {
 
         assertPath("$.store[*]", hasItems("$", "store", "[*]"));
