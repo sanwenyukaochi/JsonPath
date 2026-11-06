@@ -1,8 +1,11 @@
 package com.jayway.jsonpath;
 
-import com.jayway.jsonpath.filter.FilterOutput;
-import com.jayway.jsonpath.filter.JsonPathFilterChain;
+import com.jayway.jsonpath.reader.PathToken;
+import com.jayway.jsonpath.reader.PathTokenizer;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
 
@@ -17,7 +20,10 @@ public class JsonPath {
 
     private static JSONParser JSON_PARSER = new JSONParser(JsonPath.mode);
 
-    private JsonPathFilterChain filters;
+    private static Pattern DEFINITE_PATH_PATTERN =
+            Pattern.compile(".*(\\.\\.|\\*|\\[[\\\\/]|\\?|,|:\\s?\\]|\\[\\s?:|>|\\(|<|=|\\+).*");
+
+    private PathTokenizer tokenizer;
 
     public static void setMode(int mode) {
         if (mode != JsonPath.mode) {
@@ -38,17 +44,32 @@ public class JsonPath {
 
             throw new InvalidPathException("Invalid path");
         }
-        this.filters = new JsonPathFilterChain(PathUtil.splitPath(jsonPath));
+        this.tokenizer = new PathTokenizer(jsonPath);
     }
 
-    public <T> T read(Object json) {
-        FilterOutput filterOutput = filters.filter(json);
+    public String getPath() {
+        return this.tokenizer.getPath();
+    }
 
-        if (filterOutput == null || filterOutput.getResult() == null) {
-            return null;
+    public boolean isPathDefinite() {
+
+        String preparedPath = getPath().replaceAll("\"[^\"\\\\\\n\r]*\"", "");
+
+        return !DEFINITE_PATH_PATTERN.matcher(preparedPath).matches();
+    }
+
+    public <T> T read(Object container) {
+
+        if (!(container instanceof Map) && !(container instanceof List)) {
+            throw new IllegalArgumentException("Invalid container object");
         }
 
-        return (T) filterOutput.getResult();
+        Object result = container;
+
+        for (PathToken pathToken : tokenizer) {
+            result = pathToken.filter(result);
+        }
+        return (T) result;
     }
 
     public <T> T read(String json) throws java.text.ParseException {
