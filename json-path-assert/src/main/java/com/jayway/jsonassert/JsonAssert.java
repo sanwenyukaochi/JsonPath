@@ -7,26 +7,19 @@ import com.jayway.jsonassert.impl.matcher.IsEmptyCollection;
 import com.jayway.jsonassert.impl.matcher.IsMapContainingKey;
 import com.jayway.jsonassert.impl.matcher.IsMapContainingValue;
 import com.jayway.jsonpath.spi.JsonProvider;
-import com.jayway.jsonpath.spi.impl.DefaultJsonProvider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.text.ParseException;
 import java.util.Collection;
 import java.util.Map;
 import org.hamcrest.Matcher;
 
 public class JsonAssert {
 
-    private static JsonProvider jsonProvider = new DefaultJsonProvider();
-
-    public static final int STRICT_MODE = 0;
-    public static final int SLACK_MODE = -1;
-
-    private static int mode = SLACK_MODE;
+    private static JsonProvider jsonProvider = JsonProvider.getInstance();
 
     public static void setJsonProvider(JsonProvider jsonProvider) {
         JsonAssert.jsonProvider = jsonProvider;
@@ -40,7 +33,7 @@ public class JsonAssert {
         return new JsonAsserterImpl(jsonProvider.parse(convertReaderToString(reader)));
     }
 
-    public static JsonAsserter with(InputStream is) throws ParseException, IOException {
+    public static JsonAsserter with(InputStream is) throws IOException {
         Reader reader = new InputStreamReader(is);
         return with(reader);
     }

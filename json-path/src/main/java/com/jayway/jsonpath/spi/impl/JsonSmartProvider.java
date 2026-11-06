@@ -10,17 +10,17 @@ import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
 
-public class DefaultJsonProvider extends JsonProvider {
+public class JsonSmartProvider extends JsonProvider {
 
     private Mode mode;
 
     private JSONParser parser;
 
-    public DefaultJsonProvider() {
+    public JsonSmartProvider() {
         this(Mode.SLACK);
     }
 
-    public DefaultJsonProvider(Mode mode) {
+    public JsonSmartProvider(Mode mode) {
         this.mode = mode;
         this.parser = new JSONParser(mode.intValue());
     }

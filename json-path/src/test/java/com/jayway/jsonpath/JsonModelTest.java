@@ -3,7 +3,7 @@ package com.jayway.jsonpath;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
-public class PathReaderTest {
+public class JsonModelTest {
 
     public static final String DOCUMENT =
             """
@@ -50,11 +50,11 @@ public class PathReaderTest {
     @Test
     public void a_path_can_be_read() throws Exception {
 
-        PathReader pathReader = PathReader.create(DOCUMENT);
+        JsonModel pathReader = JsonModel.create(DOCUMENT);
 
         Map<String, Object> book = pathReader.read("store.book[1]");
 
-        PathReader pathReader1 = pathReader.get("store.book[1]");
+        JsonModel pathReader1 = pathReader.get("store.book[1]");
 
         String author = pathReader1.read("author");
 
