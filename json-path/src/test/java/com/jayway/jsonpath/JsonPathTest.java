@@ -25,29 +25,29 @@ public class JsonPathTest {
                   { "category": "reference",
                     "author": "Nigel Rees",
                     "title": "Sayings of the Century",
-                    "price": 8.95
+                    "display-price": 8.95
                   },
                   { "category": "fiction",
                     "author": "Evelyn Waugh",
                     "title": "Sword of Honour",
-                    "price": 12.99
+                    "display-price": 12.99
                   },
                   { "category": "fiction",
                     "author": "Herman Melville",
                     "title": "Moby Dick",
                     "isbn": "0-553-21311-3",
-                    "price": 8.99
+                    "display-price": 8.99
                   },
                   { "category": "fiction",
                     "author": "J. R. R. Tolkien",
                     "title": "The Lord of the Rings",
                     "isbn": "0-395-19395-8",
-                    "price": 22.99
+                    "display-price": 22.99
                   }
                 ],
                 "bicycle": {
                   "color": "red",
-                  "price": 19.95,
+                  "display-price": 19.95,
                   "foo:bar": "fooBar",
                   "dot.notation": "new",
                   "dash-notation": "dashes"
@@ -202,7 +202,7 @@ public class JsonPathTest {
     public void all_prices_in_store() throws Exception {
 
         assertThat(
-                JsonPath.<List<Double>>read(DOCUMENT, "$.store..price"),
+                JsonPath.<List<Double>>read(DOCUMENT, "$.store..['display-price']"),
                 hasItems(8.95D, 12.99D, 8.99D, 19.95D));
     }
 
@@ -242,13 +242,14 @@ public class JsonPathTest {
                 JsonPath.<List<String>>read(DOCUMENT, "$.store.book[?(@.isbn)].isbn"),
                 hasItems("0-553-21311-3", "0-395-19395-8"));
         assertTrue(JsonPath.<List>read(DOCUMENT, "$.store.book[?(@.isbn)].isbn").size() == 2);
+        assertTrue(JsonPath.<List>read(DOCUMENT, "$.store.book[?(@['isbn'])].isbn").size() == 2);
     }
 
     @Test
     public void all_books_cheaper_than_10() throws Exception {
 
         assertThat(
-                JsonPath.<List<String>>read(DOCUMENT, "$..book[?(@.price<10)].title"),
+                JsonPath.<List<String>>read(DOCUMENT, "$..book[?(@['display-price'] < 10)].title"),
                 hasItems("Sayings of the Century", "Moby Dick"));
     }
 
