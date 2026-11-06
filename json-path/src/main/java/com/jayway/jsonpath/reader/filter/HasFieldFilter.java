@@ -36,4 +36,9 @@ public class HasFieldFilter extends Filter {
         }
         return result;
     }
+
+    @Override
+    public boolean isArrayFilter() {
+        return true;
+    }
 }

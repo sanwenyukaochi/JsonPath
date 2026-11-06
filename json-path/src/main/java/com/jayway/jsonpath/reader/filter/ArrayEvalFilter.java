@@ -42,6 +42,11 @@ public class ArrayEvalFilter extends Filter {
         return result;
     }
 
+    @Override
+    public boolean isArrayFilter() {
+        return true;
+    }
+
     private boolean isMatch(
             Object check, ConditionStatement conditionStatement, JsonProvider jsonProvider) {
         if (!jsonProvider.isMap(check)) {
