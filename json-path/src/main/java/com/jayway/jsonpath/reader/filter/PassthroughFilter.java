@@ -2,11 +2,11 @@ package com.jayway.jsonpath.reader.filter;
 
 import com.jayway.jsonpath.spi.JsonProvider;
 
-public class PassThroughFilter extends Filter {
+public class PassthroughFilter extends Filter {
 
     private boolean isArrayFilter;
 
-    public PassThroughFilter(String condition, boolean isArrayFilter) {
+    public PassthroughFilter(String condition, boolean isArrayFilter) {
         super(condition);
         this.isArrayFilter = isArrayFilter;
     }
