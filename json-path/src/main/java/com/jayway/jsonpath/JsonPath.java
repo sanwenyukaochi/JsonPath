@@ -2,6 +2,7 @@ package com.jayway.jsonpath;
 
 import com.jayway.jsonpath.reader.PathToken;
 import com.jayway.jsonpath.reader.PathTokenizer;
+import com.jayway.jsonpath.reader.filter.Filter;
 import com.jayway.jsonpath.spi.JsonProvider;
 
 import java.util.List;
@@ -51,8 +52,15 @@ public class JsonPath {
 
         Object result = container;
 
+        boolean inArrayContext = false;
+
         for (PathToken pathToken : tokenizer) {
-            result = pathToken.filter(result, jsonProvider);
+            Filter filter = pathToken.getFilter();
+            result = filter.filter(result, jsonProvider, inArrayContext);
+
+            if (!inArrayContext) {
+                inArrayContext = filter.isArrayFilter();
+            }
         }
         return (T) result;
     }
