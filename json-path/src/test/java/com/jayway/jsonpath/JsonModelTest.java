@@ -1,6 +1,5 @@
 package com.jayway.jsonpath;
 
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 public class JsonModelTest {
@@ -47,17 +46,53 @@ public class JsonModelTest {
             }\
             """;
 
+    public static final JsonModel MODEL = new JsonModel(DOCUMENT);
+
     @Test
     public void a_path_can_be_read() throws Exception {
 
-        JsonModel pathReader = JsonModel.create(DOCUMENT);
+        JsonPath path = JsonPath.compile("$.store.book[*].title");
 
-        Map<String, Object> book = pathReader.read("store.book[1]");
+        JsonModel model = new JsonModel(DOCUMENT);
 
-        JsonModel pathReader1 = pathReader.get("store.book[1]");
+        Object result = model.get(path);
 
-        String author = pathReader1.read("author");
+        System.out.println(model.getJsonProvider().toJson(result));
+    }
 
-        System.out.println("d");
+    @Test
+    public void test2() throws Exception {
+        JsonPath path = JsonPath.compile("$..");
+
+        JsonModel model = new JsonModel(DOCUMENT);
+
+        System.out.println(model.getJson(path));
+    }
+
+    @Test
+    public void test3() throws Exception {
+        JsonPath path = JsonPath.compile("$..[0]");
+
+        System.out.println(MODEL.getJson(path));
+    }
+
+    @Test
+    public void test4() throws Exception {
+        JsonPath path = JsonPath.compile("$..*");
+
+        System.out.println("--------------------------------");
+
+        JsonModel model = new JsonModel(DOCUMENT);
+        System.out.println(model.getJson(path));
+    }
+
+    @Test
+    public void test5() throws Exception {
+
+        JsonModel model = new JsonModel(DOCUMENT);
+
+        JsonModel model2 = model.getModel("store.book[0]");
+
+        System.out.println(model2.getJson());
     }
 }

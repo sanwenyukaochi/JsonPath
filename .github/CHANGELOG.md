@@ -1,8 +1,17 @@
 ------------------------------------------
+0.5.6
+------------------------------------------
+- Replaced regexp with custom tokenizer
+- Removed static declaration of JSON_PARSER
+- Introduced SPI for JsonProvider
+- Elaborating new concept with JsonModel
+
+------------------------------------------
 0.5.5
 ------------------------------------------
 - Improved JSON bracket notation. $['store']['book'][*]['author name']
   properties can also contain '.' eg $['store']['book'][*]['author.name']
+
 ------------------------------------------
 0.5.4
 ------------------------------------------
@@ -18,7 +27,6 @@
 ------------------------------------------
 0.5.2
 ------------------------------------------
-
 - Fixed issue that path was never considered definite if containing a ':'
 - Bracket notation is now first class citizen $.foo.bar == $.['foo'].['bar']
 - Added JsonAsserter.assertNotDefined(String path) to allow checks for negative existence of a path
