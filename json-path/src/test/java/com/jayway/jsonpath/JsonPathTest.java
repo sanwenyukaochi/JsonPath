@@ -49,7 +49,8 @@ public class JsonPathTest {
                   "color": "red",
                   "price": 19.95,
                   "foo:bar": "fooBar",
-                  "dot.notation": "new"
+                  "dot.notation": "new",
+                  "dash-notation": "dashes"
                 }
               }
             }\
@@ -106,6 +107,12 @@ public class JsonPathTest {
         assertEquals("new", JsonPath.read(DOCUMENT, "$['store']['bicycle']['dot.notation']"));
         assertEquals("new", JsonPath.read(DOCUMENT, "$.['store']['bicycle']['dot.notation']"));
         assertEquals("new", JsonPath.read(DOCUMENT, "$.['store'].['bicycle'].['dot.notation']"));
+
+        assertEquals("dashes", JsonPath.read(DOCUMENT, "$.['store'].bicycle.['dash-notation']"));
+        assertEquals("dashes", JsonPath.read(DOCUMENT, "$['store']['bicycle']['dash-notation']"));
+        assertEquals("dashes", JsonPath.read(DOCUMENT, "$.['store']['bicycle']['dash-notation']"));
+        assertEquals(
+                "dashes", JsonPath.read(DOCUMENT, "$.['store'].['bicycle'].['dash-notation']"));
     }
 
     @Test
