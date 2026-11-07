@@ -298,7 +298,8 @@ public class PathCompiler {
 
                 case CLOSE_PARENTHESIS:
                     groupParen--;
-                    if (0 != groupParen) {
+
+                    if (0 > groupParen) {
                         parameter.append(c);
                     }
                 case COMMA:
