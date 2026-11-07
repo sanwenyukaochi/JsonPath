@@ -12,17 +12,20 @@ public abstract class Filter<T> {
         return new MapFilter(criteria);
     }
 
-    public Object doFilter(Iterable<T> filterItems, JsonProvider jsonProvider) {
-        Object result = jsonProvider.createArray();
+    public Object doFilter(Iterable<T> filterItems, Configuration configuration) {
+        JsonProvider provider = configuration.getProvider();
+        Object result = provider.createArray();
         for (T filterItem : filterItems) {
-            if (accept(filterItem)) {
-                jsonProvider.setProperty(result, jsonProvider.length(result), filterItem);
+            if (accept(filterItem, configuration)) {
+                provider.setProperty(result, provider.length(result), filterItem);
             }
         }
         return result;
     }
 
     public abstract boolean accept(T obj);
+
+    public abstract boolean accept(T obj, Configuration configuration);
 
     public abstract Filter addCriteria(Criteria criteria);
 
@@ -31,6 +34,11 @@ public abstract class Filter<T> {
         @Override
         public boolean accept(T obj) {
             return false;
+        }
+
+        @Override
+        public boolean accept(T obj, Configuration configuration) {
+            return accept(obj);
         }
 
         @Override
@@ -60,8 +68,13 @@ public abstract class Filter<T> {
 
         @Override
         public boolean accept(Map<String, Object> map) {
+            return accept(map, Configuration.defaultConfiguration());
+        }
+
+        @Override
+        public boolean accept(Map<String, Object> map, Configuration configuration) {
             for (Criteria criterion : this.criteria.values()) {
-                if (!criterion.matches(map)) {
+                if (!criterion.matches(map, configuration)) {
                     return false;
                 }
             }

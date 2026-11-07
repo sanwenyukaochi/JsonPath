@@ -1,5 +1,7 @@
 package com.jayway.jsonpath;
 
+import static com.jayway.jsonpath.Criteria.where;
+import static com.jayway.jsonpath.Filter.filter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -9,7 +11,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class ExpressionEvalTest {
@@ -180,11 +181,15 @@ public class ExpressionEvalTest {
     }
 
     @Test
-    @Disabled
     public void nulls_filter() {
 
         List<Map<String, Object>> result =
-                JsonPath.read(DOCUMENT, "$.characters[?(@.offspring == null)]");
+                JsonPath.read(
+                        DOCUMENT, "$.characters[?]", filter(where("offspring").exists(false)));
+        System.out.println(result);
+        assertEquals(1, result.size());
+
+        result = JsonPath.read(DOCUMENT, "$.characters[?(@.offspring == null)]");
         assertEquals(1, result.size());
 
         result = JsonPath.read(DOCUMENT, "$.characters[?(@.offspring != null)]");

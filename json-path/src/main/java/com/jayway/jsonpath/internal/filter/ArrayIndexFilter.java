@@ -1,5 +1,6 @@
 package com.jayway.jsonpath.internal.filter;
 
+import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.spi.JsonProvider;
 
 import java.util.regex.Pattern;
@@ -30,7 +31,8 @@ public class ArrayIndexFilter extends PathTokenFilter {
     }
 
     @Override
-    public Object filter(Object obj, JsonProvider jsonProvider) {
+    public Object filter(Object obj, Configuration configuration) {
+        JsonProvider jsonProvider = configuration.getProvider();
 
         Object result = jsonProvider.createArray();
 
@@ -73,8 +75,14 @@ public class ArrayIndexFilter extends PathTokenFilter {
                 int stop = Integer.parseInt(indexes[1]);
 
                 for (int i = start; i < stop; i++) {
-                    jsonProvider.setProperty(
-                            result, jsonProvider.length(result), jsonProvider.getProperty(obj, i));
+                    try {
+                        jsonProvider.setProperty(
+                                result,
+                                jsonProvider.length(result),
+                                jsonProvider.getProperty(obj, i));
+                    } catch (IndexOutOfBoundsException e) {
+                        break;
+                    }
                 }
                 return result;
             }
@@ -82,6 +90,7 @@ public class ArrayIndexFilter extends PathTokenFilter {
             String[] indexArr = COMMA.split(trimmedCondition);
 
             if (obj == null || jsonProvider.length(obj) == 0) {
+
                 return result;
             }
 
@@ -101,10 +110,10 @@ public class ArrayIndexFilter extends PathTokenFilter {
     }
 
     @Override
-    public Object getRef(Object obj, JsonProvider jsonProvider) {
+    public Object getRef(Object obj, Configuration configuration) {
         if (SINGLE_ARRAY_INDEX_PATTERN.matcher(condition).matches()) {
             String trimmedCondition = trim(condition, 1, 1);
-            return jsonProvider.getProperty(obj, trimmedCondition);
+            return configuration.getProvider().getProperty(obj, trimmedCondition);
 
         } else {
             throw new UnsupportedOperationException();

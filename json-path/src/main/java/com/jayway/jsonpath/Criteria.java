@@ -57,17 +57,17 @@ public class Criteria {
         this.key = JsonPath.compile(key);
     }
 
-    public JsonPath getKey() {
+    JsonPath getKey() {
         return this.key;
     }
 
-    public boolean matches(Map<String, Object> map) {
+    boolean matches(Map<String, Object> map, Configuration configuration) {
 
         if (this.criteriaChain.size() == 1) {
-            return criteriaChain.get(0).singleObjectApply(map);
+            return criteriaChain.get(0).singleObjectApply(map, configuration);
         } else {
             for (Criteria c : this.criteriaChain) {
-                if (!c.singleObjectApply(map)) {
+                if (!c.singleObjectApply(map, configuration)) {
                     return false;
                 }
             }
@@ -97,11 +97,11 @@ public class Criteria {
         return predicate.accept((T) singleObjectOrCollection);
     }
 
-    boolean singleObjectApply(Map<String, Object> map) {
+    boolean singleObjectApply(Map<String, Object> map, final Configuration configuration) {
 
         for (CriteriaType key : this.criteria.keySet()) {
 
-            Object actualVal = readSafely(this.key, map);
+            final Object actualVal = readSafely(this.key, map);
             final Object expectedVal = this.criteria.get(key);
 
             if (CriteriaType.GT.equals(key)) {
@@ -236,14 +236,24 @@ public class Criteria {
                 return objectOrAnyCollectionItemMatches(
                         map,
                         new Predicate<Object>() {
-
                             @Override
                             public boolean accept(final Object value) {
                                 boolean act = true;
+                                Object res;
                                 try {
-                                    Object val = getKey().read(value);
-                                    if (val instanceof Collection) {
-                                        act = !((Collection) val).isEmpty();
+                                    res =
+                                            getKey().read(
+                                                            value,
+                                                            configuration.options(
+                                                                    Option
+                                                                            .THROW_ON_MISSING_PROPERTY));
+
+                                    if (configuration.getProvider().isArray(res)) {
+                                        if (getKey().isPathDefinite()) {
+                                            act = true;
+                                        } else {
+                                            act = (configuration.getProvider().length(res) > 0);
+                                        }
                                     }
                                 } catch (InvalidPathException e) {
                                     act = false;
@@ -294,7 +304,7 @@ public class Criteria {
                 Collection<Criteria> cs = (Collection<Criteria>) isValue;
                 for (Criteria crit : cs) {
                     for (Criteria c : crit.criteriaChain) {
-                        if (!c.singleObjectApply(map)) {
+                        if (!c.singleObjectApply(map, configuration)) {
                             return false;
                         }
                     }
