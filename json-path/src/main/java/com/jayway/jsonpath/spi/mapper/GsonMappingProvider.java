@@ -6,7 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPathException;
 import com.jayway.jsonpath.TypeRef;
-
+import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,19 +14,19 @@ public class GsonMappingProvider implements MappingProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(GsonMappingProvider.class);
 
-    private final Factory<Gson> factory;
+    private final Callable<Gson> factory;
 
     public GsonMappingProvider(final Gson gson) {
         this(
-                new Factory<Gson>() {
+                new Callable<Gson>() {
                     @Override
-                    public Gson createInstance() {
+                    public Gson call() {
                         return gson;
                     }
                 });
     }
 
-    public GsonMappingProvider(Factory<Gson> factory) {
+    public GsonMappingProvider(Callable<Gson> factory) {
         this.factory = factory;
     }
 
@@ -35,9 +35,9 @@ public class GsonMappingProvider implements MappingProvider {
         try {
             Class.forName("com.google.gson.Gson");
             this.factory =
-                    new Factory<Gson>() {
+                    new Callable<Gson>() {
                         @Override
-                        public Gson createInstance() {
+                        public Gson call() {
                             return new Gson();
                         }
                     };
@@ -50,9 +50,7 @@ public class GsonMappingProvider implements MappingProvider {
     @Override
     public <T> T map(Object source, Class<T> targetType, Configuration configuration) {
         try {
-            return factory.createInstance()
-                    .getAdapter(targetType)
-                    .fromJsonTree((JsonElement) source);
+            return factory.call().getAdapter(targetType).fromJsonTree((JsonElement) source);
         } catch (Exception e) {
             throw new MappingException(e);
         }
@@ -62,7 +60,7 @@ public class GsonMappingProvider implements MappingProvider {
     public <T> T map(Object source, TypeRef<T> targetType, Configuration configuration) {
         try {
             return (T)
-                    factory.createInstance()
+                    factory.call()
                             .getAdapter(TypeToken.get(targetType.getType()))
                             .fromJsonTree((JsonElement) source);
         } catch (Exception e) {
