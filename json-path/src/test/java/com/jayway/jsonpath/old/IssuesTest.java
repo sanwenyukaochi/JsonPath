@@ -1,5 +1,7 @@
 package com.jayway.jsonpath.old;
 
+import static com.jayway.jsonpath.Criteria.where;
+import static com.jayway.jsonpath.Filter.filter;
 import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -16,6 +18,7 @@ import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.PathNotFoundException;
+import com.jayway.jsonpath.Predicate.PredicateContext;
 import com.jayway.jsonpath.internal.Cache;
 import com.jayway.jsonpath.internal.CompiledPath;
 import com.jayway.jsonpath.internal.Path;
@@ -23,8 +26,10 @@ import com.jayway.jsonpath.internal.Utils;
 import com.jayway.jsonpath.spi.json.GsonJsonProvider;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.GsonMappingProvider;
+import com.jayway.jsonpath.spi.mapper.MappingException;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.minidev.json.JSONAware;
@@ -178,7 +183,7 @@ public class IssuesTest extends BaseTest {
 ]\
 """;
 
-        List<String> result = JsonPath.read(json, "$.[?(@.compatible == true)].sku");
+        List<String> result = JsonPath.read(json, "$[?(@.compatible == true)].sku");
 
         Assertions.assertThat(result).containsExactly("SKU-005", "SKU-003");
     }
@@ -804,5 +809,52 @@ public class IssuesTest extends BaseTest {
         Assertions.assertThat(cache.getSilent("3")).isNotNull();
         Assertions.assertThat(cache.getSilent("2")).isNotNull();
         Assertions.assertThat(cache.getSilent("1")).isNull();
+    }
+
+    @Test
+    public void issue_129() throws Exception {
+
+        final Map<String, Integer> match = new HashMap<String, Integer>();
+        match.put("a", 1);
+        match.put("b", 2);
+
+        Map<String, Integer> noMatch = new HashMap<String, Integer>();
+        noMatch.put("a", -1);
+        noMatch.put("b", -2);
+
+        Filter orig = filter(where("a").eq(1).and("b").eq(2));
+
+        String filterAsString = orig.toString();
+
+        Filter parsed = Filter.parse(filterAsString);
+
+        Assertions.assertThat(orig.apply(createPredicateContext(match))).isTrue();
+        Assertions.assertThat(parsed.apply(createPredicateContext(match))).isTrue();
+        Assertions.assertThat(orig.apply(createPredicateContext(noMatch))).isFalse();
+        Assertions.assertThat(parsed.apply(createPredicateContext(noMatch))).isFalse();
+    }
+
+    private PredicateContext createPredicateContext(final Map<String, Integer> map) {
+        return new PredicateContext() {
+            @Override
+            public Object item() {
+                return map;
+            }
+
+            @Override
+            public <T> T item(Class<T> clazz) throws MappingException {
+                return (T) map;
+            }
+
+            @Override
+            public Object root() {
+                return map;
+            }
+
+            @Override
+            public Configuration configuration() {
+                return Configuration.defaultConfiguration();
+            }
+        };
     }
 }

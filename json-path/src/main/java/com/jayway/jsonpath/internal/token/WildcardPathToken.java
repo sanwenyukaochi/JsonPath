@@ -8,6 +8,8 @@ import com.jayway.jsonpath.internal.PathRef;
 
 public class WildcardPathToken extends PathToken {
 
+    WildcardPathToken() {}
+
     @Override
     public void evaluate(
             String currentPath, PathRef parent, Object model, EvaluationContextImpl ctx) {
@@ -29,7 +31,7 @@ public class WildcardPathToken extends PathToken {
     }
 
     @Override
-    boolean isTokenDefinite() {
+    public boolean isTokenDefinite() {
         return false;
     }
 

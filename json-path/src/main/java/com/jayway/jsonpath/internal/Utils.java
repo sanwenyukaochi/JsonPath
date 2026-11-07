@@ -115,7 +115,7 @@ public final class Utils {
     }
 
     public static boolean isNumeric(String str) {
-        if (str == null) {
+        if (str == null || str.trim().isEmpty()) {
             return false;
         }
         int sz = str.length();

@@ -6,7 +6,7 @@ import com.jayway.jsonpath.internal.Utils;
 
 import java.util.List;
 
-public class PropertyPathToken extends PathToken {
+class PropertyPathToken extends PathToken {
 
     private final List<String> properties;
 
@@ -30,7 +30,7 @@ public class PropertyPathToken extends PathToken {
     }
 
     @Override
-    boolean isTokenDefinite() {
+    public boolean isTokenDefinite() {
         return true;
     }
 
@@ -38,7 +38,7 @@ public class PropertyPathToken extends PathToken {
     public String getPathFragment() {
         return new StringBuilder()
                 .append("[")
-                .append(Utils.join(", ", "'", properties))
+                .append(Utils.join(",", "'", properties))
                 .append("]")
                 .toString();
     }

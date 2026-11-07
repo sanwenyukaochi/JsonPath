@@ -227,6 +227,7 @@ public class JsonPath {
         return new JsonReader(configuration);
     }
 
+    @Deprecated
     public static ParseContext using(JsonProvider provider) {
         return new JsonReader(Configuration.builder().jsonProvider(provider).build());
     }

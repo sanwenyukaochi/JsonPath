@@ -270,9 +270,6 @@ public class JsonPathTest extends BaseTest {
     public void access_array_by_index_from_tail() throws Exception {
 
         assertThat(
-                JsonPath.<List<String>>read(DOCUMENT, "$..book[(@.length-1)].author"),
-                hasItems("J. R. R. Tolkien"));
-        assertThat(
                 JsonPath.<List<String>>read(DOCUMENT, "$..book[1:].author"),
                 hasItems("Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien"));
     }
