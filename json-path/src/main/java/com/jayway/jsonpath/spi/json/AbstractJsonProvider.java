@@ -86,9 +86,8 @@ public abstract class AbstractJsonProvider implements JsonProvider {
             return ((String) obj).length();
         }
         throw new JsonPathException(
-                "length operation cannot be applied to " + obj != null
-                        ? obj.getClass().getName()
-                        : "null");
+                "length operation cannot be applied to "
+                        + (obj != null ? obj.getClass().getName() : "null"));
     }
 
     @SuppressWarnings("unchecked")
