@@ -17,14 +17,14 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("/api/")
+@Path("/")
 @Produces(MediaType.TEXT_HTML)
 public class ApiResource {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiResource.class);
 
     @GET
-    @Path("validate")
+    @Path("/validate")
     @Produces(MediaType.APPLICATION_JSON)
     public Response validate(@QueryParam("path") String path) {
         int result = -1;
@@ -37,7 +37,7 @@ public class ApiResource {
     }
 
     @POST
-    @Path("eval")
+    @Path("/eval")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTemplate(
