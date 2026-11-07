@@ -1,40 +1,35 @@
 {
-    "@id": "ID",
-    "foo": "bar",
+    "expensive": 10,
     "store": {
         "bicycle": {
             "color": "red",
-            "dash-notation": "dashes",
-            "display-price": 19.95,
-            "dot.notation": "new",
-            "foo": "baz",
-            "foo:bar": "fooBar"
+            "price": 19.95
         },
         "book": [
             {
                 "author": "Nigel Rees",
                 "category": "reference",
-                "display-price": 8.95,
+                "price": 8.95,
                 "title": "Sayings of the Century"
             },
             {
                 "author": "Evelyn Waugh",
                 "category": "fiction",
-                "display-price": 12.99,
+                "price": 12.99,
                 "title": "Sword of Honour"
             },
             {
                 "author": "Herman Melville",
                 "category": "fiction",
-                "display-price": 8.99,
                 "isbn": "0-553-21311-3",
+                "price": 8.99,
                 "title": "Moby Dick"
             },
             {
                 "author": "J. R. R. Tolkien",
                 "category": "fiction",
-                "display-price": 22.99,
                 "isbn": "0-395-19395-8",
+                "price": 22.99,
                 "title": "The Lord of the Rings"
             }
         ]

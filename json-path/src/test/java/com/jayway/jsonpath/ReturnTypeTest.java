@@ -1,6 +1,9 @@
 package com.jayway.jsonpath;
 
+import static com.jayway.jsonpath.JsonPath.using;
+import static com.jayway.jsonpath.Option.AS_PATH_LIST;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 import java.util.Map;
@@ -49,5 +52,28 @@ public class ReturnTypeTest extends BaseTest {
                 .containsEntry("author", "Nigel Rees")
                 .containsEntry("title", "Sayings of the Century")
                 .containsEntry("display-price", 8.95D);
+    }
+
+    @Test
+    public void a_path_evaluation_can_be_returned_as_PATH_LIST() {
+        Configuration conf = Configuration.builder().options(AS_PATH_LIST).build();
+
+        List<String> pathList = using(conf).parse(JSON_DOCUMENT).read("$..author");
+
+        assertThat(pathList)
+                .containsExactly(
+                        "$['store']['book'][0]['author']",
+                        "$['store']['book'][1]['author']",
+                        "$['store']['book'][2]['author']",
+                        "$['store']['book'][3]['author']");
+    }
+
+    @Test
+    public void class_cast_exception_is_thrown_when_return_type_is_not_expected() {
+        assertThrows(
+                ClassCastException.class,
+                () -> {
+                    List<String> list = reader.read("$.store.book[0].author");
+                });
     }
 }
