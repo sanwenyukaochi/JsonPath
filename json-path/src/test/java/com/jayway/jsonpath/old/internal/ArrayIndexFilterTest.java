@@ -1,6 +1,7 @@
 package com.jayway.jsonpath.old.internal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.jayway.jsonpath.JsonPath;
 import java.util.List;
@@ -39,5 +40,11 @@ public class ArrayIndexFilterTest {
     public void head_tail_grabs_correct() {
         List<Integer> result = JsonPath.parse(JSON).read("$[0:3]");
         assertThat(result, Matchers.contains(1, 3, 5));
+    }
+
+    @Test
+    public void can_access_items_from_end_with_negative_index() {
+        int result = JsonPath.parse(JSON).read("$[-3]");
+        assertEquals(8, result);
     }
 }
