@@ -112,6 +112,7 @@ subprojects {
         constraints {
             add("implementation", "net.minidev:json-smart:2.6.1")
             add("implementation", "com.google.code.gson:gson:2.15.0")
+            add("implementation", "org.json:json:20260814")
             add("implementation", "tools.jackson.core:jackson-databind:3.2.4")
             add("api", "org.hamcrest:hamcrest-library:3.0")
             add("testImplementation", "org.assertj:assertj-core:3.27.7")
