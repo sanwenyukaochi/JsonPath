@@ -1,6 +1,6 @@
 package com.jayway.jsonpath;
 
-public interface Transformer {
+public interface Transformer<T> {
 
-    public JsonModel transform(JsonModel model);
+    public Object transform(T obj);
 }

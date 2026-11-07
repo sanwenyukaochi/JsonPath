@@ -14,8 +14,6 @@ import java.util.regex.Pattern;
 
 public class Criteria {
 
-    private static final Object NOT_SET = new Object();
-
     private enum CriteriaType {
         GT,
         GTE,
@@ -31,6 +29,8 @@ public class Criteria {
         REGEX,
         OR
     }
+
+    private static final Object NOT_SET = new Object();
 
     private final String key;
 
@@ -209,7 +209,6 @@ public class Criteria {
                 }
                 return true;
             } else {
-
                 if (isValue == null) {
                     return (map.get(key) == null);
                 } else {
