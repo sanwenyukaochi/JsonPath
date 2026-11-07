@@ -1,13 +1,11 @@
 package com.jayway.jsonpath;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Disabled;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class NullHandlingTest {
@@ -45,10 +43,11 @@ public class NullHandlingTest {
     }
 
     @Test
-    @Disabled
     public void last_token_defaults_to_null() {
+        Configuration configuration =
+                Configuration.builder().options(Option.DEFAULT_PATH_LEAF_TO_NULL).build();
 
-        assertNull(JsonPath.read(DOCUMENT, "$.children[2].age"));
+        assertNull(JsonPath.parse(DOCUMENT, configuration).read("$.children[2].age"));
     }
 
     @Test
@@ -59,23 +58,34 @@ public class NullHandlingTest {
 
     @Test
     public void the_age_of_all_with_age_defined() {
-        List<Integer> result = JsonPath.read(DOCUMENT, "$.children[*].age");
+        List<Integer> result =
+                JsonPath.using(
+                                Configuration.defaultConfiguration()
+                                        .options(Option.SUPPRESS_EXCEPTIONS))
+                        .parse(DOCUMENT)
+                        .read("$.children[*].age");
 
-        assertThat(result, Matchers.hasItems(0, null));
+        Assertions.assertThat(result).containsSequence(0, null);
     }
 
     @Test
     public void path2() {
-        System.out.println(
-                (Object)
-                        JsonPath.read(
-                                "{\"a\":[{\"b\":1,\"c\":2},{\"b\":5,\"c\":2}]}", "a[?(@.b==4)].c"));
+        List<Object> result =
+                JsonPath.read("{\"a\":[{\"b\":1,\"c\":2},{\"b\":5,\"c\":2}]}", "a[?(@.b==4)].c");
+        Assertions.assertThat(result).isEmpty();
     }
 
+    @Test
     public void path() {
-        System.out.println(
-                (Object)
-                        JsonPath.read(
-                                "{\"a\":[{\"b\":1,\"c\":2},{\"b\":5,\"c\":2}]}", "a[?(@.b==5)].d"));
+        String json = "{\"a\":[{\"b\":1,\"c\":2},{\"b\":5,\"c\":2}]}";
+
+        List<Object> result =
+                JsonPath.using(
+                                Configuration.defaultConfiguration()
+                                        .options(Option.DEFAULT_PATH_LEAF_TO_NULL))
+                        .parse(json)
+                        .read("a[?(@.b==5)].d");
+
+        System.out.println(result);
     }
 }

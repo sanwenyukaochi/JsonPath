@@ -1,7 +1,7 @@
 package com.jayway.jsonpath;
 
 public enum Option {
-    THROW_ON_MISSING_PROPERTY,
+    DEFAULT_PATH_LEAF_TO_NULL,
 
     ALWAYS_RETURN_LIST,
 

@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("unchecked")
 public class Criteria implements Predicate {
 
     private static final Logger logger = LoggerFactory.getLogger(Criteria.class);
@@ -179,10 +180,8 @@ public class Criteria implements Predicate {
             boolean eval(Object expected, Object actual, Configuration configuration) {
                 final Class<?> expType = (Class<?>) expected;
                 final Class<?> actType = actual == null ? null : actual.getClass();
-                if (actType != null) {
-                    return expType.isAssignableFrom(actType);
-                }
-                return false;
+
+                return actType != null && expType.isAssignableFrom(actType);
             }
         },
         REGEX {
@@ -279,11 +278,17 @@ public class Criteria implements Predicate {
         if (CriteriaType.EXISTS == criteriaType) {
             boolean exists = ((Boolean) expected);
             try {
-                path.evaluate(model, configuration.options(Option.THROW_ON_MISSING_PROPERTY))
-                        .getValue();
-                return exists == true;
+
+                Configuration c = configuration;
+                if (c.containsOption(Option.ALWAYS_RETURN_LIST)
+                        || c.containsOption(Option.SUPPRESS_EXCEPTIONS)) {
+                    c = c.options();
+                }
+
+                path.evaluate(model, c).getValue();
+                return exists;
             } catch (PathNotFoundException e) {
-                return exists == false;
+                return !exists;
             }
         } else {
 

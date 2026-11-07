@@ -87,9 +87,7 @@ public class JsonPathTest {
                 PathNotFoundException.class,
                 () -> {
                     Object read =
-                            JsonPath.using(
-                                            Configuration.defaultConfiguration()
-                                                    .options(Option.THROW_ON_MISSING_PROPERTY))
+                            JsonPath.using(Configuration.defaultConfiguration())
                                     .parse(DOCUMENT)
                                     .read("$.store.book[*].fooBar");
 

@@ -2,7 +2,6 @@ package com.jayway.jsonpath.reader;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.json.JsonProviderFactory;
 
@@ -18,10 +17,7 @@ public class ReadConfigurationTest {
         Configuration configuration = Configuration.defaultConfiguration();
 
         Configuration configuration2 =
-                Configuration.builder()
-                        .jsonProvider(JsonProviderFactory.createProvider())
-                        .options(Option.THROW_ON_MISSING_PROPERTY)
-                        .build();
+                Configuration.builder().jsonProvider(JsonProviderFactory.createProvider()).build();
 
         JsonProvider jsonProvider = JsonProviderFactory.createProvider();
 
