@@ -15,6 +15,7 @@ public class FilterCompiler {
     private static final char EVAL_CONTEXT = '@';
 
     private static final char OPEN_SQUARE_BRACKET = '[';
+    private static final char CLOSE_SQUARE_BRACKET = ']';
     private static final char OPEN_PARENTHESIS = '(';
     private static final char CLOSE_PARENTHESIS = ')';
     private static final char OPEN_OBJECT = '{';
@@ -333,7 +334,12 @@ public class FilterCompiler {
         while (filter.inBounds()) {
             if (filter.currentChar() == OPEN_SQUARE_BRACKET) {
                 int closingSquareBracketIndex =
-                        filter.indexOfClosingSquareBracket(filter.position());
+                        filter.indexOfMatchingCloseChar(
+                                filter.position(),
+                                OPEN_SQUARE_BRACKET,
+                                CLOSE_SQUARE_BRACKET,
+                                true,
+                                false);
                 if (closingSquareBracketIndex == -1) {
                     throw new InvalidPathException(
                             "Square brackets does not match in filter " + filter);
