@@ -16,13 +16,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.List;
-import java.util.regex.Pattern;
 
 public class JsonPath {
-
-    private static final Pattern DEFINITE_PATH_PATTERN =
-            Pattern.compile(".*(\\.\\.|\\*|\\[[\\\\/]|\\?|,|:\\s?]|\\[\\s?:|>|\\(|<|=|\\+).*");
 
     private final Path path;
 
@@ -36,11 +31,10 @@ public class JsonPath {
     }
 
     public static boolean isPathDefinite(String path) {
-        String preparedPath = path.replaceAll("\"[^\"\\\\\\n\r]*\"", "");
-        return !DEFINITE_PATH_PATTERN.matcher(preparedPath).matches();
+        return compile(path).isDefinite();
     }
 
-    public boolean isPathDefinite() {
+    public boolean isDefinite() {
         return path.isDefinite();
     }
 
@@ -50,16 +44,7 @@ public class JsonPath {
     }
 
     public <T> T read(Object jsonObject, Configuration configuration) {
-
-        return path.evaluate(jsonObject, configuration).get();
-    }
-
-    public List<String> readPathList(Object jsonObject) {
-        return readPathList(jsonObject, Configuration.defaultConfiguration());
-    }
-
-    public List<String> readPathList(Object jsonObject, Configuration configuration) {
-        return path.evaluate(jsonObject, configuration).getPathList();
+        return (T) path.evaluate(jsonObject, configuration).getWithOptions();
     }
 
     @SuppressWarnings({"unchecked"})
