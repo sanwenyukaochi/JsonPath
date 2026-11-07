@@ -32,6 +32,15 @@ public class BaseTest {
     public static final Configuration JSON_SMART_CONFIGURATION =
             Configuration.defaultConfiguration();
 
+    public static final String JSON_BOOK_DOCUMENT =
+"""
+{    "category" : "reference",
+   "author" : "Nigel Rees",
+   "title" : "Sayings of the Century",
+   "display-price" : 8.95
+}\
+""";
+
     public static final String JSON_DOCUMENT =
             """
             {

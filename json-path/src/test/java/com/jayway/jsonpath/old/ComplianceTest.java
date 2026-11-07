@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.jayway.jsonpath.JsonPath;
@@ -89,88 +90,46 @@ public class ComplianceTest {
     @Test
     public void test_four() throws Exception {
         String json =
-                """
-                {
-                    "menu": {
-                        "header": "SVG Viewer",
-                        "items": [
-                            {
-                                "id": "Open"
-                            },
-                            {
-                                "id": "OpenNew",
-                                "label": "Open New"
-                            },
-                            null,
-                            {
-                                "id": "ZoomIn",
-                                "label": "Zoom In"
-                            },
-                            {
-                                "id": "ZoomOut",
-                                "label": "Zoom Out"
-                            },
-                            {
-                                "id": "OriginalView",
-                                "label": "Original View"
-                            },
-                            null,
-                            {
-                                "id": "Quality"
-                            },
-                            {
-                                "id": "Pause"
-                            },
-                            {
-                                "id": "Mute"
-                            },
-                            null,
-                            {
-                                "id": "Find",
-                                "label": "Find..."
-                            },
-                            {
-                                "id": "FindAgain",
-                                "label": "Find Again"
-                            },
-                            {
-                                "id": "Copy"
-                            },
-                            {
-                                "id": "CopyAgain",
-                                "label": "Copy Again"
-                            },
-                            {
-                                "id": "CopySVG",
-                                "label": "Copy SVG"
-                            },
-                            {
-                                "id": "ViewSVG",
-                                "label": "View SVG"
-                            },
-                            {
-                                "id": "ViewSource",
-                                "label": "View Source"
-                            },
-                            {
-                                "id": "SaveAs",
-                                "label": "Save As"
-                            },
-                            null,
-                            {
-                                "id": "Help"
-                            },
-                            {
-                                "id": "About",
-                                "label": "About Adobe CVG Viewer..."
-                            }
-                        ]
-                    }
-                }\
-                """;
+"""
+{ "menu": {
+                 "header": "SVG Viewer",
+                 "items": [
+                     {"id": "Open"},
+                     {"id": "OpenNew", "label": "Open New"},
+                     null,
+                     {"id": "ZoomIn", "label": "Zoom In"},
+                     {"id": "ZoomOut", "label": "Zoom Out"},
+                     {"id": "OriginalView", "label": "Original View"},
+                     null,
+                     {"id": "Quality"},
+                     {"id": "Pause"},
+                     {"id": "Mute"},
+                     null,
+                     {"id": "Find", "label": "Find..."},
+                     {"id": "FindAgain", "label": "Find Again"},
+                     {"id": "Copy"},
+                     {"id": "CopyAgain", "label": "Copy Again"},
+                     {"id": "CopySVG", "label": "Copy SVG"},
+                     {"id": "ViewSVG", "label": "View SVG"},
+                     {"id": "ViewSource", "label": "View Source"},
+                     {"id": "SaveAs", "label": "Save As"},
+                     null,
+                     {"id": "Help"},
+                     {"id": "About", "label": "About Adobe CVG Viewer..."}
+                 ]
+               }
+             }\
+""";
 
+        assertThat(
+                JsonPath.<List<String>>read(json, "$.menu.items[?(@)]"),
+                Matchers.is(notNullValue()));
         assertThat(
                 JsonPath.<List<String>>read(json, "$.menu.items[?(@ && @.id == 'ViewSVG')].id"),
                 hasItems("ViewSVG"));
+
+        assertThat(
+                JsonPath.<List<String>>read(json, "$.menu.items[?(@ && @.id && !@.label)].id"),
+                hasItems("Open", "Quality", "Pause", "Mute", "Copy", "Help"));
     }
 }

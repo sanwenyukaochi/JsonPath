@@ -39,10 +39,10 @@ public class Criteria implements Predicate {
     private static enum CriteriaType {
         EQ {
             @Override
-            boolean eval(Object left, Object right, PredicateContext ctx) {
-                boolean res = (0 == safeCompare(left, right));
+            boolean eval(Object expected, Object model, PredicateContext ctx) {
+                boolean res = (0 == safeCompare(expected, model));
                 if (logger.isDebugEnabled())
-                    logger.debug("[{}] {} [{}] => {}", right, name(), left, res);
+                    logger.debug("[{}] {} [{}] => {}", model, name(), expected, res);
                 return res;
             }
 
@@ -53,10 +53,10 @@ public class Criteria implements Predicate {
         },
         NE {
             @Override
-            boolean eval(Object left, Object right, PredicateContext ctx) {
-                boolean res = (0 != safeCompare(left, right));
+            boolean eval(Object expected, Object model, PredicateContext ctx) {
+                boolean res = (0 != safeCompare(expected, model));
                 if (logger.isDebugEnabled())
-                    logger.debug("[{}] {} [{}] => {}", right, name(), left, res);
+                    logger.debug("[{}] {} [{}] => {}", model, name(), expected, res);
                 return res;
             }
 
@@ -67,13 +67,13 @@ public class Criteria implements Predicate {
         },
         GT {
             @Override
-            boolean eval(Object left, Object right, PredicateContext ctx) {
-                if ((left == null) ^ (right == null)) {
+            boolean eval(Object expected, Object model, PredicateContext ctx) {
+                if ((expected == null) ^ (model == null)) {
                     return false;
                 }
-                boolean res = (0 > safeCompare(left, right));
+                boolean res = (0 > safeCompare(expected, model));
                 if (logger.isDebugEnabled())
-                    logger.debug("[{}] {} [{}] => {}", right, name(), left, res);
+                    logger.debug("[{}] {} [{}] => {}", model, name(), expected, res);
                 return res;
             }
 
@@ -84,13 +84,13 @@ public class Criteria implements Predicate {
         },
         GTE {
             @Override
-            boolean eval(Object left, Object right, PredicateContext ctx) {
-                if ((left == null) ^ (right == null)) {
+            boolean eval(Object expected, Object model, PredicateContext ctx) {
+                if ((expected == null) ^ (model == null)) {
                     return false;
                 }
-                boolean res = (0 >= safeCompare(left, right));
+                boolean res = (0 >= safeCompare(expected, model));
                 if (logger.isDebugEnabled())
-                    logger.debug("[{}] {} [{}] => {}", right, name(), left, res);
+                    logger.debug("[{}] {} [{}] => {}", model, name(), expected, res);
                 return res;
             }
 
@@ -101,13 +101,13 @@ public class Criteria implements Predicate {
         },
         LT {
             @Override
-            boolean eval(Object left, Object right, PredicateContext ctx) {
-                if ((left == null) ^ (right == null)) {
+            boolean eval(Object expected, Object model, PredicateContext ctx) {
+                if ((expected == null) ^ (model == null)) {
                     return false;
                 }
-                boolean res = (0 < safeCompare(left, right));
+                boolean res = (0 < safeCompare(expected, model));
                 if (logger.isDebugEnabled())
-                    logger.debug("[{}] {} [{}] => {}", right, name(), left, res);
+                    logger.debug("[{}] {} [{}] => {}", model, name(), expected, res);
                 return res;
             }
 
@@ -118,13 +118,13 @@ public class Criteria implements Predicate {
         },
         LTE {
             @Override
-            boolean eval(Object left, Object right, PredicateContext ctx) {
-                if ((left == null) ^ (right == null)) {
+            boolean eval(Object expected, Object model, PredicateContext ctx) {
+                if ((expected == null) ^ (model == null)) {
                     return false;
                 }
-                boolean res = (0 <= safeCompare(left, right));
+                boolean res = (0 <= safeCompare(expected, model));
                 if (logger.isDebugEnabled())
-                    logger.debug("[{}] {} [{}] => {}", right, name(), left, res);
+                    logger.debug("[{}] {} [{}] => {}", model, name(), expected, res);
                 return res;
             }
 
@@ -135,39 +135,62 @@ public class Criteria implements Predicate {
         },
         IN {
             @Override
-            boolean eval(Object left, Object right, PredicateContext ctx) {
+            boolean eval(Object expected, Object model, PredicateContext ctx) {
                 boolean res = false;
-                Collection exps = (Collection) left;
+                Collection exps = (Collection) expected;
                 for (Object exp : exps) {
-                    if (0 == safeCompare(exp, right)) {
+                    if (0 == safeCompare(exp, model)) {
                         res = true;
                         break;
                     }
                 }
                 if (logger.isDebugEnabled())
-                    logger.debug("[{}] {} [{}] => {}", right, name(), join(", ", exps), res);
+                    logger.debug("[{}] {} [{}] => {}", model, name(), join(", ", exps), res);
                 return res;
             }
         },
         NIN {
             @Override
-            boolean eval(Object left, Object right, PredicateContext ctx) {
-                Collection nexps = (Collection) left;
-                boolean res = !nexps.contains(right);
+            boolean eval(Object expected, Object model, PredicateContext ctx) {
+                Collection nexps = (Collection) expected;
+                boolean res = !nexps.contains(model);
                 if (logger.isDebugEnabled())
-                    logger.debug("[{}] {} [{}] => {}", right, name(), join(", ", nexps), res);
+                    logger.debug("[{}] {} [{}] => {}", model, name(), join(", ", nexps), res);
+                return res;
+            }
+        },
+        CONTAINS {
+            @Override
+            boolean eval(Object expected, Object model, PredicateContext ctx) {
+                boolean res = false;
+                if (ctx.configuration().jsonProvider().isArray(model)) {
+                    for (Object o : ctx.configuration().jsonProvider().toIterable(model)) {
+                        if (expected.equals(o)) {
+                            res = true;
+                            break;
+                        }
+                    }
+                } else if (model instanceof String) {
+                    if (isNullish(expected) || !(expected instanceof String)) {
+                        res = false;
+                    } else {
+                        res = ((String) model).contains((String) expected);
+                    }
+                }
+                if (logger.isDebugEnabled())
+                    logger.debug("[{}] {} [{}] => {}", model, name(), expected, res);
                 return res;
             }
         },
         ALL {
             @Override
-            boolean eval(Object left, Object right, PredicateContext ctx) {
+            boolean eval(Object expected, Object model, PredicateContext ctx) {
                 boolean res = true;
-                Collection exps = (Collection) left;
-                if (ctx.configuration().jsonProvider().isArray(right)) {
+                Collection exps = (Collection) expected;
+                if (ctx.configuration().jsonProvider().isArray(model)) {
                     for (Object exp : exps) {
                         boolean found = false;
-                        for (Object check : ctx.configuration().jsonProvider().toIterable(right)) {
+                        for (Object check : ctx.configuration().jsonProvider().toIterable(model)) {
                             if (0 == safeCompare(exp, check)) {
                                 found = true;
                                 break;
@@ -181,7 +204,7 @@ public class Criteria implements Predicate {
                     if (logger.isDebugEnabled())
                         logger.debug(
                                 "[{}] {} [{}] => {}",
-                                join(", ", ctx.configuration().jsonProvider().toIterable(right)),
+                                join(", ", ctx.configuration().jsonProvider().toIterable(model)),
                                 name(),
                                 join(", ", exps),
                                 res);
@@ -200,16 +223,16 @@ public class Criteria implements Predicate {
         },
         SIZE {
             @Override
-            boolean eval(Object left, Object right, PredicateContext ctx) {
-                int size = (Integer) left;
+            boolean eval(Object expected, Object model, PredicateContext ctx) {
+                int size = (Integer) expected;
                 boolean res;
-                if (ctx.configuration().jsonProvider().isArray(right)) {
-                    int length = ctx.configuration().jsonProvider().length(right);
+                if (ctx.configuration().jsonProvider().isArray(model)) {
+                    int length = ctx.configuration().jsonProvider().length(model);
                     res = (length == size);
                     if (logger.isDebugEnabled())
                         logger.debug("Array with size {} {} {} => {}", length, name(), size, res);
-                } else if (right instanceof String) {
-                    int length = ((String) right).length();
+                } else if (model instanceof String) {
+                    int length = ((String) model).length();
                     res = length == size;
                     if (logger.isDebugEnabled())
                         logger.debug(
@@ -219,7 +242,7 @@ public class Criteria implements Predicate {
                     if (logger.isDebugEnabled())
                         logger.debug(
                                 "{} {} {} => {}",
-                                right == null ? "null" : right.getClass().getName(),
+                                model == null ? "null" : model.getClass().getName(),
                                 name(),
                                 size,
                                 res);
@@ -229,33 +252,33 @@ public class Criteria implements Predicate {
         },
         EXISTS {
             @Override
-            boolean eval(Object left, Object right, PredicateContext ctx) {
+            boolean eval(Object expected, Object model, PredicateContext ctx) {
 
                 throw new UnsupportedOperationException();
             }
         },
         TYPE {
             @Override
-            boolean eval(Object left, Object right, PredicateContext ctx) {
-                final Class<?> expType = (Class<?>) left;
-                final Class<?> actType = right == null ? null : right.getClass();
+            boolean eval(Object expected, Object model, PredicateContext ctx) {
+                final Class<?> expType = (Class<?>) expected;
+                final Class<?> actType = model == null ? null : model.getClass();
 
                 return actType != null && expType.isAssignableFrom(actType);
             }
         },
         REGEX {
             @Override
-            boolean eval(Object left, Object right, PredicateContext ctx) {
+            boolean eval(Object expected, Object model, PredicateContext ctx) {
                 boolean res = false;
                 Pattern pattern;
                 Object target;
 
-                if (right instanceof Pattern) {
-                    pattern = (Pattern) right;
-                    target = left;
+                if (model instanceof Pattern) {
+                    pattern = (Pattern) model;
+                    target = expected;
                 } else {
-                    pattern = (Pattern) left;
-                    target = right;
+                    pattern = (Pattern) expected;
+                    target = model;
                 }
 
                 if (target != null) {
@@ -264,9 +287,9 @@ public class Criteria implements Predicate {
                 if (logger.isDebugEnabled())
                     logger.debug(
                             "[{}] {} [{}] => {}",
-                            right == null ? "null" : right.toString(),
+                            model == null ? "null" : model.toString(),
                             name(),
-                            left == null ? "null" : left.toString(),
+                            expected == null ? "null" : expected.toString(),
                             res);
                 return res;
             }
@@ -278,26 +301,26 @@ public class Criteria implements Predicate {
         },
         MATCHES {
             @Override
-            boolean eval(Object left, final Object right, final PredicateContext ctx) {
+            boolean eval(Object expected, final Object model, final PredicateContext ctx) {
                 PredicateContextImpl pci = (PredicateContextImpl) ctx;
-                Predicate exp = (Predicate) left;
+                Predicate exp = (Predicate) expected;
                 return exp.apply(
                         new PredicateContextImpl(
-                                right, ctx.root(), ctx.configuration(), pci.documentPathCache()));
+                                model, ctx.root(), ctx.configuration(), pci.documentPathCache()));
             }
         },
         NOT_EMPTY {
             @Override
-            boolean eval(Object left, Object right, PredicateContext ctx) {
+            boolean eval(Object expected, Object model, PredicateContext ctx) {
                 boolean res = false;
-                if (right != null) {
-                    if (ctx.configuration().jsonProvider().isArray(right)) {
-                        int len = ctx.configuration().jsonProvider().length(right);
+                if (model != null) {
+                    if (ctx.configuration().jsonProvider().isArray(model)) {
+                        int len = ctx.configuration().jsonProvider().length(model);
                         res = (0 != len);
                         if (logger.isDebugEnabled())
                             logger.debug("array length = {} {} => {}", len, name(), res);
-                    } else if (right instanceof String) {
-                        int len = ((String) right).length();
+                    } else if (model instanceof String) {
+                        int len = ((String) model).length();
                         res = (0 != len);
                         if (logger.isDebugEnabled())
                             logger.debug("string length = {} {} => {}", len, name(), res);
@@ -307,7 +330,7 @@ public class Criteria implements Predicate {
             }
         };
 
-        abstract boolean eval(Object left, Object right, PredicateContext ctx);
+        abstract boolean eval(Object expected, Object model, PredicateContext ctx);
 
         public static CriteriaType parse(String str) {
             if ("==".equals(str)) {
@@ -333,14 +356,6 @@ public class Criteria implements Predicate {
 
     private Criteria(List<Criteria> criteriaChain, Object left) {
 
-        if (left instanceof Path) {
-            if (!((Path) left).isDefinite()) {
-                throw new InvalidCriteriaException(
-                        "A criteria path must be definite. The path "
-                                + left.toString()
-                                + " is not!");
-            }
-        }
         this.left = left;
         this.criteriaChain = criteriaChain;
         this.criteriaChain.add(this);
@@ -489,6 +504,12 @@ public class Criteria implements Predicate {
         notNull(c, "collection can not be null");
         this.criteriaType = CriteriaType.IN;
         this.right = c;
+        return this;
+    }
+
+    public Criteria contains(Object o) {
+        this.criteriaType = CriteriaType.CONTAINS;
+        this.right = o;
         return this;
     }
 
@@ -692,7 +713,6 @@ public class Criteria implements Predicate {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(left.toString()).append(criteriaType.toString()).append(wrapString(right));
-
         return sb.toString();
     }
 

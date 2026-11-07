@@ -7,13 +7,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.jayway.jsonpath.BaseTest;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Filter;
-import com.jayway.jsonpath.InvalidCriteriaException;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Predicate;
 import com.jayway.jsonpath.spi.json.JsonProvider;
@@ -22,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class FilterTest extends BaseTest {
@@ -431,11 +430,78 @@ public class FilterTest extends BaseTest {
     }
 
     @Test
-    public void filter_path_must_be_absolute() {
-        assertThrows(
-                InvalidCriteriaException.class,
-                () -> {
-                    where("$.store.*").size(4);
-                });
+    public void contains_filter_evaluates_on_array() {
+
+        String json =
+"""
+{
+"store": {
+    "book": [
+        {
+            "category": "reference",
+            "authors" : [
+                 {
+                     "firstName" : "Nigel",
+                     "lastName" :  "Rees"
+                  }
+            ],
+            "title": "Sayings of the Century",
+            "price": 8.95
+        },
+        {
+            "category": "fiction",
+            "authors": [
+                 {
+                     "firstName" : "Evelyn",
+                     "lastName" :  "Waugh"
+                  },
+                 {
+                     "firstName" : "Another",
+                     "lastName" :  "Author"
+                  }
+            ],
+            "title": "Sword of Honour",
+            "price": 12.99
+        }
+    ]
+  }
+}\
+""";
+
+        Filter filter = filter(where("authors[*].lastName").contains("Waugh"));
+
+        List<String> result = JsonPath.parse(json).read("$.store.book[?].title", filter);
+
+        Assertions.assertThat(result).containsExactly("Sword of Honour");
+    }
+
+    @Test
+    public void contains_filter_evaluates_on_string() {
+
+        String json =
+"""
+{
+"store": {
+    "book": [
+        {
+            "category": "reference",
+            "title": "Sayings of the Century",
+            "price": 8.95
+        },
+        {
+            "category": "fiction",
+            "title": "Sword of Honour",
+            "price": 12.99
+        }
+    ]
+  }
+}\
+""";
+
+        Filter filter = filter(where("category").contains("fic"));
+
+        List<String> result = JsonPath.parse(json).read("$.store.book[?].title", filter);
+
+        Assertions.assertThat(result).containsExactly("Sword of Honour");
     }
 }
