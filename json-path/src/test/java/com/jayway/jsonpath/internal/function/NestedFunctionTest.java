@@ -98,4 +98,10 @@ public class NestedFunctionTest extends BaseFunctionTest {
             assertTrue(e.getMessage().startsWith("Arguments to function: 'append'"));
         }
     }
+
+    @Test
+    public void testSimpleLiteralArgument() {
+        verifyMathFunction(conf, "$.sum(5)", 5.0);
+        verifyMathFunction(conf, "$.sum(50)", 50.0);
+    }
 }
