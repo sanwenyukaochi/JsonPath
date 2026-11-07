@@ -4,12 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.gson.JsonArray;
 import com.jayway.jsonpath.spi.json.GsonJsonProvider;
+import com.jayway.jsonpath.spi.json.Jackson3JsonNodeJsonProvider;
+import com.jayway.jsonpath.spi.json.Jackson3JsonProvider;
 import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
 import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import com.jayway.jsonpath.spi.json.JakartaJsonProvider;
 import com.jayway.jsonpath.spi.json.JsonOrgJsonProvider;
 import com.jayway.jsonpath.spi.json.JsonSmartJsonProvider;
 import com.jayway.jsonpath.spi.mapper.GsonMappingProvider;
+import com.jayway.jsonpath.spi.mapper.Jackson3MappingProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import com.jayway.jsonpath.spi.mapper.JakartaMappingProvider;
 import com.jayway.jsonpath.spi.mapper.JsonOrgMappingProvider;
@@ -164,6 +167,54 @@ public class ProviderInTest {
         assertEquals(doubleQuoteInResult, doubleQuoteEqualsResult);
 
         final List<jakarta.json.JsonValue> singleQuoteInResult = ctx.read(SINGLE_QUOTES_IN_FILTER);
+        assertEquals(doubleQuoteInResult, singleQuoteInResult);
+    }
+
+    @Test
+    public void testJsonPathQuotesJackson3() {
+        final Configuration jackson3 =
+                Configuration.builder()
+                        .jsonProvider(new Jackson3JsonProvider())
+                        .mappingProvider(new Jackson3MappingProvider())
+                        .build();
+        final DocumentContext ctx = JsonPath.using(jackson3).parse(JSON);
+
+        final List<String> doubleQuoteEqualsResult = ctx.read(DOUBLE_QUOTES_EQUALS_FILTER);
+        assertEquals(Lists.newArrayList("bar"), doubleQuoteEqualsResult);
+
+        final List<String> singleQuoteEqualsResult = ctx.read(SINGLE_QUOTES_EQUALS_FILTER);
+        assertEquals(doubleQuoteEqualsResult, singleQuoteEqualsResult);
+
+        final List<String> doubleQuoteInResult = ctx.read(DOUBLE_QUOTES_IN_FILTER);
+        assertEquals(doubleQuoteInResult, doubleQuoteEqualsResult);
+
+        final List<String> singleQuoteInResult = ctx.read(SINGLE_QUOTES_IN_FILTER);
+        assertEquals(doubleQuoteInResult, singleQuoteInResult);
+    }
+
+    @Test
+    public void testJsonPathQuotesJackson3JsonNode() {
+        final Configuration jackson3JsonNode =
+                Configuration.builder()
+                        .jsonProvider(new Jackson3JsonNodeJsonProvider())
+                        .mappingProvider(new Jackson3MappingProvider())
+                        .build();
+        final DocumentContext ctx = JsonPath.using(jackson3JsonNode).parse(JSON);
+
+        final tools.jackson.databind.node.ArrayNode doubleQuoteEqualsResult =
+                ctx.read(DOUBLE_QUOTES_EQUALS_FILTER);
+        assertEquals("bar", doubleQuoteEqualsResult.get(0).asText());
+
+        final tools.jackson.databind.node.ArrayNode singleQuoteEqualsResult =
+                ctx.read(SINGLE_QUOTES_EQUALS_FILTER);
+        assertEquals(doubleQuoteEqualsResult, singleQuoteEqualsResult);
+
+        final tools.jackson.databind.node.ArrayNode doubleQuoteInResult =
+                ctx.read(DOUBLE_QUOTES_IN_FILTER);
+        assertEquals(doubleQuoteInResult, doubleQuoteEqualsResult);
+
+        final tools.jackson.databind.node.ArrayNode singleQuoteInResult =
+                ctx.read(SINGLE_QUOTES_IN_FILTER);
         assertEquals(doubleQuoteInResult, singleQuoteInResult);
     }
 }
