@@ -4,7 +4,9 @@ import com.jayway.jsonpath.Configuration;
 
 public interface Path {
 
-    EvaluationContext evaluate(Object model, Configuration configuration);
+    EvaluationContext evaluate(Object document, Object rootDocument, Configuration configuration);
 
     boolean isDefinite();
+
+    boolean isRootPath();
 }

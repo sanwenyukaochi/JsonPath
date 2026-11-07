@@ -8,6 +8,8 @@ public interface EvaluationContext {
 
     Configuration configuration();
 
+    Object rootDocument();
+
     <T> T getValue();
 
     <T> T getPath();

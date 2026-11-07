@@ -431,7 +431,7 @@ public class FilterTest extends BaseTest {
                 new Predicate() {
                     @Override
                     public boolean apply(PredicateContext ctx) {
-                        Map<String, Object> t = (Map<String, Object>) ctx.target();
+                        Map<String, Object> t = (Map<String, Object>) ctx.contextDocument();
 
                         Object o = t.get("int-key");
 

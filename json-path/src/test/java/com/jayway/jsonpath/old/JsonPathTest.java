@@ -247,7 +247,7 @@ public class JsonPathTest extends BaseTest {
 
         List<String> result =
                 PathCompiler.compile("$.store.*")
-                        .evaluate(OBJ_DOCUMENT, Configuration.defaultConfiguration())
+                        .evaluate(OBJ_DOCUMENT, OBJ_DOCUMENT, Configuration.defaultConfiguration())
                         .getPathList();
 
         Assertions.assertThat(result).containsOnly("$['store']['bicycle']", "$['store']['book']");

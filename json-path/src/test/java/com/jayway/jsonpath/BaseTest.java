@@ -1,5 +1,7 @@
 package com.jayway.jsonpath;
 
+import com.jayway.jsonpath.internal.compiler.PredicateContextImpl;
+
 public class BaseTest {
     public static final String JSON_DOCUMENT =
             """
@@ -11,6 +13,7 @@ public class BaseTest {
                 "boolean-property": true,
                 "null-property": null,
                 "int-small-property": 1,
+                "max-price": 10,
                 "store": {
                     "book": [
                         {
@@ -55,16 +58,6 @@ public class BaseTest {
             """;
 
     public Predicate.PredicateContext createPredicateContext(final Object check) {
-        return new Predicate.PredicateContext() {
-            @Override
-            public Object target() {
-                return check;
-            }
-
-            @Override
-            public Configuration configuration() {
-                return Configuration.defaultConfiguration();
-            }
-        };
+        return new PredicateContextImpl(check, check, Configuration.defaultConfiguration());
     }
 }
