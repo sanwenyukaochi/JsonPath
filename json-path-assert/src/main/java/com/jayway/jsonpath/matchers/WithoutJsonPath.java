@@ -1,10 +1,9 @@
 package com.jayway.jsonpath.matchers;
 
-import static org.hamcrest.Matchers.empty;
-
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.JsonPathException;
 import com.jayway.jsonpath.ReadContext;
+
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 
@@ -23,7 +22,7 @@ public class WithoutJsonPath extends TypeSafeDiagnosingMatcher<ReadContext> {
                     .appendText(jsonPath.getPath())
                     .appendText(" was evaluated to ")
                     .appendValue(value);
-            return value == null || empty().matches(value);
+            return false;
         } catch (JsonPathException e) {
             return true;
         }
