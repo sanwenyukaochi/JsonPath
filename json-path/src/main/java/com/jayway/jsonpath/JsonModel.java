@@ -214,10 +214,18 @@ public class JsonModel {
         return new JsonModel(json, JsonProviderFactory.createProvider());
     }
 
+    public static JsonModel create(String json) {
+        return model(json);
+    }
+
     public static JsonModel model(Object jsonObject) {
         notNull(jsonObject, "jsonObject can not be null");
 
         return new JsonModel(jsonObject, JsonProviderFactory.createProvider());
+    }
+
+    public static JsonModel create(Object jsonObject) {
+        return model(jsonObject);
     }
 
     public static JsonModel model(URL url) throws IOException {
@@ -226,10 +234,18 @@ public class JsonModel {
         return new JsonModel(url, JsonProviderFactory.createProvider());
     }
 
+    public static JsonModel create(URL url) throws IOException {
+        return model(url);
+    }
+
     public static JsonModel model(InputStream jsonInputStream) throws IOException {
         notNull(jsonInputStream, "jsonInputStream can not be null");
 
         return new JsonModel(jsonInputStream, JsonProviderFactory.createProvider());
+    }
+
+    public static JsonModel create(InputStream jsonInputStream) throws IOException {
+        return model(jsonInputStream);
     }
 
     private <T> T getTargetObject(JsonPath jsonPath, Class<T> clazz) {

@@ -21,4 +21,7 @@ public class IssuesTest {
 
         assertNull(JsonPath.read(json, "$.foo.id"));
     }
+
+    @Test
+    public void issue_11() throws Exception {}
 }
