@@ -82,7 +82,12 @@ allprojects {
 
             json {
                 target("**/*.json")
-                targetExclude("**/.devcontainer/devcontainer.json")
+                targetExclude(
+                    "**/.devcontainer/devcontainer.json",
+                    rootProject.file("json-path-assert/src/test/resources/books.json"),
+                    rootProject.file("json-path-assert/src/test/resources/example.json"),
+                    rootProject.file("json-path-assert/src/test/resources/invalid.json"),
+                )
                 gson()
                     .indentWithSpaces(4)
                     .sortByKeys()

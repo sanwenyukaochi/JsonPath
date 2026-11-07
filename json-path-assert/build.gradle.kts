@@ -10,4 +10,5 @@ dependencies {
     api("org.hamcrest:hamcrest-library")
     compileOnly("tools.jackson.core:jackson-databind")
     testImplementation("tools.jackson.core:jackson-databind")
+    testImplementation("net.minidev:json-smart")
 }
