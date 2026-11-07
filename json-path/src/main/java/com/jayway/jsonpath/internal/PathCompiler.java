@@ -132,18 +132,7 @@ public class PathCompiler {
         return pa;
     }
 
-    private static void assertValidFieldChars(String s, int start, int positions) {
-        int i = start;
-        while (i < start + positions) {
-            char c = s.charAt(i);
-
-            if (!Character.isLetterOrDigit(c) && c != '-' && c != '_' && c != '$' && c != '@') {
-                throw new InvalidPathException(
-                        "Invalid field name! Use bracket notation if your filed names does not match pattern: ([a-zA-Z@][a-zA-Z0-9@\\$_\\-]*)$");
-            }
-            i++;
-        }
-    }
+    private static void assertValidFieldChars(String s, int start, int positions) {}
 
     private static int fastForward(String s, int index) {
         int skipCount = 0;
