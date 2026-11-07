@@ -7,7 +7,7 @@ import net.minidev.json.JSONArray;
 
 import org.junit.jupiter.api.Test;
 
-public class JSONEntityFunctionTest extends BaseFunctionTest {
+public class JSONEntityPathFunctionTest extends BaseFunctionTest {
 
     private static final String BATCH_JSON =
 """

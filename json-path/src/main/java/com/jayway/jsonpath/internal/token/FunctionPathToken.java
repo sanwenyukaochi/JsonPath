@@ -1,8 +1,8 @@
 package com.jayway.jsonpath.internal.token;
 
 import com.jayway.jsonpath.internal.PathRef;
-import com.jayway.jsonpath.internal.function.Function;
-import com.jayway.jsonpath.internal.function.FunctionFactory;
+import com.jayway.jsonpath.internal.function.PathFunction;
+import com.jayway.jsonpath.internal.function.PathFunctionFactory;
 
 public class FunctionPathToken extends PathToken {
 
@@ -21,8 +21,8 @@ public class FunctionPathToken extends PathToken {
     @Override
     public void evaluate(
             String currentPath, PathRef parent, Object model, EvaluationContextImpl ctx) {
-        Function function = FunctionFactory.newFunction(functionName);
-        Object result = function.invoke(currentPath, parent, model, ctx);
+        PathFunction pathFunction = PathFunctionFactory.newFunction(functionName);
+        Object result = pathFunction.invoke(currentPath, parent, model, ctx);
         ctx.addResult(currentPath, parent, result);
     }
 

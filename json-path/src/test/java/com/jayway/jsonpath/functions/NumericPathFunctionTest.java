@@ -11,13 +11,13 @@ import org.slf4j.LoggerFactory;
 
 @ParameterizedClass
 @MethodSource("configurations")
-public class NumericFunctionTest extends BaseFunctionTest {
+public class NumericPathFunctionTest extends BaseFunctionTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(NumericFunctionTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(NumericPathFunctionTest.class);
 
     private Configuration conf = Configurations.GSON_CONFIGURATION;
 
-    public NumericFunctionTest(Configuration conf) {
+    public NumericPathFunctionTest(Configuration conf) {
         logger.debug("Testing with configuration {}", conf.getClass().getName());
         this.conf = conf;
     }
