@@ -270,7 +270,7 @@ public class JsonContext implements ParseContext, DocumentContext {
         return this;
     }
 
-    private final class LimitingEvaluationListener implements EvaluationListener {
+    private static final class LimitingEvaluationListener implements EvaluationListener {
         final int limit;
 
         private LimitingEvaluationListener(int limit) {
