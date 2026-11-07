@@ -17,7 +17,9 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.internal.Utils;
+import com.jayway.jsonpath.spi.json.GsonJsonProvider;
 import com.jayway.jsonpath.spi.json.JsonProvider;
+import com.jayway.jsonpath.spi.mapper.GsonMappingProvider;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
@@ -626,5 +628,58 @@ public class IssuesTest extends BaseTest {
             assertTrue(false);
         } catch (RuntimeException e) {
         }
+    }
+
+    @Test
+    public void issue_97() throws Exception {
+        String json =
+"""
+{
+    "books": [
+        {
+            "category": "fiction"
+        },
+        {
+            "category": "reference"
+        },
+        {
+            "category": "fiction"
+        },
+        {
+            "category": "fiction"
+        },
+        {
+            "category": "reference"
+        },
+        {
+            "category": "fiction"
+        },
+        {
+            "category": "reference"
+        },
+        {
+            "category": "reference"
+        },
+        {
+            "category": "reference"
+        },
+        {
+            "category": "reference"
+        },
+        {
+            "category": "reference"
+        }
+    ]
+}
+""";
+
+        Configuration conf =
+                Configuration.builder()
+                        .jsonProvider(new GsonJsonProvider())
+                        .mappingProvider(new GsonMappingProvider())
+                        .build();
+
+        DocumentContext context = JsonPath.using(conf).parse(json);
+        context.delete("$.books[?(@.category == 'reference')]");
     }
 }
