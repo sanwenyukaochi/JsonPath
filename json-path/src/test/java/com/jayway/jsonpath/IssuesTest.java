@@ -2,6 +2,7 @@ package com.jayway.jsonpath;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import net.minidev.json.JSONObject;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class IssuesTest {
@@ -119,14 +119,25 @@ public class IssuesTest {
     }
 
     @Test
-    @Disabled
     public void issue_22() throws Exception {
         assertThrows(
                 PathNotFoundException.class,
                 () -> {
+                    Configuration configuration =
+                            Configuration.builder()
+                                    .options(Option.THROW_ON_MISSING_PROPERTY)
+                                    .build();
                     String json = "{\"a\":{\"b\":1,\"c\":2}}";
-                    System.out.println((Object) JsonPath.read(json, "a.d"));
+                    System.out.println((Object) JsonPath.read(configuration, json, "a.d"));
                 });
+    }
+
+    @Test
+    public void issue_22c() throws Exception {
+        Configuration configuration = Configuration.builder().build();
+
+        String json = "{\"a\":{\"b\":1,\"c\":2}}";
+        assertNull(JsonPath.read(configuration, json, "a.d"));
     }
 
     @Test

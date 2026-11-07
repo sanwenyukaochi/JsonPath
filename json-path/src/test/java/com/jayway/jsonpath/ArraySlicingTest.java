@@ -2,7 +2,6 @@ package com.jayway.jsonpath;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 import org.hamcrest.Matchers;
@@ -38,11 +37,8 @@ public class ArraySlicingTest {
 
     @Test
     public void get_between_index_out_of_bounds() {
-        assertThrows(
-                IndexOutOfBoundsException.class,
-                () -> {
-                    List<Integer> result = JsonPath.read(JSON_ARRAY, "$[1:15]");
-                });
+        List<Integer> result = JsonPath.read(JSON_ARRAY, "$[1:15]");
+        assertThat(result, Matchers.contains(3, 5, 7, 8, 13, 20));
     }
 
     @Test

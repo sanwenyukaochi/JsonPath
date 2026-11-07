@@ -1,7 +1,7 @@
 package com.jayway.jsonpath.internal.filter;
 
+import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Filter;
-import com.jayway.jsonpath.spi.JsonProvider;
 
 import java.util.LinkedList;
 
@@ -14,22 +14,20 @@ public class ArrayQueryFilter extends PathTokenFilter {
     @Override
     public Object filter(
             Object obj,
-            JsonProvider jsonProvider,
+            Configuration configuration,
             LinkedList<Filter> filters,
             boolean inArrayContext) {
-
         Filter filter = filters.poll();
-
-        return filter.doFilter(jsonProvider.toIterable(obj), jsonProvider);
+        return filter.doFilter(configuration.getProvider().toIterable(obj), configuration);
     }
 
     @Override
-    public Object filter(Object obj, JsonProvider jsonProvider) {
+    public Object filter(Object obj, Configuration configuration) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Object getRef(Object obj, JsonProvider jsonProvider) {
+    public Object getRef(Object obj, Configuration configuration) {
         throw new UnsupportedOperationException("");
     }
 

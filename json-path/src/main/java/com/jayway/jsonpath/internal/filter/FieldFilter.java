@@ -1,6 +1,8 @@
 package com.jayway.jsonpath.internal.filter;
 
+import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Filter;
+import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.internal.PathToken;
 import com.jayway.jsonpath.spi.JsonProvider;
@@ -22,9 +24,10 @@ public class FieldFilter extends PathTokenFilter {
     @Override
     public Object filter(
             Object obj,
-            JsonProvider jsonProvider,
+            Configuration configuration,
             LinkedList<Filter> filters,
             boolean inArrayContext) {
+        JsonProvider jsonProvider = configuration.getProvider();
         if (jsonProvider.isArray(obj)) {
             if (!inArrayContext) {
                 throw new PathNotFoundException(
@@ -35,6 +38,7 @@ public class FieldFilter extends PathTokenFilter {
                 Object result = jsonProvider.createArray();
                 for (Object current : jsonProvider.toIterable(obj)) {
                     if (jsonProvider.isMap(current)) {
+
                         Collection<String> keys = jsonProvider.getPropertyKeys(current);
 
                         if (split.length == 1) {
@@ -70,6 +74,15 @@ public class FieldFilter extends PathTokenFilter {
 
             Collection<String> keys = jsonProvider.getPropertyKeys(obj);
             if (!keys.contains(condition) && split.length == 1) {
+
+                if (configuration.getOptions().contains(Option.THROW_ON_MISSING_PROPERTY)) {
+                    throw new PathNotFoundException(
+                            "Path '"
+                                    + condition
+                                    + "' not found in the current context:\n"
+                                    + jsonProvider.toJson(obj));
+                }
+
                 if (pathToken.isEndToken()) {
                     return null;
                 } else {
@@ -100,7 +113,9 @@ public class FieldFilter extends PathTokenFilter {
         }
     }
 
-    public Object filter(Object obj, JsonProvider jsonProvider) {
+    @Override
+    public Object filter(Object obj, Configuration configuration) {
+        JsonProvider jsonProvider = configuration.getProvider();
         if (jsonProvider.isArray(obj)) {
             return obj;
         } else {
@@ -109,8 +124,8 @@ public class FieldFilter extends PathTokenFilter {
     }
 
     @Override
-    public Object getRef(Object obj, JsonProvider jsonProvider) {
-        return filter(obj, jsonProvider);
+    public Object getRef(Object obj, Configuration configuration) {
+        return filter(obj, configuration);
     }
 
     @Override

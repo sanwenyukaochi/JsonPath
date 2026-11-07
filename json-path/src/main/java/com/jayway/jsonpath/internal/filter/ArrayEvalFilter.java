@@ -1,6 +1,8 @@
 package com.jayway.jsonpath.internal.filter;
 
+import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.internal.filter.eval.ExpressionEvaluator;
 import com.jayway.jsonpath.spi.JsonProvider;
@@ -21,7 +23,8 @@ public class ArrayEvalFilter extends PathTokenFilter {
     }
 
     @Override
-    public Object filter(Object obj, JsonProvider jsonProvider) {
+    public Object filter(Object obj, Configuration configuration) {
+        JsonProvider jsonProvider = configuration.getProvider();
         Iterable<Object> src = null;
         try {
             src = jsonProvider.toIterable(obj);
@@ -34,7 +37,7 @@ public class ArrayEvalFilter extends PathTokenFilter {
         }
         Object result = jsonProvider.createArray();
         for (Object item : src) {
-            if (isMatch(item, conditionStatement, jsonProvider)) {
+            if (isMatch(item, conditionStatement, configuration)) {
                 jsonProvider.setProperty(result, jsonProvider.length(result), item);
             }
         }
@@ -42,7 +45,7 @@ public class ArrayEvalFilter extends PathTokenFilter {
     }
 
     @Override
-    public Object getRef(Object obj, JsonProvider jsonProvider) {
+    public Object getRef(Object obj, Configuration configuration) {
         throw new UnsupportedOperationException("");
     }
 
@@ -52,9 +55,11 @@ public class ArrayEvalFilter extends PathTokenFilter {
     }
 
     private boolean isMatch(
-            Object check, ConditionStatement conditionStatement, JsonProvider jsonProvider) {
+            Object check, ConditionStatement conditionStatement, Configuration configuration) {
         try {
-            Object value = conditionStatement.path.read(check);
+            Object value =
+                    conditionStatement.path.read(
+                            check, configuration.options(Option.THROW_ON_MISSING_PROPERTY));
             return ExpressionEvaluator.eval(
                     value, conditionStatement.getOperator(), conditionStatement.getExpected());
         } catch (PathNotFoundException e) {

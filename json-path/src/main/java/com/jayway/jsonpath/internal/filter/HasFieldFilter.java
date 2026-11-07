@@ -1,5 +1,6 @@
 package com.jayway.jsonpath.internal.filter;
 
+import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.spi.JsonProvider;
 
 import java.util.Collection;
@@ -21,7 +22,9 @@ public class HasFieldFilter extends PathTokenFilter {
     }
 
     @Override
-    public Object filter(Object obj, JsonProvider jsonProvider) {
+    public Object filter(Object obj, Configuration configuration) {
+        JsonProvider jsonProvider = configuration.getProvider();
+
         Iterable<Object> src = jsonProvider.toIterable(obj);
         Object result = jsonProvider.createArray();
 
@@ -37,7 +40,7 @@ public class HasFieldFilter extends PathTokenFilter {
     }
 
     @Override
-    public Object getRef(Object obj, JsonProvider jsonProvider) {
+    public Object getRef(Object obj, Configuration configuration) {
         throw new UnsupportedOperationException();
     }
 
