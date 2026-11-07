@@ -16,6 +16,7 @@ application {
 
 dependencies {
     implementation(project(":json-path"))
+    implementation("net.minidev:json-smart")
     implementation("tools.jackson.core:jackson-databind")
     implementation(platform("org.eclipse.jetty:jetty-bom:12.1.14"))
     implementation("org.eclipse.jetty:jetty-server")

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
+import net.minidev.json.JSONStyle;
 import net.minidev.json.JSONValue;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
@@ -17,29 +18,38 @@ import net.minidev.json.writer.JsonReaderI;
 
 public class JsonSmartJsonProvider extends AbstractJsonProvider {
 
-    private final Mode mode;
-
-    private static final JsonReaderI<?> orderedMapper = JSONValue.defaultReader.DEFAULT_ORDERED;
+    private final int parseMode;
+    private final JsonReaderI<?> mapper;
 
     public JsonSmartJsonProvider() {
-        this(Mode.SLACK);
+        this(JSONParser.MODE_PERMISSIVE, JSONValue.defaultReader.DEFAULT_ORDERED);
     }
 
+    public JsonSmartJsonProvider(int parseMode) {
+        this(parseMode, JSONValue.defaultReader.DEFAULT_ORDERED);
+    }
+
+    public JsonSmartJsonProvider(int parseMode, JsonReaderI<?> mapper) {
+        this.parseMode = parseMode;
+        this.mapper = mapper;
+    }
+
+    @Deprecated
     public JsonSmartJsonProvider(Mode mode) {
-        this.mode = mode;
+        this(mode.intValue(), JSONValue.defaultReader.DEFAULT_ORDERED);
     }
 
     public Object createArray() {
-        return orderedMapper.createArray();
+        return mapper.createArray();
     }
 
     public Object createMap() {
-        return orderedMapper.createObject();
+        return mapper.createObject();
     }
 
     public Object parse(String json) {
         try {
-            return createParser().parse(json, orderedMapper);
+            return createParser().parse(json, mapper);
         } catch (ParseException e) {
             throw new InvalidJsonException(e);
         }
@@ -48,7 +58,7 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
     @Override
     public Object parse(InputStream jsonStream, String charset) throws InvalidJsonException {
         try {
-            return createParser().parse(new InputStreamReader(jsonStream, charset), orderedMapper);
+            return createParser().parse(new InputStreamReader(jsonStream, charset), mapper);
         } catch (ParseException e) {
             throw new InvalidJsonException(e);
         } catch (UnsupportedEncodingException e) {
@@ -60,9 +70,9 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
     public String toJson(Object obj) {
 
         if (obj instanceof Map) {
-            return JSONObject.toJSONString((Map<String, ?>) obj);
+            return JSONObject.toJSONString((Map<String, ?>) obj, JSONStyle.LT_COMPRESS);
         } else if (obj instanceof List) {
-            return JSONArray.toJSONString((List<?>) obj);
+            return JSONArray.toJSONString((List<?>) obj, JSONStyle.LT_COMPRESS);
         } else {
             throw new UnsupportedOperationException(
                     obj.getClass().getName() + " can not be converted to JSON");
@@ -70,6 +80,6 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
     }
 
     private JSONParser createParser() {
-        return new JSONParser(mode.intValue());
+        return new JSONParser(parseMode);
     }
 }

@@ -16,6 +16,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+import net.minidev.json.JSONStyle;
+import net.minidev.json.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +26,10 @@ import org.slf4j.LoggerFactory;
 public class ApiResource {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiResource.class);
+
+    static {
+        JSONValue.COMPRESSION = JSONStyle.LT_COMPRESS;
+    }
 
     @GET
     @Path("/info")
