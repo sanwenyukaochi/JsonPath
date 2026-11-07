@@ -11,17 +11,13 @@ import java.util.Collection;
 
 public class PredicatePathToken extends PathToken {
 
-    private static final String[] FRAGMENTS = {
-        "[?]", "[?,?]", "[?,?,?]", "[?,?,?,?]", "[?,?,?,?,?]"
-    };
-
     private final Collection<Predicate> predicates;
 
-    public PredicatePathToken(Predicate filter) {
+    PredicatePathToken(Predicate filter) {
         this.predicates = asList(filter);
     }
 
-    public PredicatePathToken(Collection<Predicate> predicates) {
+    PredicatePathToken(Collection<Predicate> predicates) {
         this.predicates = predicates;
     }
 
@@ -73,11 +69,20 @@ public class PredicatePathToken extends PathToken {
 
     @Override
     public String getPathFragment() {
-        return FRAGMENTS[predicates.size() - 1];
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < predicates.size(); i++) {
+            if (i != 0) {
+                sb.append(",");
+            }
+            sb.append("?");
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     @Override
-    boolean isTokenDefinite() {
+    public boolean isTokenDefinite() {
         return false;
     }
 }

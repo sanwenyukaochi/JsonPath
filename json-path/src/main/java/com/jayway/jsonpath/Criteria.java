@@ -5,11 +5,13 @@ import static com.jayway.jsonpath.internal.Utils.notNull;
 
 import com.jayway.jsonpath.internal.Path;
 import com.jayway.jsonpath.internal.PathCompiler;
+import com.jayway.jsonpath.internal.Utils;
 import com.jayway.jsonpath.internal.token.PredicateContextImpl;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -21,14 +23,25 @@ public class Criteria implements Predicate {
 
     private static final Logger logger = LoggerFactory.getLogger(Criteria.class);
 
+    private static final String CRITERIA_WRAPPER_CHAR = "¦";
+
     private static final String[] OPERATORS = {
-        CriteriaType.EQ.toString(),
         CriteriaType.GTE.toString(),
         CriteriaType.LTE.toString(),
+        CriteriaType.EQ.toString(),
         CriteriaType.NE.toString(),
         CriteriaType.LT.toString(),
         CriteriaType.GT.toString(),
-        CriteriaType.REGEX.toString()
+        CriteriaType.REGEX.toString(),
+        CriteriaType.NIN.toString(),
+        CriteriaType.IN.toString(),
+        CriteriaType.CONTAINS.toString(),
+        CriteriaType.ALL.toString(),
+        CriteriaType.SIZE.toString(),
+        CriteriaType.EXISTS.toString(),
+        CriteriaType.TYPE.toString(),
+        CriteriaType.MATCHES.toString(),
+        CriteriaType.NOT_EMPTY.toString(),
     };
     private static final char BS = '\\';
 
@@ -135,6 +148,39 @@ public class Criteria implements Predicate {
                 return "<=";
             }
         },
+        REGEX {
+            @Override
+            boolean eval(Object expected, Object model, PredicateContext ctx) {
+                boolean res = false;
+                Pattern pattern;
+                Object target;
+
+                if (model instanceof Pattern) {
+                    pattern = (Pattern) model;
+                    target = expected;
+                } else {
+                    pattern = (Pattern) expected;
+                    target = model;
+                }
+
+                if (target != null) {
+                    res = pattern.matcher(target.toString()).matches();
+                }
+                if (logger.isDebugEnabled())
+                    logger.debug(
+                            "[{}] {} [{}] => {}",
+                            model == null ? "null" : model.toString(),
+                            name(),
+                            expected == null ? "null" : expected.toString(),
+                            res);
+                return res;
+            }
+
+            @Override
+            public String toString() {
+                return "=~";
+            }
+        },
         IN {
             @Override
             boolean eval(Object expected, Object model, PredicateContext ctx) {
@@ -150,6 +196,11 @@ public class Criteria implements Predicate {
                     logger.debug("[{}] {} [{}] => {}", model, name(), join(", ", exps), res);
                 return res;
             }
+
+            @Override
+            public String toString() {
+                return CRITERIA_WRAPPER_CHAR + name() + CRITERIA_WRAPPER_CHAR;
+            }
         },
         NIN {
             @Override
@@ -159,6 +210,11 @@ public class Criteria implements Predicate {
                 if (logger.isDebugEnabled())
                     logger.debug("[{}] {} [{}] => {}", model, name(), join(", ", nexps), res);
                 return res;
+            }
+
+            @Override
+            public String toString() {
+                return CRITERIA_WRAPPER_CHAR + name() + CRITERIA_WRAPPER_CHAR;
             }
         },
         CONTAINS {
@@ -182,6 +238,11 @@ public class Criteria implements Predicate {
                 if (logger.isDebugEnabled())
                     logger.debug("[{}] {} [{}] => {}", model, name(), expected, res);
                 return res;
+            }
+
+            @Override
+            public String toString() {
+                return CRITERIA_WRAPPER_CHAR + name() + CRITERIA_WRAPPER_CHAR;
             }
         },
         ALL {
@@ -222,6 +283,11 @@ public class Criteria implements Predicate {
                 }
                 return res;
             }
+
+            @Override
+            public String toString() {
+                return CRITERIA_WRAPPER_CHAR + name() + CRITERIA_WRAPPER_CHAR;
+            }
         },
         SIZE {
             @Override
@@ -251,12 +317,22 @@ public class Criteria implements Predicate {
                 }
                 return res;
             }
+
+            @Override
+            public String toString() {
+                return CRITERIA_WRAPPER_CHAR + name() + CRITERIA_WRAPPER_CHAR;
+            }
         },
         EXISTS {
             @Override
             boolean eval(Object expected, Object model, PredicateContext ctx) {
 
                 throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public String toString() {
+                return CRITERIA_WRAPPER_CHAR + name() + CRITERIA_WRAPPER_CHAR;
             }
         },
         TYPE {
@@ -267,38 +343,10 @@ public class Criteria implements Predicate {
 
                 return actType != null && expType.isAssignableFrom(actType);
             }
-        },
-        REGEX {
-            @Override
-            boolean eval(Object expected, Object model, PredicateContext ctx) {
-                boolean res = false;
-                Pattern pattern;
-                Object target;
-
-                if (model instanceof Pattern) {
-                    pattern = (Pattern) model;
-                    target = expected;
-                } else {
-                    pattern = (Pattern) expected;
-                    target = model;
-                }
-
-                if (target != null) {
-                    res = pattern.matcher(target.toString()).matches();
-                }
-                if (logger.isDebugEnabled())
-                    logger.debug(
-                            "[{}] {} [{}] => {}",
-                            model == null ? "null" : model.toString(),
-                            name(),
-                            expected == null ? "null" : expected.toString(),
-                            res);
-                return res;
-            }
 
             @Override
             public String toString() {
-                return "=~";
+                return CRITERIA_WRAPPER_CHAR + name() + CRITERIA_WRAPPER_CHAR;
             }
         },
         MATCHES {
@@ -309,6 +357,11 @@ public class Criteria implements Predicate {
                 return exp.apply(
                         new PredicateContextImpl(
                                 model, ctx.root(), ctx.configuration(), pci.documentPathCache()));
+            }
+
+            @Override
+            public String toString() {
+                return CRITERIA_WRAPPER_CHAR + name() + CRITERIA_WRAPPER_CHAR;
             }
         },
         NOT_EMPTY {
@@ -330,34 +383,37 @@ public class Criteria implements Predicate {
                 }
                 return res;
             }
+
+            @Override
+            public String toString() {
+                return CRITERIA_WRAPPER_CHAR + name() + CRITERIA_WRAPPER_CHAR;
+            }
+        },
+        NOOP {
+            @Override
+            boolean eval(Object expected, Object model, PredicateContext ctx) {
+                return true;
+            }
+
+            @Override
+            public String toString() {
+                return CRITERIA_WRAPPER_CHAR + name() + CRITERIA_WRAPPER_CHAR;
+            }
         };
 
         abstract boolean eval(Object expected, Object model, PredicateContext ctx);
 
         public static CriteriaType parse(String str) {
-            if ("==".equals(str)) {
-                return EQ;
-            } else if (">".equals(str)) {
-                return GT;
-            } else if (">=".equals(str)) {
-                return GTE;
-            } else if ("<".equals(str)) {
-                return LT;
-            } else if ("<=".equals(str)) {
-                return LTE;
-            } else if ("!=".equals(str)) {
-                return NE;
-            } else if ("=~".equals(str)) {
-                return REGEX;
-            } else {
-                throw new UnsupportedOperationException(
-                        "CriteriaType " + str + " can not be parsed");
+            for (CriteriaType criteriaType : values()) {
+                if (criteriaType.toString().equals(str)) {
+                    return criteriaType;
+                }
             }
+            throw new UnsupportedOperationException("CriteriaType " + str + " can not be parsed");
         }
     }
 
     private Criteria(List<Criteria> criteriaChain, Object left) {
-
         this.left = left;
         this.criteriaChain = criteriaChain;
         this.criteriaChain.add(this);
@@ -608,21 +664,23 @@ public class Criteria implements Predicate {
     public static Criteria parse(String criteria) {
         int operatorIndex = -1;
         String left = "";
-        String operator = "";
+        CriteriaType operator = null;
         String right = "";
+
         for (int y = 0; y < OPERATORS.length; y++) {
             operatorIndex = criteria.indexOf(OPERATORS[y]);
             if (operatorIndex != -1) {
-                operator = OPERATORS[y];
+                operator = CriteriaType.parse(OPERATORS[y]);
                 break;
             }
         }
-        if (!operator.isEmpty()) {
+        if (operator != null) {
             left = criteria.substring(0, operatorIndex).trim();
-            right = criteria.substring(operatorIndex + operator.length()).trim();
+            right = criteria.substring(operatorIndex + operator.toString().length()).trim();
         } else {
             left = criteria.trim();
         }
+
         return Criteria.create(left, operator, right);
     }
 
@@ -648,7 +706,7 @@ public class Criteria implements Predicate {
         }
     }
 
-    public static Criteria create(String left, String operator, String right) {
+    private static Criteria create(String left, CriteriaType operator, String right) {
         Object leftPrepared = left;
         Object rightPrepared = right;
         Path leftPath = null;
@@ -683,16 +741,18 @@ public class Criteria implements Predicate {
             rightPrepared = rightPath;
         } else if (isString(right)) {
             rightPrepared = right.substring(1, right.length() - 1);
+        } else if (Utils.isNumeric(right)) {
+            rightPrepared = new BigDecimal(right);
         } else if (isJson(right)) {
             rightPrepared = new JsonValue(right);
         } else if (isPattern(right)) {
             rightPrepared = compilePattern(right);
         }
 
-        if (leftPath != null && operator.isEmpty()) {
+        if (leftPath != null && (operator == null)) {
             return Criteria.where(leftPath).exists(existsCheck);
         } else {
-            return new Criteria(leftPrepared, CriteriaType.parse(operator), rightPrepared);
+            return new Criteria(leftPrepared, operator, rightPrepared);
         }
     }
 
@@ -762,6 +822,8 @@ public class Criteria implements Predicate {
             return expected.compareTo((String) right);
         } else if (left instanceof Number && right instanceof Number) {
             return new BigDecimal(left.toString()).compareTo(new BigDecimal(right.toString()));
+        } else if (left instanceof Number && right instanceof BigDecimal) {
+            return new BigDecimal(left.toString()).compareTo((BigDecimal) right);
         } else if (left instanceof String && right instanceof Number) {
             return new BigDecimal(left.toString()).compareTo(new BigDecimal(right.toString()));
         } else if (left instanceof String && right instanceof Boolean) {
@@ -788,7 +850,40 @@ public class Criteria implements Predicate {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(left.toString()).append(criteriaType.toString()).append(wrapString(right));
+
+        Iterator<Criteria> i = criteriaChain.iterator();
+        while (i.hasNext()) {
+            Criteria c = i.next();
+
+            if (CriteriaType.NOT_EMPTY == c.criteriaType) {
+                sb.append(c.left.toString()).append(" ").append(c.criteriaType.toString());
+
+            } else if (CriteriaType.EXISTS == c.criteriaType) {
+                Boolean exists = (Boolean) c.right;
+                if (exists.booleanValue()) {
+                    sb.append(c.left.toString());
+                } else {
+                    sb.append("!").append(c.left.toString());
+                }
+            } else if (CriteriaType.TYPE == c.criteriaType) {
+                Class tp = (Class) c.right;
+                sb.append(c.left.toString())
+                        .append(" ")
+                        .append(c.criteriaType.toString())
+                        .append(" ")
+                        .append(tp.getCanonicalName());
+            } else {
+                sb.append(c.left.toString())
+                        .append(" ")
+                        .append(c.criteriaType.toString())
+                        .append(" ")
+                        .append(wrapString(c.right));
+            }
+
+            if (i.hasNext()) {
+                sb.append(" && ");
+            }
+        }
         return sb.toString();
     }
 
@@ -797,9 +892,24 @@ public class Criteria implements Predicate {
             return "null";
         }
         if (o instanceof String) {
-            return "'" + o.toString() + "'";
-        } else {
-            return o.toString();
+            String s = o.toString();
+            return "'" + s + "'";
         }
+        if (o instanceof Collection) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+
+            Iterator i = ((Collection) o).iterator();
+            while (i.hasNext()) {
+                sb.append(wrapString(i.next()));
+                if (i.hasNext()) {
+                    sb.append(",");
+                }
+            }
+            sb.append("]");
+            return sb.toString();
+        }
+
+        return o.toString();
     }
 }
