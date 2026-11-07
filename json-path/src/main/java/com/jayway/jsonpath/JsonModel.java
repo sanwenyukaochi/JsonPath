@@ -71,6 +71,10 @@ public class JsonModel {
         return jsonProvider.isMap(jsonObject);
     }
 
+    public void print() {
+        System.out.println(toJson());
+    }
+
     public boolean hasPath(String jsonPath) {
         return hasPath(JsonPath.compile(jsonPath));
     }
@@ -323,6 +327,8 @@ public class JsonModel {
 
         Double getDouble(String key);
 
+        String getString(String key);
+
         ObjectOps putAll(Map<String, Object> map);
 
         ObjectOps remove(String key);
@@ -347,6 +353,8 @@ public class JsonModel {
         ArrayOps set(int index, Object value);
 
         ArrayOps transform(Transformer<List<Object>> transformer);
+
+        ArrayOps each(Transformer<Object> transformer);
 
         ListMappingModelReader toList();
 
@@ -406,6 +414,11 @@ public class JsonModel {
         @Override
         public Double getDouble(String key) {
             return ConvertUtils.toDouble(get(key));
+        }
+
+        @Override
+        public String getString(String key) {
+            return ConvertUtils.toString(get(key));
         }
 
         @Override
@@ -486,6 +499,16 @@ public class JsonModel {
         public ArrayOps transform(Transformer<List<Object>> transformer) {
             Object transformed = transformer.transform(getTargetObject(jsonPath, List.class));
             setTargetObject(jsonPath, transformed);
+            return this;
+        }
+
+        @Override
+        public ArrayOps each(Transformer<Object> transformer) {
+
+            List targetObject = getTargetObject(jsonPath, List.class);
+            for (int i = 0; i < targetObject.size(); i++) {
+                targetObject.set(i, transformer.transform(targetObject.get(i)));
+            }
             return this;
         }
 

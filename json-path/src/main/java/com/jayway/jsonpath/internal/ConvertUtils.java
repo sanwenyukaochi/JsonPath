@@ -35,4 +35,12 @@ public class ConvertUtils {
                     "Could not convert " + o.toString() + " to Double");
         }
     }
+
+    public static String toString(Object o) {
+        if (null == o) {
+            return null;
+        }
+
+        return o.toString();
+    }
 }
