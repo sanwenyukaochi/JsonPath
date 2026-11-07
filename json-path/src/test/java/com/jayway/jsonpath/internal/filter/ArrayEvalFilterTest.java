@@ -10,6 +10,10 @@ public class ArrayEvalFilterTest {
     public void condition_statements_can_be_parsed() {
 
         assertEquals(
+                new ArrayEvalFilter.ConditionStatement("@.length", ">", "0"),
+                ArrayEvalFilter.createConditionStatement("[?(@.length>0)]"));
+
+        assertEquals(
                 new ArrayEvalFilter.ConditionStatement("@", "==", "5"),
                 ArrayEvalFilter.createConditionStatement("[?(@==5)]"));
         assertEquals(

@@ -95,6 +95,27 @@ public class JsonPathTest {
             """;
 
     @Test
+    public void bracket_notation_with_dots() {
+        String json =
+                """
+                {
+                    "store": {
+                        "book": [
+                            {
+                                "author.name": "Nigel Rees",
+                                "category": "reference",
+                                "price": 8.95,
+                                "title": "Sayings of the Century"
+                            }
+                        ]
+                    }
+                }\
+                """;
+
+        assertEquals("Nigel Rees", JsonPath.read(json, "$.store.book[0]['author.name']"));
+    }
+
+    @Test
     public void null_object_in_path() {
 
         String json =

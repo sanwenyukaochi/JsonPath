@@ -1,7 +1,6 @@
 package com.jayway.jsonpath;
 
 import static java.util.Arrays.asList;
-import static org.apache.commons.lang3.Validate.notEmpty;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.util.ArrayList;
@@ -12,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.Validate;
 
 public class Criteria {
 
@@ -28,6 +28,7 @@ public class Criteria {
         EXISTS,
         TYPE,
         REGEX,
+        NOT_EMPTY,
         OR
     }
 
@@ -43,14 +44,14 @@ public class Criteria {
     private Object isValue = NOT_SET;
 
     private Criteria(String key) {
-        notEmpty(key, "key can not be null or empty");
+        Validate.notEmpty(key, "key can not be null or empty");
         this.criteriaChain = new ArrayList<Criteria>();
         this.criteriaChain.add(this);
         this.key = JsonPath.compile(key);
     }
 
     private Criteria(List<Criteria> criteriaChain, String key) {
-        notEmpty(key, "key can not be null or empty");
+        Validate.notEmpty(key, "key can not be null or empty");
         this.criteriaChain = criteriaChain;
         this.criteriaChain.add(this);
         this.key = JsonPath.compile(key);
@@ -214,6 +215,20 @@ public class Criteria {
                 List act = (List) actualVal;
 
                 return (act.size() == exp);
+
+            } else if (CriteriaType.NOT_EMPTY.equals(key)) {
+
+                if (actualVal == null) {
+                    return false;
+                }
+                boolean empty = false;
+                if (actualVal instanceof Collection) {
+                    empty = ((List) actualVal).isEmpty();
+                } else if (actualVal instanceof String) {
+                    empty = ((String) actualVal).isEmpty();
+                }
+
+                return !empty;
 
             } else if (CriteriaType.EXISTS.equals(key)) {
 
@@ -397,6 +412,12 @@ public class Criteria {
     public Criteria size(int s) {
         checkFilterCanBeApplied(CriteriaType.SIZE);
         criteria.put(CriteriaType.SIZE, s);
+        return this;
+    }
+
+    public Criteria notEmpty() {
+        checkFilterCanBeApplied(CriteriaType.NOT_EMPTY);
+        criteria.put(CriteriaType.NOT_EMPTY, null);
         return this;
     }
 
