@@ -257,4 +257,12 @@ public class InlineFilterTest extends BaseTest {
         }
         assertHasOneResult("[\"\\\\'foo\"]", "$[?(@ == \"\\\\'foo\")]", conf);
     }
+
+    @Test
+    public void filter_evaluation_does_not_break_path_evaluation() {
+        assertHasOneResult(
+                "[{\"s\": \"fo\", \"expected_size\": \"m\"}, {\"s\": \"lo\", \"expected_size\": 2}]",
+                "$[?(@.s size @.expected_size)]",
+                conf);
+    }
 }

@@ -287,4 +287,21 @@ public class PathCompilerTest {
                     compile("$.prop..");
                 });
     }
+
+    @Test
+    public void issue_predicate_or_has_lower_priority_than_and() {
+        String json =
+"""
+{
+    "logs": [
+        {
+            "id": 2
+        }
+    ]
+}\
+""";
+
+        List<String> result = JsonPath.read(json, "$.logs[?(@.x && @.y || @.id)]");
+        assertThat(result).hasSize(1);
+    }
 }
