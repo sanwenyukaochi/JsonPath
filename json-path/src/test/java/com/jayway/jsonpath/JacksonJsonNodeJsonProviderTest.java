@@ -141,4 +141,46 @@ public class JacksonJsonNodeJsonProviderTest extends BaseTest {
         assertThat(node1).isSameAs(node2);
         assertThat(child1).isSameAs(child2);
     }
+
+    @Test
+    public void empty_array_check_works() throws IOException {
+        String json =
+"""
+[
+  {
+    "name": "a",
+    "groups": [
+      {
+        "type": "phase",
+        "name": "alpha"
+      },
+      {
+        "type": "not_phase",
+        "name": "beta"
+      }
+    ]
+  },
+  {
+    "name": "b",
+    "groups": [
+      {
+        "type": "phase",
+        "name": "beta"
+      },
+      {
+        "type": "not_phase",
+        "name": "alpha"
+      }
+    ]
+  }
+]\
+""";
+        ArrayNode node =
+                using(JACKSON_JSON_NODE_CONFIGURATION)
+                        .parse(json)
+                        .read(
+                                "$[?(@.groups[?(@.type == 'phase' && @.name == 'alpha')] empty false)]");
+        assertThat(node.size()).isEqualTo(1);
+        assertThat(node.get(0).get("name").asText()).isEqualTo("a");
+    }
 }
