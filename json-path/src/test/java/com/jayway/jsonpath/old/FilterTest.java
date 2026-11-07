@@ -15,6 +15,7 @@ import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.InvalidCriteriaException;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Predicate;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.json.JsonProviderFactory;
 import java.util.Collections;
@@ -293,11 +294,6 @@ public class FilterTest extends BaseTest {
         assertThat((String) JsonPath.read(jocksInTexas1, "[0].address.state"), is("Texas"));
         assertThat((String) JsonPath.read(jocksInTexas1, "[0].first-name"), is("Jock"));
         assertThat((String) JsonPath.read(jocksInTexas1, "[0].last-name"), is("Ewing"));
-
-        System.out.println("res1" + jocksInTexas1);
-        System.out.println("res2" + jocksInTexas2);
-
-        System.out.println("done");
     }
 
     @Test
@@ -318,14 +314,79 @@ public class FilterTest extends BaseTest {
     }
 
     @Test
-    public void arrays_of_maps_can_be_filtered() throws Exception {}
+    public void arrays_of_maps_can_be_filtered() throws Exception {
+
+        Map<String, Object> rootGrandChild_A = new HashMap<String, Object>();
+        rootGrandChild_A.put("name", "rootGrandChild_A");
+
+        Map<String, Object> rootGrandChild_B = new HashMap<String, Object>();
+        rootGrandChild_B.put("name", "rootGrandChild_B");
+
+        Map<String, Object> rootGrandChild_C = new HashMap<String, Object>();
+        rootGrandChild_C.put("name", "rootGrandChild_C");
+
+        Map<String, Object> rootChild_A = new HashMap<String, Object>();
+        rootChild_A.put("name", "rootChild_A");
+        rootChild_A.put("children", asList(rootGrandChild_A, rootGrandChild_B, rootGrandChild_C));
+
+        Map<String, Object> rootChild_B = new HashMap<String, Object>();
+        rootChild_B.put("name", "rootChild_B");
+        rootChild_B.put("children", asList(rootGrandChild_A, rootGrandChild_B, rootGrandChild_C));
+
+        Map<String, Object> rootChild_C = new HashMap<String, Object>();
+        rootChild_C.put("name", "rootChild_C");
+        rootChild_C.put("children", asList(rootGrandChild_A, rootGrandChild_B, rootGrandChild_C));
+
+        Map<String, Object> root = new HashMap<String, Object>();
+        root.put("children", asList(rootChild_A, rootChild_B, rootChild_C));
+
+        Predicate customFilter =
+                new Predicate() {
+                    @Override
+                    public boolean apply(PredicateContext ctx) {
+                        if (ctx.configuration()
+                                .getProvider()
+                                .getMapValue(ctx.target(), "name")
+                                .equals("rootGrandChild_A")) {
+                            return true;
+                        }
+                        return false;
+                    }
+                };
+
+        Filter rootChildFilter = filter(where("name").regex(Pattern.compile("rootChild_[A|B]")));
+        Filter rootGrandChildFilter =
+                filter(where("name").regex(Pattern.compile("rootGrandChild_[A|B]")));
+
+        List read =
+                JsonPath.read(
+                        root,
+                        "children[?].children[?, ?]",
+                        rootChildFilter,
+                        rootGrandChildFilter,
+                        customFilter);
+    }
 
     @Test
-    public void arrays_of_objects_can_be_filtered() throws Exception {}
+    public void arrays_of_objects_can_be_filtered() throws Exception {
+        Map<String, Object> doc = new HashMap<String, Object>();
+        doc.put("items", asList(1, 2, 3));
+
+        Predicate customFilter =
+                new Predicate() {
+                    @Override
+                    public boolean apply(PredicateContext ctx) {
+                        return 1 == (Integer) ctx.target();
+                    }
+                };
+
+        List<Integer> res = JsonPath.read(doc, "$.items[?]", customFilter);
+
+        assertEquals(1, res.get(0).intValue());
+    }
 
     @Test
     public void filters_can_contain_json_path_expressions() throws Exception {
-        System.out.println(DOCUMENT);
         Object doc = JsonProviderFactory.createProvider().parse(DOCUMENT);
 
         assertFalse(
@@ -365,12 +426,10 @@ public class FilterTest extends BaseTest {
         List<Map<String, Object>> result =
                 JsonPath.read(doc, "$.fields[?]", filter(where("errors").notEmpty()));
         assertEquals(1, result.size());
-        System.out.println(result);
 
         List<Map<String, Object>> result2 =
                 JsonPath.read(doc, "$.fields[?]", filter(where("name").notEmpty()));
         assertEquals(2, result2.size());
-        System.out.println(result2);
     }
 
     @Test
