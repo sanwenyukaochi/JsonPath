@@ -857,4 +857,14 @@ public class IssuesTest extends BaseTest {
             }
         };
     }
+
+    @Test
+    public void issue_131() {
+
+        String json = "[1, 2, {\"d\": { \"random\":null, \"date\": \"1234\"} , \"l\": \"filler\"}]";
+
+        Object read = JsonPath.read(json, "$[2]['d'][?(@.random)]['date']");
+
+        System.out.println(read);
+    }
 }
