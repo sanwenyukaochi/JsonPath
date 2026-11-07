@@ -25,8 +25,20 @@ public class JsonAsserterImpl implements JsonAsserter {
 
             throw new AssertionError(
                     String.format(
-                            "JSON doesn't match.\nExpected:\n%s\nActual:\n%s",
-                            matcher.toString(), obj));
+                            "JSON path [%s] doesn't match.\nExpected:\n%s\nActual:\n%s",
+                            path, matcher.toString(), obj));
+        }
+        return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> JsonAsserter assertThat(String path, Matcher<T> matcher, String message) {
+        T obj = JsonPath.<T>read(jsonObject, path);
+        if (!matcher.matches(obj)) {
+            throw new AssertionError(
+                    String.format(
+                            "JSON Assert Error: %s\nExpected:\n%s\nActual:\n%s",
+                            message, matcher.toString(), obj));
         }
         return this;
     }
@@ -46,12 +58,38 @@ public class JsonAsserterImpl implements JsonAsserter {
         return this;
     }
 
+    @Override
+    public JsonAsserter assertNotDefined(String path, String message) {
+        try {
+            Object o = JsonPath.read(jsonObject, path);
+            throw new AssertionError(
+                    format("Document contains the path <%s> but was expected not to.", path));
+        } catch (InvalidPathException e) {
+        }
+        return this;
+    }
+
     public JsonAsserter assertNull(String path) {
         return assertThat(path, nullValue());
     }
 
+    @Override
+    public JsonAsserter assertNull(String path, String message) {
+        return assertThat(path, nullValue(), message);
+    }
+
+    @Override
+    public <T> JsonAsserter assertEquals(String path, T expected, String message) {
+        return null;
+    }
+
     public <T> JsonAsserter assertNotNull(String path) {
         return assertThat(path, notNullValue());
+    }
+
+    @Override
+    public <T> JsonAsserter assertNotNull(String path, String message) {
+        return assertThat(path, notNullValue(), message);
     }
 
     public JsonAsserter and() {
