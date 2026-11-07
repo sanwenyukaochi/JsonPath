@@ -135,7 +135,7 @@ public class IssuesTest {
                                     .options(Option.THROW_ON_MISSING_PROPERTY)
                                     .build();
                     String json = "{\"a\":{\"b\":1,\"c\":2}}";
-                    System.out.println((Object) JsonPath.read(configuration, json, "a.d"));
+                    System.out.println((Object) JsonPath.parse(json, configuration).read("a.d"));
                 });
     }
 
@@ -144,7 +144,7 @@ public class IssuesTest {
         Configuration configuration = Configuration.builder().build();
 
         String json = "{\"a\":{\"b\":1,\"c\":2}}";
-        assertNull(JsonPath.read(configuration, json, "a.d"));
+        assertNull(JsonPath.parse(json, configuration).read("a.d"));
     }
 
     @Test

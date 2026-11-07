@@ -238,47 +238,43 @@ public class JsonPath {
         return new JsonReader(Configuration.builder().jsonProvider(provider).build());
     }
 
-    public static ReadContext parse(Object json, Configuration configuration) {
-        return new JsonReader(configuration).parse(json);
-    }
-
     public static ReadContext parse(Object json) {
         return new JsonReader().parse(json);
-    }
-
-    public static ReadContext parse(String json, Configuration configuration) {
-        return new JsonReader(configuration).parse(json);
     }
 
     public static ReadContext parse(String json) {
         return new JsonReader().parse(json);
     }
 
-    public static ReadContext parse(InputStream json, Configuration configuration) {
-        return new JsonReader(configuration).parse(json);
-    }
-
     public static ReadContext parse(InputStream json) {
         return new JsonReader().parse(json);
-    }
-
-    public static ReadContext parse(File json, Configuration configuration) throws IOException {
-        return new JsonReader(configuration).parse(json);
     }
 
     public static ReadContext parse(File json) throws IOException {
         return new JsonReader().parse(json);
     }
 
-    @SuppressWarnings({"unchecked"})
-    public static <T> T read(
-            Configuration configuration, Object json, String path, Filter... filters) {
-        return compile(path, filters).read(json, configuration);
+    public static ReadContext parse(URL json) throws IOException {
+        return new JsonReader().parse(json);
     }
 
-    @SuppressWarnings({"unchecked"})
-    public static <T> T read(
-            Configuration configuration, String json, String path, Filter... filters) {
-        return read(configuration, configuration.getProvider().parse(json), path, filters);
+    public static ReadContext parse(Object json, Configuration configuration) {
+        return new JsonReader(configuration).parse(json);
+    }
+
+    public static ReadContext parse(String json, Configuration configuration) {
+        return new JsonReader(configuration).parse(json);
+    }
+
+    public static ReadContext parse(InputStream json, Configuration configuration) {
+        return new JsonReader(configuration).parse(json);
+    }
+
+    public static ReadContext parse(File json, Configuration configuration) throws IOException {
+        return new JsonReader(configuration).parse(json);
+    }
+
+    public static ReadContext parse(URL json, Configuration configuration) throws IOException {
+        return new JsonReader(configuration).parse(json);
     }
 }

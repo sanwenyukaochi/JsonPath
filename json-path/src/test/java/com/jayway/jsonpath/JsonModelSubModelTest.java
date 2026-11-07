@@ -90,7 +90,8 @@ public class JsonModelSubModelTest {
                 .transform(
                         new Transformer<Map<String, Object>>() {
                             @Override
-                            public Object transform(Map<String, Object> obj) {
+                            public Object transform(
+                                    Map<String, Object> obj, Configuration configuration) {
                                 return Collections.singletonMap("prop", "new");
                             }
                         });
@@ -108,7 +109,8 @@ public class JsonModelSubModelTest {
                 .transform(
                         new Transformer<Map<String, Object>>() {
                             @Override
-                            public Object transform(Map<String, Object> obj) {
+                            public Object transform(
+                                    Map<String, Object> obj, Configuration configuration) {
                                 return Collections.singletonMap("prop", "new");
                             }
                         });
