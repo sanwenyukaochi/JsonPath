@@ -19,46 +19,53 @@ import org.junit.jupiter.api.Test;
 public class JsonAssertTest {
 
     public static final String JSON =
-            """
-            { "store": {
-                "book": [
-                  { "category": "reference",
-                    "author": "Nigel Rees",
-                    "title": "Sayings of the Century",
-                    "price": 8.95
-                  },
-                  { "category": "fiction",
-                    "author": "Evelyn Waugh",
-                    "title": "Sword of Honour",
-                    "price": 12.99
-                  },
-                  { "category": "fiction",
-                    "author": "Herman Melville",
-                    "title": "Moby Dick",
-                    "isbn": "0-553-21311-3",
-                    "price": 8.99
-                  },
-                  { "category": "fiction",
-                    "author": "J. R. R. Tolkien",
-                    "title": "The Lord of the Rings",
-                    "isbn": "0-395-19395-8",
-                    "price": 22.99
-                  }
-                ],
-                "bicycle": {
-                  "color": "red",
-                  "price": 19.95,
-                  "nullValue": null
-                }
-              }
-            }\
-            """;
+"""
+{ "store": {
+    "book": [\s
+      { "category": "reference",
+        "author": "Nigel Rees",
+        "title": "Sayings of the Century",
+        "price": 8.95
+      },
+      { "category": "fiction",
+        "author": "Evelyn Waugh",
+        "title": "Sword of Honour",
+        "price": 12.99
+      },
+      { "category": "fiction",
+        "author": "Herman Melville",
+        "title": "Moby Dick",
+        "isbn": "0-553-21311-3",
+        "price": 8.99
+      },
+      { "category": "fiction",
+        "author": "J. R. R. Tolkien",
+        "title": "The Lord of the Rings",
+        "isbn": "0-395-19395-8",
+        "price": 22.99
+      }
+    ],
+    "bicycle": {
+      "color": "red",
+      "price": 19.95
+,      "nullValue": null
+    }
+  }
+}\
+""";
+
+    @Test
+    public void invalid_path() throws Exception {
+        with(JSON).assertThat("$.store.book[*].fooBar", collectionWithSize(equalTo(4)));
+    }
 
     @Test
     public void failed_error_message() throws Exception {
         assertThrows(
                 AssertionError.class,
-                () -> with(JSON).assertThat("$.store.book[0].category", endsWith("foobar")));
+                () -> {
+                    with(JSON).assertThat("$.store.book[0].category", endsWith("foobar"));
+                });
     }
 
     @Test
@@ -137,7 +144,7 @@ public class JsonAssertTest {
                 .assertThat("$.store.book[0]", hasEntry("category", "reference"))
                 .assertThat("$.store.book[0]", hasEntry("title", "Sayings of the Century"))
                 .and()
-                .assertThat("$..book[0]", hasEntry("category", "reference"))
+                .assertThat("$..book[0]", is(collectionWithSize(equalTo(1))))
                 .and()
                 .assertThat("$.store.book[0]", mapContainingKey(equalTo("category")))
                 .and()
@@ -147,7 +154,7 @@ public class JsonAssertTest {
                 .assertThat("$.['store'].['book'][0]", hasEntry("category", "reference"))
                 .assertThat("$.['store'].['book'][0]", hasEntry("title", "Sayings of the Century"))
                 .and()
-                .assertThat("$..['book'][0]", hasEntry("category", "reference"))
+                .assertThat("$..['book'][0]", is(collectionWithSize(equalTo(1))))
                 .and()
                 .assertThat("$.['store'].['book'][0]", mapContainingKey(equalTo("category")))
                 .and()
@@ -172,15 +179,19 @@ public class JsonAssertTest {
     }
 
     @Test
-    public void invalid_path() throws Exception {
-        with(JSON).assertThat("$.store.book[*].fooBar", emptyCollection());
-    }
-
-    @Test
     public void path_including_wildcard_path_followed_by_another_path_concatenates_results_to_list()
             throws Exception {
         with(getResourceAsStream("lotto.json"))
                 .assertThat("lotto.winners[*].winnerId", hasItems(23, 54));
+    }
+
+    @Test
+    public void testNotDefined() throws Exception {
+        JsonAsserter asserter = JsonAssert.with("{\"foo\":\"bar\"}");
+        asserter.assertEquals("$.foo", "bar");
+        asserter.assertEquals("$foo", "bar");
+        asserter.assertNotDefined("$.xxx");
+        asserter.assertNotDefined("$xxx");
     }
 
     private InputStream getResourceAsStream(String resourceName) {

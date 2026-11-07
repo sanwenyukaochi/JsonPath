@@ -4,17 +4,17 @@ import static com.jayway.jsonpath.internal.Utils.notEmpty;
 import static com.jayway.jsonpath.internal.Utils.notNull;
 
 import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.Filter;
+import com.jayway.jsonpath.Filter2;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.ReadContext;
-import com.jayway.jsonpath.spi.HttpProviderFactory;
-import com.jayway.jsonpath.spi.JsonProvider;
+import com.jayway.jsonpath.spi.http.HttpProviderFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 
 public class JsonReader implements ParseContext, ReadContext {
 
@@ -23,10 +23,6 @@ public class JsonReader implements ParseContext, ReadContext {
 
     public JsonReader() {
         this(Configuration.defaultConfiguration());
-    }
-
-    public JsonReader(JsonProvider jsonProvider) {
-        this(Configuration.builder().jsonProvider(jsonProvider).build());
     }
 
     public JsonReader(Configuration configuration) {
@@ -81,7 +77,7 @@ public class JsonReader implements ParseContext, ReadContext {
     }
 
     @Override
-    public <T> T read(String path, Filter... filters) {
+    public <T> T read(String path, Filter2... filters) {
         notEmpty(path, "path can not be null or empty");
         return read(JsonPath.compile(path, filters));
     }
@@ -90,5 +86,17 @@ public class JsonReader implements ParseContext, ReadContext {
     public <T> T read(JsonPath path) {
         notNull(path, "path can not be null");
         return path.read(json, configuration);
+    }
+
+    @Override
+    public List<String> readPathList(String path, Filter2... filters) {
+        notEmpty(path, "path can not be null or empty");
+        return readPathList(JsonPath.compile(path, filters));
+    }
+
+    @Override
+    public List<String> readPathList(JsonPath path) {
+        notNull(path, "path can not be null");
+        return path.readPathList(json, configuration);
     }
 }

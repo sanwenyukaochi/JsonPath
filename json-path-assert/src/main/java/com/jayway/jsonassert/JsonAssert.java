@@ -6,7 +6,7 @@ import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import com.jayway.jsonassert.impl.matcher.IsEmptyCollection;
 import com.jayway.jsonassert.impl.matcher.IsMapContainingKey;
 import com.jayway.jsonassert.impl.matcher.IsMapContainingValue;
-import com.jayway.jsonpath.spi.JsonProviderFactory;
+import com.jayway.jsonpath.spi.json.JsonProviderFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
