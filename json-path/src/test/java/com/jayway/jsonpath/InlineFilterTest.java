@@ -137,4 +137,30 @@ public class InlineFilterTest extends BaseTest {
                 .containsExactly(
                         "Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien");
     }
+
+    @Test
+    public void patterns_can_be_evaluated() {
+        List<String> resLeft =
+                JsonPath.parse(JSON_DOCUMENT)
+                        .read("$.store.book[?(@.category =~ /reference/)].author");
+        assertThat(resLeft).containsExactly("Nigel Rees");
+
+        resLeft =
+                JsonPath.parse(JSON_DOCUMENT)
+                        .read("$.store.book[?(/reference/ =~ @.category)].author");
+        assertThat(resLeft).containsExactly("Nigel Rees");
+    }
+
+    @Test
+    public void patterns_can_be_evaluated_with_ignore_case() {
+        List<String> resLeft =
+                JsonPath.parse(JSON_DOCUMENT)
+                        .read("$.store.book[?(@.category =~ /REFERENCE/)].author");
+        assertThat(resLeft).isEmpty();
+
+        resLeft =
+                JsonPath.parse(JSON_DOCUMENT)
+                        .read("$.store.book[?(@.category =~ /REFERENCE/i)].author");
+        assertThat(resLeft).containsExactly("Nigel Rees");
+    }
 }
