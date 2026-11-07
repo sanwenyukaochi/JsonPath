@@ -1,6 +1,8 @@
 package com.jayway.jsonpath;
 
 import static java.util.Arrays.asList;
+import static org.apache.commons.lang.Validate.notEmpty;
+import static org.apache.commons.lang.Validate.notNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import javax.lang.model.type.NullType;
 
 public class Criteria {
 
@@ -24,12 +25,14 @@ public class Criteria {
     private Object isValue = NOT_SET;
 
     public Criteria(String key) {
+        notEmpty(key, "key can not be null or empty");
         this.criteriaChain = new ArrayList<Criteria>();
         this.criteriaChain.add(this);
         this.key = key;
     }
 
     protected Criteria(List<Criteria> criteriaChain, String key) {
+        notEmpty(key, "key can not be null or empty");
         this.criteriaChain = criteriaChain;
         this.criteriaChain.add(this);
         this.key = key;
@@ -71,12 +74,20 @@ public class Criteria {
                     expectedVal = this.criteria.get(key);
                     if ("$gt".equals(key)) {
 
+                        if (expectedVal == null || actualVal == null) {
+                            return false;
+                        }
+
                         Number expectedNumber = (Number) expectedVal;
                         Number actualNumber = (Number) actualVal;
 
                         return (actualNumber.doubleValue() > expectedNumber.doubleValue());
 
                     } else if ("$gte".equals(key)) {
+
+                        if (expectedVal == null || actualVal == null) {
+                            return false;
+                        }
 
                         Number expectedNumber = (Number) expectedVal;
                         Number actualNumber = (Number) actualVal;
@@ -85,6 +96,10 @@ public class Criteria {
 
                     } else if ("$lt".equals(key)) {
 
+                        if (expectedVal == null || actualVal == null) {
+                            return false;
+                        }
+
                         Number expectedNumber = (Number) expectedVal;
                         Number actualNumber = (Number) actualVal;
 
@@ -92,12 +107,22 @@ public class Criteria {
 
                     } else if ("$lte".equals(key)) {
 
+                        if (expectedVal == null || actualVal == null) {
+                            return false;
+                        }
+
                         Number expectedNumber = (Number) expectedVal;
                         Number actualNumber = (Number) actualVal;
 
                         return (actualNumber.doubleValue() <= expectedNumber.doubleValue());
 
                     } else if ("$ne".equals(key)) {
+                        if (expectedVal == null && actualVal == null) {
+                            return false;
+                        }
+                        if (expectedVal == null) {
+                            return !(actualVal == null);
+                        }
 
                         return !expectedVal.equals(actualVal);
 
@@ -136,29 +161,42 @@ public class Criteria {
                     } else if ("$type".equals(key)) {
 
                         Class<?> exp = (Class<?>) expectedVal;
-                        Class<?> act =
-                                map.containsKey(this.key)
-                                        ? map.get(this.key).getClass()
-                                        : NullType.class;
-
-                        return act.equals(exp);
+                        Class<?> act = null;
+                        if (map.containsKey(this.key)) {
+                            Object actVal = map.get(this.key);
+                            if (actVal != null) {
+                                act = actVal.getClass();
+                            }
+                        }
+                        if (act == null) {
+                            return false;
+                        } else {
+                            return act.equals(exp);
+                        }
 
                     } else if ("$regex".equals(key)) {
 
                         Pattern exp = (Pattern) expectedVal;
                         String act = (String) actualVal;
-
+                        if (act == null) {
+                            return false;
+                        }
                         return exp.matcher(act).matches();
 
                     } else if ("$or".equals(key)) {
 
-                        System.out.println("auch");
+                        throw new UnsupportedOperationException("Or not supported yet");
                     }
                 }
             }
         }
         if (isValue != NOT_SET) {
-            return isValue.equals(map.get(key));
+
+            if (isValue == null) {
+                return (map.get(key) == null);
+            } else {
+                return isValue.equals(map.get(key));
+            }
         } else {
 
         }
@@ -185,6 +223,10 @@ public class Criteria {
         }
         this.isValue = o;
         return this;
+    }
+
+    public Criteria eq(Object o) {
+        return is(o);
     }
 
     public Criteria ne(Object o) {
@@ -230,6 +272,7 @@ public class Criteria {
     }
 
     public Criteria nin(Collection<?> o) {
+        notNull(o, "collection can not be null");
         criteria.put("$nin", o);
         return this;
     }

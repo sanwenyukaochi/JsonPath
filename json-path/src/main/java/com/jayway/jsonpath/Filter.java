@@ -6,27 +6,40 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class Filter {
+public abstract class Filter<T> {
 
-    public abstract boolean apply(Map<String, Object> map);
+    public static Filter filter(Criteria criteria) {
+        return new MapFilter(criteria);
+    }
 
-    public List<?> doFilter(List<Map<String, Object>> filterItems) {
-        List<Object> result = new ArrayList<Object>();
-
-        for (Map<String, Object> filterItem : filterItems) {
-
-            if (apply(filterItem)) {
+    public List<T> doFilter(List<T> filterItems) {
+        List<T> result = new ArrayList<T>();
+        for (T filterItem : filterItems) {
+            if (accept(filterItem)) {
                 result.add(filterItem);
             }
         }
         return result;
     }
 
-    public static Filter filter(Criteria criteria) {
-        return new MapFilter(criteria);
+    public abstract boolean accept(T obj);
+
+    public abstract Filter addCriteria(Criteria criteria);
+
+    public abstract static class FilterAdapter<T> extends Filter<T> {
+
+        @Override
+        public boolean accept(T obj) {
+            return false;
+        }
+
+        @Override
+        public Filter addCriteria(Criteria criteria) {
+            throw new UnsupportedOperationException("can not add criteria to a FilterAdapter.");
+        }
     }
 
-    private static class MapFilter extends Filter {
+    private static class MapFilter extends FilterAdapter<Map<String, Object>> {
 
         private HashMap<String, Criteria> criteria = new LinkedHashMap<String, Criteria>();
 
@@ -45,19 +58,13 @@ public abstract class Filter {
             return this;
         }
 
-        protected List<Criteria> getCriteria() {
-            return new ArrayList<Criteria>(this.criteria.values());
-        }
-
         @Override
-        public boolean apply(Map<String, Object> map) {
-
-            for (Criteria criterion : getCriteria()) {
+        public boolean accept(Map<String, Object> map) {
+            for (Criteria criterion : this.criteria.values()) {
                 if (!criterion.apply(map)) {
                     return false;
                 }
             }
-
             return true;
         }
     }
