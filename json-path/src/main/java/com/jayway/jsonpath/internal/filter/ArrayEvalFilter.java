@@ -1,6 +1,5 @@
 package com.jayway.jsonpath.internal.filter;
 
-import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.internal.filter.eval.ExpressionEvaluator;
@@ -12,13 +11,13 @@ import java.util.regex.Pattern;
 public class ArrayEvalFilter extends PathTokenFilter {
 
     private static final Pattern PATTERN =
-            Pattern.compile("\\[\\s?\\?\\(\\s?(@.*?)\\s?([!=<>]+)\\s?(.*?)\\s?\\)\\s?\\]");
+            Pattern.compile("\\[\\s?\\?\\(\\s?(@.*?)\\s?([!=<>]+)\\s?(.*?)\\s?\\)\\s?]");
 
     private final ConditionStatement conditionStatement;
 
-    public ArrayEvalFilter(String condition) {
-        super(condition);
-        this.conditionStatement = createConditionStatement(condition);
+    public ArrayEvalFilter(ConditionStatement statement) {
+        super(statement.condition);
+        this.conditionStatement = statement;
     }
 
     @Override
@@ -27,7 +26,7 @@ public class ArrayEvalFilter extends PathTokenFilter {
         try {
             src = jsonProvider.toIterable(obj);
         } catch (ClassCastException e) {
-            throw new InvalidPathException(
+            throw new PathNotFoundException(
                     "The path fragment '"
                             + this.condition
                             + "' can not be applied to a JSON object only a JSON array.",
@@ -66,26 +65,28 @@ public class ArrayEvalFilter extends PathTokenFilter {
         }
     }
 
-    static ConditionStatement createConditionStatement(String str) {
-        Matcher matcher = PATTERN.matcher(str);
+    static ConditionStatement createConditionStatement(String condition) {
+        Matcher matcher = PATTERN.matcher(condition);
         if (matcher.matches()) {
             String property = matcher.group(1).trim();
             String operator = matcher.group(2).trim();
             String expected = matcher.group(3).trim();
 
-            return new ConditionStatement(property, operator, expected);
+            return new ConditionStatement(condition, property, operator, expected);
         } else {
-            throw new InvalidPathException("Invalid match " + str);
+            return null;
         }
     }
 
     static class ConditionStatement {
+        private final String condition;
         private final String field;
         private final String operator;
         private final String expected;
         private final JsonPath path;
 
-        ConditionStatement(String field, String operator, String expected) {
+        ConditionStatement(String condition, String field, String operator, String expected) {
+            this.condition = condition;
             this.field = field;
             this.operator = operator;
 
@@ -100,6 +101,14 @@ public class ArrayEvalFilter extends PathTokenFilter {
             } else {
                 this.path = JsonPath.compile(this.field.replace("@", "$"));
             }
+        }
+
+        ConditionStatement(String field, String operator, String expected) {
+            this(null, field, operator, expected);
+        }
+
+        String getCondition() {
+            return condition;
         }
 
         public JsonPath getJsonPath() {

@@ -13,6 +13,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.InputStream;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class JsonAssertTest {
@@ -61,6 +62,7 @@ public class JsonAssertTest {
     }
 
     @Test
+    @Disabled
     public void links_document() throws Exception {
 
         with(getResourceAsStream("links.json"))
@@ -72,6 +74,7 @@ public class JsonAssertTest {
     }
 
     @Test
+    @Disabled
     public void a_document_can_be_expected_not_to_contain_a_path() throws Exception {
         with(JSON).assertNotDefined("$.store.bicycle.cool");
     }

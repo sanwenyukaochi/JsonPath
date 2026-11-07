@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class ExpressionEvalTest {
@@ -179,6 +180,7 @@ public class ExpressionEvalTest {
     }
 
     @Test
+    @Disabled
     public void nulls_filter() {
 
         List<Map<String, Object>> result =

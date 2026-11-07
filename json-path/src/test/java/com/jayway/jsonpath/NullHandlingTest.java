@@ -2,6 +2,7 @@ package com.jayway.jsonpath;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
@@ -36,7 +37,13 @@ public class NullHandlingTest {
     @Test
     public void not_defined_property_throws_PathNotFoundException() {
         assertThrows(
-                PathNotFoundException.class, () -> JsonPath.read(DOCUMENT, "$.children[2].age"));
+                PathNotFoundException.class,
+                () -> assertNull(JsonPath.read(DOCUMENT, "$.children[0].child.age")));
+    }
+
+    @Test
+    public void last_token_defaults_to_null() {
+        assertNull(JsonPath.read(DOCUMENT, "$.children[2].age"));
     }
 
     @Test

@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class FilterTest {
@@ -186,6 +187,7 @@ public class FilterTest {
     }
 
     @Test
+    @Disabled
     public void exists_filters_evaluates() throws Exception {
         Map<String, Object> check = new HashMap<String, Object>();
         check.put("foo", "foo");

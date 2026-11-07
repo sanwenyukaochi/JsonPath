@@ -29,7 +29,6 @@ public class JsonPath {
 
     private static Pattern DEFINITE_PATH_PATTERN =
             Pattern.compile(".*(\\.\\.|\\*|\\[[\\\\/]|\\?|,|:\\s?]|\\[\\s?:|>|\\(|<|=|\\+).*");
-    private static Pattern INVALID_PATH_PATTERN = Pattern.compile("[^\\?\\+=\\-\\*/!]\\(");
 
     private PathTokenizer tokenizer;
     private LinkedList<Filter> filters;
@@ -39,10 +38,6 @@ public class JsonPath {
         notNull(jsonPath, "path can not be null");
         jsonPath = jsonPath.trim();
         notEmpty(jsonPath, "path can not be empty");
-
-        if (INVALID_PATH_PATTERN.matcher(jsonPath).matches()) {
-            throw new InvalidPathException("Invalid path");
-        }
 
         int filterCountInPath = StringUtils.countMatches(jsonPath, "[?]");
         isTrue(
@@ -108,7 +103,16 @@ public class JsonPath {
 
         for (PathToken pathToken : tokenizer) {
             PathTokenFilter filter = pathToken.getFilter();
+
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Applying filter: " + filter + " to " + result);
+            }
+
             result = filter.filter(result, jsonProvider, contextFilters, inArrayContext);
+
+            if (result == null && !pathToken.isEndToken()) {
+                throw new PathNotFoundException("AAAAAA");
+            }
 
             if (!inArrayContext) {
                 inArrayContext = filter.isArrayFilter();
