@@ -1,7 +1,6 @@
 package com.jayway.jsonpath.internal.function;
 
 import com.jayway.jsonpath.InvalidPathException;
-import com.jayway.jsonpath.internal.function.http.HttpLoader;
 import com.jayway.jsonpath.internal.function.json.Append;
 import com.jayway.jsonpath.internal.function.numeric.Average;
 import com.jayway.jsonpath.internal.function.numeric.Max;
@@ -29,8 +28,6 @@ public class PathFunctionFactory {
         map.put("max", Max.class);
 
         map.put("concat", Concatenate.class);
-
-        map.put("getjson", HttpLoader.class);
 
         map.put("length", Length.class);
         map.put("size", Length.class);
