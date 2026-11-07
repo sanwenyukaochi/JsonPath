@@ -1,6 +1,6 @@
 package com.jayway.jsonpath;
 
-import static com.jayway.jsonpath.internal.PathCompiler.compile;
+import static com.jayway.jsonpath.internal.path.PathCompiler.compile;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

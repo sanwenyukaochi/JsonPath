@@ -1,4 +1,4 @@
-package com.jayway.jsonpath.internal.token;
+package com.jayway.jsonpath.internal.path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
