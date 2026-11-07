@@ -67,6 +67,10 @@ public class Parameter {
         this.json = json;
     }
 
+    public ILateBindingValue getILateBingValue() {
+        return lateBinding;
+    }
+
     public static <T> List<T> toList(
             final Class<T> type, final EvaluationContext ctx, final List<Parameter> parameters) {
         List<T> values = new ArrayList();
