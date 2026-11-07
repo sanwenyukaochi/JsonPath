@@ -89,7 +89,7 @@ public class FilterCompilerTest {
             compile(filter);
             throw new AssertionError("Expected " + filter + " to throw InvalidPathException");
         } catch (InvalidPathException e) {
-            e.printStackTrace();
+
         }
     }
 

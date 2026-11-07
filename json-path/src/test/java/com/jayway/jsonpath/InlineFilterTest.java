@@ -236,4 +236,25 @@ public class InlineFilterTest extends BaseTest {
         assertHasOneResult("[{\"value\":5.1}]", "$[?(@.value<7)]", conf);
         assertHasNoResults("[{\"value\":7.1}]", "$[?(@.value<5)]", conf);
     }
+
+    @Test
+    public void escape_pattern() {
+        assertHasOneResult("[\"x\"]", "$[?(@ =~ /\\/|x/)]", conf);
+    }
+
+    @Test
+    public void escaped_literals() {
+        if (conf.jsonProvider().getClass().getSimpleName().startsWith("Jackson")) {
+            return;
+        }
+        assertHasOneResult("[\"\\'foo\"]", "$[?(@ == '\\'foo')]", conf);
+    }
+
+    @Test
+    public void escaped_literals2() {
+        if (conf.jsonProvider().getClass().getSimpleName().startsWith("Jackson")) {
+            return;
+        }
+        assertHasOneResult("[\"\\\\'foo\"]", "$[?(@ == \"\\\\'foo\")]", conf);
+    }
 }
