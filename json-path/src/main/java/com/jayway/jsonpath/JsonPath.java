@@ -59,10 +59,14 @@ public class JsonPath {
         return this.tokenizer.getPath();
     }
 
-    public boolean isPathDefinite() {
-        String preparedPath = getPath().replaceAll("\"[^\"\\\\\\n\r]*\"", "");
+    public static boolean isPathDefinite(String path) {
+        String preparedPath = path.replaceAll("\"[^\"\\\\\\n\r]*\"", "");
 
         return !DEFINITE_PATH_PATTERN.matcher(preparedPath).matches();
+    }
+
+    public boolean isPathDefinite() {
+        return JsonPath.isPathDefinite(getPath());
     }
 
     @SuppressWarnings({"unchecked"})
