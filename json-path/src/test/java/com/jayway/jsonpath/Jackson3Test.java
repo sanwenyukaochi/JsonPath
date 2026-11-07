@@ -1,0 +1,84 @@
+package com.jayway.jsonpath;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.singletonMap;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Date;
+import org.junit.jupiter.api.Test;
+
+public class Jackson3Test extends BaseTest {
+
+    @Test
+    public void an_object_can_be_mapped_to_pojo() {
+
+        String json =
+"""
+{
+   "foo" : "foo",
+   "bar" : 10,
+   "baz" : true
+}\
+""";
+
+        FooBarBaz fooBarBaz =
+                JsonPath.using(JACKSON3_CONFIGURATION).parse(json).read("$", FooBarBaz.class);
+
+        assertThat(fooBarBaz.foo).isEqualTo("foo");
+        assertThat(fooBarBaz.bar).isEqualTo(10L);
+        assertThat(fooBarBaz.baz).isEqualTo(true);
+
+        fooBarBaz =
+                JsonPath.using(JACKSON3_CONFIGURATION)
+                        .parseUtf8(json.getBytes(UTF_8))
+                        .read("$", FooBarBaz.class);
+
+        assertThat(fooBarBaz.foo).isEqualTo("foo");
+        assertThat(fooBarBaz.bar).isEqualTo(10L);
+        assertThat(fooBarBaz.baz).isEqualTo(true);
+    }
+
+    public static class FooBarBaz {
+        public String foo;
+        public Long bar;
+        public boolean baz;
+    }
+
+    @Test
+    public void jackson_converts_dates() {
+
+        Date now = new Date();
+
+        Object json = singletonMap("date_as_long", now.getTime());
+
+        Date date =
+                JsonPath.using(JACKSON3_CONFIGURATION)
+                        .parse(json)
+                        .read("$['date_as_long']", Date.class);
+
+        assertThat(date).isEqualTo(now);
+    }
+
+    @Test
+    public void single_quotes_work_with_in_filter() {
+        final String jsonArray = "[{\"foo\": \"bar\"}, {\"foo\": \"baz\"}]";
+        final Object readFromSingleQuote =
+                JsonPath.using(JACKSON3_CONFIGURATION)
+                        .parse(jsonArray)
+                        .read("$.[?(@.foo in ['bar'])].foo");
+        final Object readFromDoubleQuote =
+                JsonPath.using(JACKSON3_CONFIGURATION)
+                        .parse(jsonArray)
+                        .read("$.[?(@.foo in [\"bar\"])].foo");
+        assertThat(readFromSingleQuote).isEqualTo(readFromDoubleQuote);
+        final Object readFromSingleQuoteBytes =
+                JsonPath.using(JACKSON3_CONFIGURATION)
+                        .parseUtf8(jsonArray.getBytes(UTF_8))
+                        .read("$.[?(@.foo in ['bar'])].foo");
+        final Object readFromDoubleQuoteBytes =
+                JsonPath.using(JACKSON3_CONFIGURATION)
+                        .parseUtf8(jsonArray.getBytes(UTF_8))
+                        .read("$.[?(@.foo in [\"bar\"])].foo");
+        assertThat(readFromSingleQuoteBytes).isEqualTo(readFromDoubleQuoteBytes);
+    }
+}
