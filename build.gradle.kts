@@ -8,7 +8,7 @@ plugins {
     id("com.diffplug.spotless") version "8.11.0"
 }
 
-version = "2.1.1-SNAPSHOT"
+version = "2.2.0"
 
 repositories {
     mavenCentral()
