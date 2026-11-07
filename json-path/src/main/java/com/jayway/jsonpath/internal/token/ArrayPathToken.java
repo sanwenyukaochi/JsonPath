@@ -2,7 +2,6 @@ package com.jayway.jsonpath.internal.token;
 
 import static java.lang.String.format;
 
-import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.internal.PathRef;
 import org.slf4j.Logger;
@@ -183,7 +182,7 @@ public class ArrayPathToken extends PathToken {
             if (!isUpstreamDefinite()) {
                 return false;
             } else {
-                throw new InvalidPathException(
+                throw new PathNotFoundException(
                         format(
                                 "Filter: %s can only be applied to arrays. Current context is: %s",
                                 toString(), model));
