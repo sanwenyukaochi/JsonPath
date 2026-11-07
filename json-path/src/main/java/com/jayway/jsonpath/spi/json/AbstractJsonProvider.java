@@ -1,7 +1,6 @@
-package com.jayway.jsonpath.internal.spi.json;
+package com.jayway.jsonpath.spi.json;
 
 import com.jayway.jsonpath.JsonPathException;
-import com.jayway.jsonpath.spi.json.JsonProvider;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

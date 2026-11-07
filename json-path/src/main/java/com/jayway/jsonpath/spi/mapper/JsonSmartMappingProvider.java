@@ -1,9 +1,7 @@
-package com.jayway.jsonpath.internal.spi.mapper;
+package com.jayway.jsonpath.spi.mapper;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.TypeRef;
-import com.jayway.jsonpath.spi.mapper.MappingException;
-import com.jayway.jsonpath.spi.mapper.MappingProvider;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;

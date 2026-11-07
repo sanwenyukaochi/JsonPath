@@ -1,4 +1,4 @@
-package com.jayway.jsonpath.internal.spi.json;
+package com.jayway.jsonpath.spi.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
