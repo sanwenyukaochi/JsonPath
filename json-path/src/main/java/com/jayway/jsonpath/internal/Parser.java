@@ -91,7 +91,7 @@ public class Parser {
         return next(offset);
     }
 
-    public boolean isInts(String chars, boolean allowSequence) {
+    public static boolean isInts(String chars, boolean allowSequence) {
         for (int i = 0; i < chars.length(); i++) {
 
             char c = chars.charAt(i);
@@ -105,7 +105,7 @@ public class Parser {
         return true;
     }
 
-    private boolean contains(Token[] arr, char checkFor) {
+    private static boolean contains(Token[] arr, char checkFor) {
         for (int i = 0; i < arr.length; i++) {
             if (arr[i].c == checkFor) {
                 return true;
