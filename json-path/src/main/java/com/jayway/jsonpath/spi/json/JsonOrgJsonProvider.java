@@ -169,9 +169,8 @@ public class JsonOrgJsonProvider extends AbstractJsonProvider {
             }
         }
         throw new JsonPathException(
-                "length operation can not applied to " + obj != null
-                        ? obj.getClass().getName()
-                        : "null");
+                "length operation can not applied to "
+                        + (obj != null ? obj.getClass().getName() : "null"));
     }
 
     @Override
