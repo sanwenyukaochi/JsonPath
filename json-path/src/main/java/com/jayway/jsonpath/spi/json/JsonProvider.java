@@ -15,8 +15,6 @@ public interface JsonProvider {
 
     String toJson(Object obj);
 
-    Object createNull();
-
     Object createArray();
 
     boolean isArray(Object obj);

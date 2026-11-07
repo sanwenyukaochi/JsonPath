@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
@@ -94,11 +93,6 @@ public class GsonJsonProvider extends AbstractJsonProvider {
     @Override
     public String toJson(Object obj) {
         return obj.toString();
-    }
-
-    @Override
-    public Object createNull() {
-        return JsonNull.INSTANCE;
     }
 
     @Override
