@@ -48,4 +48,18 @@ public class JacksonTest extends BaseTest {
 
         assertThat(date).isEqualTo(now);
     }
+
+    @Test
+    public void single_quotes_work_with_in_filter() {
+        final String jsonArray = "[{\"foo\": \"bar\"}, {\"foo\": \"baz\"}]";
+        final Object readFromSingleQuote =
+                JsonPath.using(JACKSON_CONFIGURATION)
+                        .parse(jsonArray)
+                        .read("$.[?(@.foo in ['bar'])].foo");
+        final Object readFromDoubleQuote =
+                JsonPath.using(JACKSON_CONFIGURATION)
+                        .parse(jsonArray)
+                        .read("$.[?(@.foo in [\"bar\"])].foo");
+        assertThat(readFromSingleQuote).isEqualTo(readFromDoubleQuote);
+    }
 }

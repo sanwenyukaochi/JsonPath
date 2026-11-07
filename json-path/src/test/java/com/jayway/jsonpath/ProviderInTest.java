@@ -1,7 +1,6 @@
 package com.jayway.jsonpath;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.gson.JsonArray;
 import com.jayway.jsonpath.spi.json.GsonJsonProvider;
@@ -47,7 +46,8 @@ public class ProviderInTest {
         final List<String> doubleQuoteInResult = ctx.read(DOUBLE_QUOTES_IN_FILTER);
         assertEquals(doubleQuoteInResult, doubleQuoteEqualsResult);
 
-        assertThrows(InvalidJsonException.class, () -> ctx.read(SINGLE_QUOTES_IN_FILTER));
+        final List<String> singleQuoteInResult = ctx.read(SINGLE_QUOTES_IN_FILTER);
+        assertEquals(doubleQuoteInResult, singleQuoteInResult);
     }
 
     @Test
@@ -68,7 +68,8 @@ public class ProviderInTest {
         final ArrayNode doubleQuoteInResult = ctx.read(DOUBLE_QUOTES_IN_FILTER);
         assertEquals(doubleQuoteInResult, doubleQuoteEqualsResult);
 
-        assertThrows(InvalidJsonException.class, () -> ctx.read(SINGLE_QUOTES_IN_FILTER));
+        final ArrayNode singleQuoteInResult = ctx.read(SINGLE_QUOTES_IN_FILTER);
+        assertEquals(doubleQuoteInResult, singleQuoteInResult);
     }
 
     @Test
