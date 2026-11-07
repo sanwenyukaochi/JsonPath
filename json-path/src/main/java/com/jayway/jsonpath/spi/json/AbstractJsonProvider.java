@@ -27,7 +27,12 @@ public abstract class AbstractJsonProvider implements JsonProvider {
         if (!isArray(array)) {
             throw new UnsupportedOperationException();
         } else {
-            ((List) array).set(index, newValue);
+            List l = (List) array;
+            if (index == l.size()) {
+                l.add(newValue);
+            } else {
+                l.set(index, newValue);
+            }
         }
     }
 
@@ -44,14 +49,10 @@ public abstract class AbstractJsonProvider implements JsonProvider {
     public void setProperty(Object obj, Object key, Object value) {
         if (isMap(obj)) ((Map) obj).put(key.toString(), value);
         else {
-            List list = (List) obj;
-            int index;
-            if (key != null) {
-                index = key instanceof Integer ? (Integer) key : Integer.parseInt(key.toString());
-            } else {
-                index = list.size();
-            }
-            list.add(index, value);
+            throw new JsonPathException(
+                    "setProperty operation cannot be used with " + obj != null
+                            ? obj.getClass().getName()
+                            : "null");
         }
     }
 
@@ -87,7 +88,7 @@ public abstract class AbstractJsonProvider implements JsonProvider {
             return ((String) obj).length();
         }
         throw new JsonPathException(
-                "length operation can not applied to " + obj != null
+                "length operation cannot be applied to " + obj != null
                         ? obj.getClass().getName()
                         : "null");
     }
@@ -95,7 +96,9 @@ public abstract class AbstractJsonProvider implements JsonProvider {
     @SuppressWarnings("unchecked")
     public Iterable<? extends Object> toIterable(Object obj) {
         if (isArray(obj)) return ((Iterable) obj);
-        else return ((Map) obj).values();
+        else
+            throw new JsonPathException(
+                    "Cannot iterate over " + obj != null ? obj.getClass().getName() : "null");
     }
 
     @Override
