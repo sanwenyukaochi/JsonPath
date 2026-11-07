@@ -1,6 +1,7 @@
 package com.jayway.jsonpath.spi;
 
 import com.jayway.jsonpath.InvalidJsonException;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.Collection;

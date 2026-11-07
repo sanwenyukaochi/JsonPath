@@ -4,7 +4,6 @@ import com.jayway.jsonpath.spi.JsonProvider;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 public abstract class Filter<T> {

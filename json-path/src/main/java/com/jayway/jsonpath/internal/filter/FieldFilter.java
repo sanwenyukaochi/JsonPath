@@ -3,6 +3,7 @@ package com.jayway.jsonpath.internal.filter;
 import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.spi.JsonProvider;
+
 import java.util.Collection;
 import java.util.LinkedList;
 

@@ -2,6 +2,7 @@ package com.jayway.jsonpath.internal.filter;
 
 import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.spi.JsonProvider;
+
 import java.util.LinkedList;
 
 public class ArrayQueryFilter extends PathTokenFilter {
