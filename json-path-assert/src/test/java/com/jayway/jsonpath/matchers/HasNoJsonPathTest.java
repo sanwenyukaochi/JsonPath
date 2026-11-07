@@ -9,7 +9,13 @@ import static org.hamcrest.Matchers.not;
 import org.junit.jupiter.api.Test;
 
 public class HasNoJsonPathTest {
-    private static final String JSON_STRING = "{" + "\"name\": \"Jessie\"" + "}";
+    private static final String JSON_STRING =
+"""
+{
+  "none": null,
+  "name": "Jessie"
+}\
+""";
 
     @Test
     public void shouldMatchMissingJsonPath() {
@@ -26,5 +32,10 @@ public class HasNoJsonPathTest {
         assertThat(
                 hasNoJsonPath("$.name"),
                 hasToString(equalTo("is json without json path \"$['name']\"")));
+    }
+
+    @Test
+    public void shouldNotMatchExplicitNull() {
+        assertThat(JSON_STRING, not(hasNoJsonPath("$.none")));
     }
 }
