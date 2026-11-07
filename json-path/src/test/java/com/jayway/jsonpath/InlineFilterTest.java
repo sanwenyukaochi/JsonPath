@@ -279,4 +279,56 @@ public class InlineFilterTest extends BaseTest {
     public void escape_pattern_before_literal() {
         assertHasOneResult("[\"x\"]", "$[?(@ =~ /\\/|x/ || @ == \"abc\")]", conf);
     }
+
+    @Test
+    public void patterns_match_against_lists() {
+        List<String> haveRefBooks =
+                JsonPath.parse(MULTI_STORE_JSON_DOCUMENT)
+                        .read("$.store[?(@.book[*].category =~ /Reference/i)].name");
+        assertThat(haveRefBooks).containsExactly("First");
+    }
+
+    public static final String MULTI_STORE_JSON_DOCUMENT =
+"""
+{
+   "store" : [{
+      "name": "First",      "book" : [
+         {
+            "category" : "reference",
+            "author" : "Nigel Rees",
+            "title" : "Sayings of the Century",
+            "display-price" : 8.95
+         },
+         {
+            "category" : "fiction",
+            "author" : "Evelyn Waugh",
+            "title" : "Sword of Honour",
+            "display-price" : 12.99
+         },
+         {
+            "category" : "fiction",
+            "author" : "Herman Melville",
+            "title" : "Moby Dick",
+            "isbn" : "0-553-21311-3",
+            "display-price" : 8.99
+         },
+         {
+            "category" : "fiction",
+            "author" : "J. R. R. Tolkien",
+            "title" : "The Lord of the Rings",
+            "isbn" : "0-395-19395-8",
+            "display-price" : 22.99
+         }]
+      },
+      {
+       "name": "Second",
+       "book": [
+         {
+            "category" : "fiction",
+            "author" : "Ernest Hemmingway",
+            "title" : "The Old Man and the Sea",
+            "display-price" : 12.99
+         }]
+      }]}\
+""";
 }

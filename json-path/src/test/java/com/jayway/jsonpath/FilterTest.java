@@ -18,33 +18,36 @@ public class FilterTest extends BaseTest {
             Configuration.defaultConfiguration()
                     .jsonProvider()
                     .parse(
-                            """
-                            {
-                                "int-key": 1,
-                                "long-key": 3000000000,
-                                "double-key": 10.1,
-                                "boolean-key": true,
-                                "null-key": null,
-                                "string-key": "string",
-                                "string-key-empty": "",
-                                "char-key": "c",
-                                "arr-empty": [],
-                                "int-arr": [
-                                    0,
-                                    1,
-                                    2,
-                                    3,
-                                    4
-                                ],
-                                "string-arr": [
-                                    "a",
-                                    "b",
-                                    "c",
-                                    "d",
-                                    "e"
-                                ]
-                            }
-                            """);
+"""
+{
+    "int-key": 1,
+    "long-key": 3000000000,
+    "double-key": 10.1,
+    "boolean-key": true,
+    "null-key": null,
+    "string-key": "string",
+    "string-key-empty": "",
+    "char-key": "c",
+    "arr-empty": [],
+    "int-arr": [
+        0,
+        1,
+        2,
+        3,
+        4
+    ],
+    "string-arr": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
+    ],
+    "obj": {
+        "foo": "bar"
+    }
+}\
+""");
 
     @Test
     public void int_eq_evals() {
@@ -632,5 +635,25 @@ public class FilterTest extends BaseTest {
         list = Lists.newArrayList("x", "y", "z");
         assertThat(filter(where("string-arr").noneof(list)).apply(createPredicateContext(json)))
                 .isEqualTo(true);
+    }
+
+    @Test
+    public void list_regex_evals() {
+        assertThat(
+                        filter(where("string-arr").regex(Pattern.compile("^d$")))
+                                .apply(createPredicateContext(json)))
+                .isEqualTo(true);
+        assertThat(
+                        filter(where("string-arr").regex(Pattern.compile("^q$")))
+                                .apply(createPredicateContext(json)))
+                .isEqualTo(false);
+    }
+
+    @Test
+    public void obj_regex_doesnt_break() {
+        assertThat(
+                        filter(where("obj").regex(Pattern.compile("^foo$")))
+                                .apply(createPredicateContext(json)))
+                .isEqualTo(false);
     }
 }
