@@ -8,7 +8,6 @@ import static org.hamcrest.Matchers.nullValue;
 import com.jayway.jsonassert.JsonAsserter;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.PathNotFoundException;
 import org.hamcrest.Matcher;
 
@@ -53,8 +52,7 @@ public class JsonAsserterImpl implements JsonAsserter {
 
         try {
 
-            Configuration c =
-                    Configuration.builder().options(Option.THROW_ON_MISSING_PROPERTY).build();
+            Configuration c = Configuration.defaultConfiguration();
 
             JsonPath.using(c).parse(jsonObject).read(path);
             throw new AssertionError(
@@ -68,8 +66,7 @@ public class JsonAsserterImpl implements JsonAsserter {
     public JsonAsserter assertNotDefined(String path, String message) {
         try {
 
-            Configuration c =
-                    Configuration.builder().options(Option.THROW_ON_MISSING_PROPERTY).build();
+            Configuration c = Configuration.defaultConfiguration();
 
             JsonPath.using(c).parse(jsonObject).read(path);
 

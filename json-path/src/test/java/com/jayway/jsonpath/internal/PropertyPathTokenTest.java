@@ -1,6 +1,7 @@
 package com.jayway.jsonpath.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.jayway.jsonpath.Configuration;
@@ -41,9 +42,11 @@ public class PropertyPathTokenTest {
     @Test
     public void property_not_found() {
 
-        String result = JsonPath.read(SIMPLE_MAP, "$.not-found");
+        Configuration configuration =
+                Configuration.builder().options(Option.SUPPRESS_EXCEPTIONS).build();
 
-        assertThat(result).isNull();
+        String json = "{\"a\":{\"b\":1,\"c\":2}}";
+        assertNull(JsonPath.parse(SIMPLE_MAP, configuration).read("$.not-found"));
     }
 
     @Test
