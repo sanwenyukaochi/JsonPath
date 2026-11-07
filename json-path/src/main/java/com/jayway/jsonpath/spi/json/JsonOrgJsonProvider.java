@@ -12,12 +12,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class JsonOrgJsonProvider extends AbstractJsonProvider {
-
-    private static final Logger logger = LoggerFactory.getLogger(GsonJsonProvider.class);
 
     @Override
     public Object parse(String json) throws InvalidJsonException {
