@@ -2,6 +2,7 @@ package com.jayway.jsonpath;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.jayway.jsonpath.spi.JsonProviderFactory;
 import java.io.ByteArrayInputStream;
@@ -96,5 +97,11 @@ public class JsonModelTest {
         assertEquals("value", model.get("$child.key"));
         assertEquals(1, model.<Integer>get("$items[1]"));
         assertEquals(doc, JsonProviderFactory.getInstance().parse(model.toJson()));
+    }
+
+    @Test
+    public void invalid_path_throws() throws Exception {
+        assertThrows(
+                InvalidPathException.class, () -> JsonModel.create(DOCUMENT).get("store.invalid"));
     }
 }

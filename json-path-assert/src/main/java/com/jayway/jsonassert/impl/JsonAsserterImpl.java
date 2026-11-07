@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.jayway.jsonassert.JsonAsserter;
+import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.JsonPath;
 import org.hamcrest.Matcher;
 
@@ -35,11 +36,12 @@ public class JsonAsserterImpl implements JsonAsserter {
     }
 
     public JsonAsserter assertNotDefined(String path) {
-        Object o = JsonPath.read(jsonObject, path);
 
-        if (o != null) {
+        try {
+            Object o = JsonPath.read(jsonObject, path);
             throw new AssertionError(
                     format("Document contains the path <%s> but was expected not to.", path));
+        } catch (InvalidPathException e) {
         }
         return this;
     }
