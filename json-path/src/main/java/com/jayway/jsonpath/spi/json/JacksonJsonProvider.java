@@ -1,4 +1,4 @@
-package com.jayway.jsonpath.internal.spi.json;
+package com.jayway.jsonpath.spi.json;
 
 import com.jayway.jsonpath.InvalidJsonException;
 import java.io.IOException;
