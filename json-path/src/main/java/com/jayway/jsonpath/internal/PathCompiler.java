@@ -3,7 +3,6 @@ package com.jayway.jsonpath.internal;
 import static com.jayway.jsonpath.internal.Utils.notEmpty;
 import static java.util.Arrays.asList;
 
-import com.jayway.jsonpath.Criteria;
 import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.Predicate;
@@ -34,9 +33,6 @@ public class PathCompiler {
     private static final char BRACKET_CLOSE = ']';
     private static final char SPACE = ' ';
     private static final Cache cache = new Cache(200);
-    private static final String[] OPERATORS = {
-        "==", ">=", "<=", "!=", "<", ">",
-    };
 
     public static Path compile(String path, Predicate... filters) {
         notEmpty(path, "Path may not be null empty");
@@ -61,7 +57,7 @@ public class PathCompiler {
         String cacheKey = path + isRootPath + filterList.toString();
         Path p = cache.get(cacheKey);
         if (p != null) {
-            if (logger.isDebugEnabled()) logger.debug("Using cached path");
+            if (logger.isDebugEnabled()) logger.debug("Using cached path: " + cacheKey);
             return p;
         }
 
@@ -218,7 +214,7 @@ public class PathCompiler {
 
                 switch (current) {
                     case '?':
-                        return analyzeCriteriaSequence2();
+                        return analyzeCriteriaSequence4();
                     case '\'':
                         return analyzeProperty();
                     default:
@@ -237,77 +233,63 @@ public class PathCompiler {
             throw new InvalidPathException("Could not analyze path component: " + pathFragment);
         }
 
-        private int findNext(char charToFind, boolean disregardStringContent) {
-            int x = i;
-            boolean inProperty = false;
+        public PathToken analyzeCriteriaSequence4() {
+            int[] bounds = findFilterBounds();
+            i = bounds[1];
 
-            char analyzing;
-            boolean found = false;
-            while (!found) {
-                analyzing = pathFragment.charAt(x);
-
-                if (analyzing == '\'' && disregardStringContent) {
-                    inProperty = !inProperty;
-                }
-                if (!inProperty) {
-                    found = (analyzing == charToFind);
-                }
-                x++;
-            }
-            return x - 1;
+            return new PredicatePathToken(
+                    Filter.parse(pathFragment.substring(bounds[0], bounds[1])));
         }
 
-        private PathToken analyzeCriteriaSequence2() {
+        int[] findFilterBounds() {
+            int end = 0;
+            int start = i;
 
-            List<Predicate> predicates = new ArrayList<Predicate>();
+            while (pathFragment.charAt(start) != '[') {
+                start--;
+            }
 
-            int startPos = findNext('(', true) + 1;
-            int stopPos = findNext(')', true);
-
-            String[] split = pathFragment.substring(startPos, stopPos).split("&&");
-
-            for (String criteria : split) {
-                int operatorIndex = -1;
-                String left = "";
-                String operator = "";
-                String right = "";
-                for (int y = 0; y < OPERATORS.length; y++) {
-                    operatorIndex = criteria.indexOf(OPERATORS[y]);
-                    if (operatorIndex != -1) {
-                        operator = OPERATORS[y];
+            int mem = ' ';
+            int curr = start;
+            boolean inProp = false;
+            int openSquareBracket = 0;
+            int openBrackets = 0;
+            while (end == 0) {
+                char c = pathFragment.charAt(curr);
+                switch (c) {
+                    case '(':
+                        if (!inProp) openBrackets++;
                         break;
-                    }
+                    case ')':
+                        if (!inProp) openBrackets--;
+                        break;
+                    case '[':
+                        if (!inProp) openSquareBracket++;
+                        break;
+                    case ']':
+                        if (!inProp) {
+                            openSquareBracket--;
+                            if (openBrackets == 0) {
+                                end = curr + 1;
+                            }
+                        }
+                        break;
+                    case '\'':
+                        if (mem == '\\') {
+                            break;
+                        }
+                        inProp = !inProp;
+                        break;
+                    default:
+                        break;
                 }
-                if (!operator.isEmpty()) {
-                    left = criteria.substring(0, operatorIndex).trim();
-                    right = criteria.substring(operatorIndex + operator.length()).trim();
-                } else {
-                    left = criteria.trim();
-                }
-                predicates.add(Criteria.create(left, operator, right));
+                mem = c;
+                curr++;
             }
-            i = stopPos;
-
-            return new PredicatePathToken(Filter.filter(predicates));
-        }
-
-        private static boolean isAnd(char c) {
-            return c == '&';
-        }
-
-        private static boolean isOr(char c) {
-            if (c == '|') {
-                throw new UnsupportedOperationException("OR operator is not supported.");
+            if (openBrackets != 0 || openSquareBracket != 0) {
+                throw new InvalidPathException("Filter brackets are not balanced");
             }
-            return false;
-        }
-
-        private static boolean isLogicOperatorChar(char c) {
-            return isAnd(c) || isOr(c);
-        }
-
-        private static boolean isOperatorChar(char c) {
-            return c == '=' || c == '!' || c == '<' || c == '>';
+            return new int[] {start, end};
         }
 
         private PathToken analyzeProperty() {
