@@ -59,7 +59,7 @@ public class JsonModelChainedCallsTest {
         Transformer<Map<String, Object>> transformer =
                 new Transformer<Map<String, Object>>() {
                     @Override
-                    public Object transform(Map<String, Object> map) {
+                    public Object transform(Map<String, Object> map, Configuration configuration) {
                         map.remove("isbn");
                         map.put("author", "kalle");
                         return map;
@@ -79,7 +79,7 @@ public class JsonModelChainedCallsTest {
         Transformer<Object> transformer =
                 new Transformer<Object>() {
                     @Override
-                    public Object transform(Object obj) {
+                    public Object transform(Object obj, Configuration configuration) {
                         Map<String, Object> map = (Map<String, Object>) obj;
                         map.remove("isbn");
                         map.put("author", "kalle");

@@ -121,7 +121,8 @@ public class JsonModelOpsTest {
                 .transform(
                         new Transformer<Map<String, Object>>() {
                             @Override
-                            public Object transform(Map<String, Object> obj) {
+                            public Object transform(
+                                    Map<String, Object> obj, Configuration configuration) {
                                 obj.put("name", "kalle");
                                 return obj;
                             }
@@ -143,7 +144,7 @@ public class JsonModelOpsTest {
                 .transform(
                         new Transformer<List<Object>>() {
                             @Override
-                            public Object transform(List<Object> obj) {
+                            public Object transform(List<Object> obj, Configuration configuration) {
                                 return Collections.singletonMap("root", "new");
                             }
                         });
@@ -170,7 +171,8 @@ public class JsonModelOpsTest {
                 .transform(
                         new Transformer<Map<String, Object>>() {
                             @Override
-                            public Object transform(Map<String, Object> obj) {
+                            public Object transform(
+                                    Map<String, Object> obj, Configuration configuration) {
                                 obj.put("name", "kalle");
                                 return obj;
                             }
@@ -210,7 +212,8 @@ public class JsonModelOpsTest {
         Transformer transformer =
                 new Transformer<Map<String, Object>>() {
                     @Override
-                    public Map<String, Object> transform(Map<String, Object> model) {
+                    public Map<String, Object> transform(
+                            Map<String, Object> model, Configuration configuration) {
                         model.put("newProp", "newProp");
                         return model;
                     }
@@ -228,7 +231,7 @@ public class JsonModelOpsTest {
         Transformer transformer =
                 new Transformer<List<Object>>() {
                     @Override
-                    public Object transform(List<Object> model) {
+                    public Object transform(List<Object> model, Configuration configuration) {
 
                         for (Object o : model) {
                             Map<String, Object> map = (Map<String, Object>) o;
@@ -253,7 +256,7 @@ public class JsonModelOpsTest {
                     private int i = 0;
 
                     @Override
-                    public Object transform(List<Object> model) {
+                    public Object transform(List<Object> model, Configuration configuration) {
                         List<Object> newList = new ArrayList<Object>();
 
                         for (Object o : model) {
@@ -267,7 +270,7 @@ public class JsonModelOpsTest {
         Transformer multiplyingTransformer =
                 new Transformer<List<Object>>() {
                     @Override
-                    public Object transform(List<Object> model) {
+                    public Object transform(List<Object> model, Configuration configuration) {
 
                         for (int i = 0; i < model.size(); i++) {
                             int curr = (Integer) model.get(i);
