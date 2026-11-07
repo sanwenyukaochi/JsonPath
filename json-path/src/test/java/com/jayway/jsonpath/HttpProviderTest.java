@@ -2,7 +2,7 @@ package com.jayway.jsonpath;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.jayway.jsonpath.internal.IOUtils;
+import com.jayway.jsonpath.internal.Utils;
 import com.jayway.jsonpath.spi.HttpProviderFactory;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
@@ -53,9 +53,9 @@ public class HttpProviderTest {
             assertEquals(EXPECTED, json);
 
         } catch (IOException e) {
-            IOUtils.closeQuietly(inputStream);
+            Utils.closeQuietly(inputStream);
         } finally {
-            IOUtils.closeQuietly(inputStream);
+            Utils.closeQuietly(inputStream);
             server.stop(0);
         }
     }

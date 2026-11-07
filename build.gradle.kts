@@ -113,7 +113,6 @@ subprojects {
             add("implementation", "net.minidev:json-smart:2.6.1")
             add("implementation", "tools.jackson.core:jackson-databind:3.2.4")
             add("api", "org.hamcrest:hamcrest-library:3.0")
-            add("implementation", "org.apache.commons:commons-lang3:3.21.0")
             add("testImplementation", "commons-io:commons-io:2.22.0")
             add("implementation", "org.slf4j:slf4j-api:2.0.20")
             add("testImplementation", "org.slf4j:slf4j-simple:2.0.20")

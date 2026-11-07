@@ -1,6 +1,6 @@
 package com.jayway.jsonpath;
 
-import static org.apache.commons.lang3.Validate.notNull;
+import static com.jayway.jsonpath.internal.Utils.notNull;
 
 import com.jayway.jsonpath.spi.JsonProvider;
 import com.jayway.jsonpath.spi.JsonProviderFactory;

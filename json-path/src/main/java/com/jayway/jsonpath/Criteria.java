@@ -1,8 +1,9 @@
 package com.jayway.jsonpath;
 
+import static com.jayway.jsonpath.internal.Utils.notNull;
 import static java.util.Arrays.asList;
-import static org.apache.commons.lang3.Validate.notNull;
 
+import com.jayway.jsonpath.internal.Utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -11,7 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.Validate;
 
 public class Criteria {
 
@@ -44,14 +44,14 @@ public class Criteria {
     private Object isValue = NOT_SET;
 
     private Criteria(String key) {
-        Validate.notEmpty(key, "key can not be null or empty");
+        Utils.notEmpty(key, "key can not be null or empty");
         this.criteriaChain = new ArrayList<Criteria>();
         this.criteriaChain.add(this);
         this.key = JsonPath.compile(key);
     }
 
     private Criteria(List<Criteria> criteriaChain, String key) {
-        Validate.notEmpty(key, "key can not be null or empty");
+        Utils.notEmpty(key, "key can not be null or empty");
         this.criteriaChain = criteriaChain;
         this.criteriaChain.add(this);
         this.key = JsonPath.compile(key);
