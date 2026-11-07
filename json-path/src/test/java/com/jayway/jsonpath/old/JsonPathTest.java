@@ -387,4 +387,13 @@ public class JsonPathTest extends BaseTest {
             }
         }
     }
+
+    @Test
+    public void prevent_stack_overflow_error_when_unclosed_property() {
+        assertThrows(
+                InvalidPathException.class,
+                () -> {
+                    JsonPath.compile("$['boo','foo][?(@ =~ /bar/)]");
+                });
+    }
 }
