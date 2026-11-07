@@ -4,6 +4,7 @@ import com.jayway.jsonpath.InvalidPathException;
 
 public enum LogicalOperator {
     AND("&&"),
+    NOT("!"),
     OR("||");
 
     private final String operatorString;
@@ -23,6 +24,7 @@ public enum LogicalOperator {
 
     public static LogicalOperator fromString(String operatorString) {
         if (AND.operatorString.equals(operatorString)) return AND;
+        else if (NOT.operatorString.equals(operatorString)) return NOT;
         else if (OR.operatorString.equals(operatorString)) return OR;
         else throw new InvalidPathException("Failed to parse operator " + operatorString);
     }
