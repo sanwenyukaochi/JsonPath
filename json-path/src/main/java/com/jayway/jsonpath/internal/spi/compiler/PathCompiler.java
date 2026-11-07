@@ -3,8 +3,8 @@ package com.jayway.jsonpath.internal.spi.compiler;
 import static com.jayway.jsonpath.internal.Utils.notEmpty;
 import static java.util.Arrays.asList;
 
-import com.jayway.jsonpath.Criteria2;
-import com.jayway.jsonpath.Filter2;
+import com.jayway.jsonpath.Criteria;
+import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.internal.Cache;
 import com.jayway.jsonpath.internal.Utils;
@@ -29,11 +29,11 @@ public class PathCompiler {
     private static final char BRACKET_CLOSE = ']';
     private static final Cache cache = new Cache(200);
 
-    public static Path tokenize(String path, Filter2... filters) {
+    public static Path tokenize(String path, Filter... filters) {
         notEmpty(path, "Path may not be null empty");
         path = path.trim();
 
-        LinkedList<Filter2> filterList = new LinkedList<Filter2>(asList(filters));
+        LinkedList<Filter> filterList = new LinkedList<Filter>(asList(filters));
 
         if (!path.startsWith("$")) {
             path = "$." + path;
@@ -174,15 +174,15 @@ public class PathCompiler {
         private int i;
         private char current;
 
-        private final LinkedList<Filter2> filterList;
+        private final LinkedList<Filter> filterList;
         private final String pathFragment;
 
-        PathComponentAnalyzer(String pathFragment, LinkedList<Filter2> filterList) {
+        PathComponentAnalyzer(String pathFragment, LinkedList<Filter> filterList) {
             this.pathFragment = pathFragment;
             this.filterList = filterList;
         }
 
-        static PathToken analyze(String pathFragment, LinkedList<Filter2> filterList) {
+        static PathToken analyze(String pathFragment, LinkedList<Filter> filterList) {
             return new PathComponentAnalyzer(pathFragment, filterList).analyze();
         }
 
@@ -195,7 +195,7 @@ public class PathCompiler {
             else if ("[?]".equals(pathFragment)) return new FilterPathToken(filterList.poll());
             else if (FILTER_PATTERN.matcher(pathFragment).matches()) {
                 final int criteriaCount = Utils.countMatches(pathFragment, "?");
-                List<Filter2> filters = new ArrayList<Filter2>(criteriaCount);
+                List<Filter> filters = new ArrayList<Filter>(criteriaCount);
                 for (int i = 0; i < criteriaCount; i++) {
                     filters.add(filterList.poll());
                 }
@@ -232,7 +232,7 @@ public class PathCompiler {
             StringBuilder pathBuffer = new StringBuilder();
             StringBuilder operatorBuffer = new StringBuilder();
             StringBuilder valueBuffer = new StringBuilder();
-            List<Criteria2> criteria = new ArrayList<Criteria2>();
+            List<Criteria> criteria = new ArrayList<Criteria>();
 
             int bracketCount = 0;
 
@@ -300,14 +300,14 @@ public class PathCompiler {
 
             criteria.add(createCriteria(pathBuffer, operatorBuffer, valueBuffer));
 
-            Filter2 filter2 = Filter2.filter(criteria);
+            Filter filter2 = Filter.filter(criteria);
 
             return new FilterPathToken(filter2);
         }
 
-        private Criteria2 createCriteria(
+        private Criteria createCriteria(
                 StringBuilder pathBuffer, StringBuilder operatorBuffer, StringBuilder valueBuffer) {
-            return Criteria2.create(
+            return Criteria.create(
                     pathBuffer.toString().trim(),
                     operatorBuffer.toString().trim(),
                     valueBuffer.toString().trim());
