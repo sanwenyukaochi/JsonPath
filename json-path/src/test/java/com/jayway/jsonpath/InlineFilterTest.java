@@ -265,4 +265,14 @@ public class InlineFilterTest extends BaseTest {
                 "$[?(@.s size @.expected_size)]",
                 conf);
     }
+
+    @Test
+    public void escape_pattern_after_literal() {
+        assertHasOneResult("[\"x\"]", "$[?(@ == \"abc\" || @ =~ /\\/|x/)]", conf);
+    }
+
+    @Test
+    public void escape_pattern_before_literal() {
+        assertHasOneResult("[\"x\"]", "$[?(@ =~ /\\/|x/ || @ == \"abc\")]", conf);
+    }
 }
