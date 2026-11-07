@@ -95,4 +95,46 @@ public class InlineFilterTest extends BaseTest {
                         List.class);
         assertThat(h).containsOnly("Nigel Rees", "Herman Melville");
     }
+
+    @Test
+    public void no_path_ref_in_filter_hit_all() {
+
+        List<String> res = JsonPath.parse(JSON_DOCUMENT).read("$.store.book[?('a' == 'a')].author");
+
+        assertThat(res)
+                .containsExactly(
+                        "Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien");
+    }
+
+    @Test
+    public void no_path_ref_in_filter_hit_none() {
+
+        List<String> res = JsonPath.parse(JSON_DOCUMENT).read("$.store.book[?('a' == 'b')].author");
+
+        assertThat(res).isEmpty();
+    }
+
+    @Test
+    public void path_can_be_on_either_side_of_operator() {
+        List<String> resLeft =
+                JsonPath.parse(JSON_DOCUMENT)
+                        .read("$.store.book[?(@.category == 'reference')].author");
+        List<String> resRight =
+                JsonPath.parse(JSON_DOCUMENT)
+                        .read("$.store.book[?('reference' == @.category)].author");
+
+        assertThat(resLeft).containsExactly("Nigel Rees");
+        assertThat(resRight).containsExactly("Nigel Rees");
+    }
+
+    @Test
+    public void path_can_be_on_both_side_of_operator() {
+        List<String> res =
+                JsonPath.parse(JSON_DOCUMENT)
+                        .read("$.store.book[?(@.category == @.category)].author");
+
+        assertThat(res)
+                .containsExactly(
+                        "Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien");
+    }
 }
