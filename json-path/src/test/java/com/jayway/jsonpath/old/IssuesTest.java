@@ -3,6 +3,7 @@ package com.jayway.jsonpath.old;
 import static com.jayway.jsonpath.Criteria.where;
 import static com.jayway.jsonpath.Filter.filter;
 import static com.jayway.jsonpath.JsonPath.read;
+import static com.jayway.jsonpath.JsonPath.using;
 import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -1066,5 +1067,28 @@ public class IssuesTest extends BaseTest {
                 JsonPath.using(configuration).parse(json).read(JsonPath.compile("$.*.bar"));
 
         Assertions.assertThat(pathList).containsExactly("$['foo']['bar']");
+    }
+
+    @Test
+    public void issue_170() {
+
+        String json =
+"""
+{
+  "array": [
+    0,
+    1,
+    2
+  ]
+}\
+""";
+
+        DocumentContext context = using(JACKSON_JSON_NODE_CONFIGURATION).parse(json);
+        context = context.set("$.array[0]", null);
+        context = context.set("$.array[2]", null);
+
+        List<Integer> list = context.read("$.array", List.class);
+
+        Assertions.assertThat(list).containsExactly(null, 1, null);
     }
 }
