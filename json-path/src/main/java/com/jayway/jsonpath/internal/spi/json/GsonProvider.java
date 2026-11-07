@@ -29,7 +29,6 @@ public class GsonProvider extends AbstractJsonProvider {
 
     public static Object unwrap(Object o) {
 
-        System.out.println("unwrap " + o);
         if (o == null) {
             return null;
         }
@@ -108,7 +107,6 @@ public class GsonProvider extends AbstractJsonProvider {
 
     @Override
     public Object getArrayIndex(Object obj, int idx) {
-        System.out.println("getArrayIndex " + obj + " (" + obj.getClass() + ")");
         return unwrap(toJsonArray(obj).get(idx));
     }
 
@@ -144,14 +142,12 @@ public class GsonProvider extends AbstractJsonProvider {
 
     @Override
     public boolean isMap(Object obj) {
-        System.out.println("isMap " + obj + " (" + obj.getClass() + ")");
 
         return (obj instanceof JsonObject);
     }
 
     @Override
     public Collection<String> getPropertyKeys(Object obj) {
-        System.out.println("getPropertyKeys " + obj);
         List<String> keys = new ArrayList<String>();
         for (Map.Entry<String, JsonElement> entry : toJsonObject(obj).entrySet()) {
             keys.add(entry.getKey());
@@ -161,7 +157,6 @@ public class GsonProvider extends AbstractJsonProvider {
 
     @Override
     public int length(Object obj) {
-        System.out.println("length " + obj);
         if (isArray(obj)) {
             return toJsonArray(obj).size();
         } else if (isMap(obj)) {
@@ -182,7 +177,6 @@ public class GsonProvider extends AbstractJsonProvider {
 
     @Override
     public Iterable<?> toIterable(Object obj) {
-        System.out.println("toIterable " + obj + " (" + obj.getClass() + ")");
         if (isArray(obj)) {
             JsonArray arr = toJsonArray(obj);
             List<Object> values = new ArrayList<Object>(arr.size());
