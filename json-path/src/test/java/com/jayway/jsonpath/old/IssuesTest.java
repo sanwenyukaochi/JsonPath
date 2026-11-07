@@ -1055,4 +1055,16 @@ public class IssuesTest extends BaseTest {
 
         Assertions.assertThat(result).containsExactly(26452067, 31625950, 32381852, 32489262);
     }
+
+    @Test
+    public void issue_143() {
+        String json = "{ \"foo\": { \"bar\" : \"val\" }, \"moo\": { \"cow\" : \"val\" } }";
+
+        Configuration configuration = Configuration.builder().options(Option.AS_PATH_LIST).build();
+
+        List<String> pathList =
+                JsonPath.using(configuration).parse(json).read(JsonPath.compile("$.*.bar"));
+
+        Assertions.assertThat(pathList).containsExactly("$['foo']['bar']");
+    }
 }
