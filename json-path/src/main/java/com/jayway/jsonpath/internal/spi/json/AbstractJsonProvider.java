@@ -18,12 +18,8 @@ public abstract class AbstractJsonProvider implements JsonProvider {
     }
 
     public Object getMapValue(Object obj, String key) {
-        return ((Map) obj).get(key);
-    }
-
-    public Object getMapValue(Object obj, String key, boolean signalUndefined) {
         Map m = (Map) obj;
-        if (!m.containsKey(key) && signalUndefined) {
+        if (!m.containsKey(key)) {
             return JsonProvider.UNDEFINED;
         } else {
             return m.get(key);
