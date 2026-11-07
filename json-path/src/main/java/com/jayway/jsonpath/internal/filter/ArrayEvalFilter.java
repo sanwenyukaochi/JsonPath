@@ -57,7 +57,7 @@ public class ArrayEvalFilter extends PathTokenFilter {
         if (!jsonProvider.isMap(check)) {
             return false;
         }
-        Map obj = jsonProvider.toMap(check);
+        Map<String, Object> obj = jsonProvider.toMap(check);
 
         if (!obj.containsKey(conditionStatement.getField())) {
             return false;
