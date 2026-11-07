@@ -39,7 +39,8 @@ public class PathCompiler {
             path = "$." + path;
         }
 
-        Path p = cache.get(path + filterList.toString());
+        String cacheKey = path + filterList.toString();
+        Path p = cache.get(cacheKey);
         if (p != null) {
             return p;
         }
@@ -109,7 +110,7 @@ public class PathCompiler {
 
         Path pa = new CompiledPath(root);
 
-        cache.put(path, pa);
+        cache.put(cacheKey, pa);
 
         return pa;
     }
@@ -338,6 +339,7 @@ public class PathCompiler {
             StringBuilder buffer = new StringBuilder();
 
             boolean propertyIsOpen = false;
+            boolean propertyDone = false;
 
             while (current != ']') {
                 switch (current) {
@@ -345,12 +347,17 @@ public class PathCompiler {
                         if (propertyIsOpen) {
                             property = buffer.toString();
                             propertyIsOpen = false;
+                            propertyDone = true;
                         } else {
                             propertyIsOpen = true;
                         }
                         break;
                     default:
                         if (propertyIsOpen) {
+                            if (propertyDone) {
+                                throw new InvalidPathException(
+                                        "Only single properties are supported.");
+                            }
                             buffer.append(current);
                         }
                         break;
