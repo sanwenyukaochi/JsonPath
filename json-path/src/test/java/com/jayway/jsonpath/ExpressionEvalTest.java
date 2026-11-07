@@ -1,14 +1,66 @@
 package com.jayway.jsonpath;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.jayway.jsonpath.internal.filter.eval.ExpressionEvaluator;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 public class ExpressionEvalTest {
+
+    public static final String DOCUMENT =
+            """
+            {
+                "characters": [
+                    {
+                        "aliases": [],
+                        "name": "Kleeg Lars",
+                        "occupation": "Moisture farmer",
+                        "offspring": []
+                    },
+                    {
+                        "aliases": [],
+                        "name": "Shmi Skywalker",
+                        "occupation": "Virgin mother",
+                        "offspring": [
+                            "AnakinSkywalker"
+                        ]
+                    },
+                    {
+                        "aliases": [
+                            "Darth Vader"
+                        ],
+                        "name": "Annakin Skywalker",
+                        "occupation": "Hand of the Emperor, Lord of the Sith",
+                        "offspring": [
+                            "Luke Skywalker",
+                            "LeiaOrgana"
+                        ]
+                    },
+                    {
+                        "aliases": [
+                            "Nerf herder"
+                        ],
+                        "name": "Luke Skywalker",
+                        "occupation": "Farm boy",
+                        "offspring": null
+                    },
+                    {
+                        "aliases": [
+                            "Your Highness"
+                        ],
+                        "name": "Leia Organa",
+                        "occupation": "Senator",
+                    }
+                ]
+            }
+            \
+            """;
 
     @Test
     public void long_eval() throws Exception {
@@ -107,7 +159,36 @@ public class ExpressionEvalTest {
         assertFalse(ExpressionEvaluator.eval(false, "==", "true"));
         assertFalse(ExpressionEvaluator.eval(true, "!=", "true"));
         assertFalse(ExpressionEvaluator.eval(true, "<>", "true"));
-        assertFalse(ExpressionEvaluator.eval(false, "!=", "false"));
         assertFalse(ExpressionEvaluator.eval(false, "<>", "false"));
+        assertFalse(ExpressionEvaluator.eval(false, "!=", "false"));
+    }
+
+    @Test
+    public void null_eval() throws Exception {
+        assertTrue(ExpressionEvaluator.eval(new Integer(10), "!=", "null"));
+
+        assertTrue(ExpressionEvaluator.eval(null, "==", "null"));
+
+        assertTrue(ExpressionEvaluator.eval(null, "<>", "FOO"));
+        assertTrue(ExpressionEvaluator.eval("FOO", "<>", "null"));
+
+        assertTrue(ExpressionEvaluator.eval(null, "!=", "FOO"));
+        assertTrue(ExpressionEvaluator.eval("FOO", "<>", "null"));
+
+        assertTrue(ExpressionEvaluator.eval(null, "!=", "10"));
+    }
+
+    @Test
+    public void nulls_filter() {
+
+        List<Map<String, Object>> result =
+                JsonPath.read(DOCUMENT, "$.characters[?(@.offspring == null)]");
+        assertEquals(1, result.size());
+
+        result = JsonPath.read(DOCUMENT, "$.characters[?(@.offspring != null)]");
+        assertEquals(3, result.size());
+
+        result = JsonPath.read(DOCUMENT, "$.characters[?(@.offspring)]");
+        assertEquals(4, result.size());
     }
 }

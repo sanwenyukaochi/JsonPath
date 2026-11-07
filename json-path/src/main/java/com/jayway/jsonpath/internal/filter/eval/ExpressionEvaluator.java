@@ -8,6 +8,8 @@ import java.util.Map;
 
 public class ExpressionEvaluator {
 
+    private static final String NULL_VALUE = "null";
+
     public enum Operator {
         equal("=="),
         not_equal("!="),
@@ -43,6 +45,21 @@ public class ExpressionEvaluator {
         Operator operator = operatorsByRepresentation.get(comparator);
         if (operator == null) {
             throw new IllegalArgumentException("Unsupported operator " + comparator);
+        }
+
+        if (actual == null) {
+            if (operator == Operator.equal) {
+                return NULL_VALUE.equals(expected);
+            } else if (operator == Operator.not_equal
+                    || operator == Operator.less_or_greater_than) {
+                return !NULL_VALUE.equals(expected);
+            }
+        } else {
+            if (operator == Operator.not_equal || operator == Operator.less_or_greater_than) {
+                if (NULL_VALUE.equals(expected)) {
+                    return true;
+                }
+            }
         }
 
         if (actual instanceof Long) {

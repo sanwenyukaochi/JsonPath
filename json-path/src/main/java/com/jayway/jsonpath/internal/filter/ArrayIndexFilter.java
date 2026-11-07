@@ -1,5 +1,6 @@
 package com.jayway.jsonpath.internal.filter;
 
+import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.spi.JsonProvider;
 
 import java.util.regex.Pattern;
@@ -81,8 +82,11 @@ public class ArrayIndexFilter extends PathTokenFilter {
         } else {
             String[] indexArr = COMMA.split(trimmedCondition);
 
-            if (jsonProvider.length(obj) == 0) {
-                return result;
+            if (obj == null || jsonProvider.length(obj) == 0) {
+                throw new PathNotFoundException(
+                        "Failed to access array index: '"
+                                + condition
+                                + "' since the array is null or empty");
             }
 
             if (indexArr.length == 1) {

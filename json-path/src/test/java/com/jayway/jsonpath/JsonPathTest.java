@@ -95,6 +95,36 @@ public class JsonPathTest {
             """;
 
     @Test
+    public void null_object_in_path() {
+
+        String json =
+                """
+                {
+                  "success": true,
+                  "data": {
+                    "user": 3,
+                    "own": null,
+                    "passes": null,
+                    "completed": null
+                  },
+                  "data2": {
+                    "user": 3,
+                    "own": null,
+                    "passes": [{"id":"1"}],
+                    "completed": null
+                  },
+                  "version": 1371160528774
+                }\
+                """;
+
+        System.out.println((Object) JsonPath.read(json, "$.data.passes[0].id"));
+        System.out.println(JsonPath.isPathDefinite("$.data.passes[0].id"));
+
+        System.out.println((Object) JsonPath.read(json, "$.data2.passes[0].id"));
+        System.out.println(JsonPath.isPathDefinite("$.data2.passes[0].id"));
+    }
+
+    @Test
     public void array_start_expands() throws Exception {
         assertThat(
                 JsonPath.<List<String>>read(ARRAY_EXPAND, "$[?(@['parent'] == 'ONE')].child.name"),
