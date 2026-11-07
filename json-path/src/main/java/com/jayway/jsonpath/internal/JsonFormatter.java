@@ -1,11 +1,6 @@
 package com.jayway.jsonpath.internal;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class JsonFormatter {
-
-    private static final Logger logger = LoggerFactory.getLogger(JsonFormatter.class);
 
     private static final String INDENT = "   ";
 
