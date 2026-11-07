@@ -90,7 +90,7 @@ public class PathCompiler {
                         break;
                     case PERIOD:
                         i++;
-                        if (path.charAt(i) == PERIOD) {
+                        if (i < path.length() && path.charAt(i) == PERIOD) {
 
                             fragment = "..";
                             i++;
