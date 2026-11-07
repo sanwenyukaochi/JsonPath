@@ -19,6 +19,7 @@ public class IsCollectionWithSize<E> extends CollectionMatcher<Collection<? exte
         return sizeMatcher.matches(item.size());
     }
 
+    @Override
     public void describeTo(Description description) {
         description.appendText("a collection with size ").appendDescriptionOf(sizeMatcher);
     }
