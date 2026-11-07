@@ -7,7 +7,7 @@ plugins {
 }
 
 description = "JsonPath web demonstration and benchmark"
-version = "2.0.1-SNAPSHOT"
+version = "2.0.0"
 
 application {
     mainClass.set("com.jayway.jsonpath.web.boot.Main")
