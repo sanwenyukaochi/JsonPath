@@ -3,6 +3,7 @@ package com.jayway.jsonpath.spi.json;
 import com.jayway.jsonpath.InvalidJsonException;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
 public interface JsonProvider {
@@ -10,6 +11,10 @@ public interface JsonProvider {
     static final Object UNDEFINED = new Object();
 
     Object parse(String json) throws InvalidJsonException;
+
+    default Object parse(byte[] json) throws InvalidJsonException {
+        return parse(new String(json, StandardCharsets.UTF_8));
+    }
 
     Object parse(InputStream jsonStream, String charset) throws InvalidJsonException;
 

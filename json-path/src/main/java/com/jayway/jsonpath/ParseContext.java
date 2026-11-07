@@ -17,6 +17,8 @@ public interface ParseContext {
 
     DocumentContext parse(File json) throws IOException;
 
+    DocumentContext parseUtf8(byte[] json);
+
     @Deprecated
     DocumentContext parse(URL json) throws IOException;
 }
