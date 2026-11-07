@@ -1,7 +1,6 @@
 package com.jayway.jsonpath.spi.json;
 
 import com.jayway.jsonpath.InvalidJsonException;
-import com.jayway.jsonpath.ValueCompareException;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -9,10 +8,6 @@ import java.util.Collection;
 public interface JsonProvider {
 
     static final Object UNDEFINED = new Object();
-
-    Object unwrap(Object obj);
-
-    int compare(Object expected, Object providerParsed) throws ValueCompareException;
 
     Object parse(String json) throws InvalidJsonException;
 
@@ -25,8 +20,6 @@ public interface JsonProvider {
     Object createArray();
 
     boolean isArray(Object obj);
-
-    boolean isString(Object obj);
 
     int length(Object obj);
 
