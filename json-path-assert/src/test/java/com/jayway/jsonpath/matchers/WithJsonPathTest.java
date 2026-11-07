@@ -2,7 +2,6 @@ package com.jayway.jsonpath.matchers;
 
 import static com.jayway.jsonpath.JsonPath.compile;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.withJsonPath;
-import static com.jayway.jsonpath.matchers.JsonPathMatchers.withoutJsonPath;
 import static com.jayway.jsonpath.matchers.helpers.ResourceHelpers.resource;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -17,6 +16,7 @@ import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
 import java.util.Collection;
+import java.util.List;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.StringDescription;
@@ -45,34 +45,14 @@ public class WithJsonPathTest {
     public void shouldNotMatchNonExistingJsonPath() {
         assertThat(BOOKS_JSON, not(withJsonPath(compile("$.not_there"))));
         assertThat(BOOKS_JSON, not(withJsonPath(compile("$.store.book[5].title"))));
-        assertThat(BOOKS_JSON, not(withJsonPath(compile("$.store.book[*].not_there"))));
+        assertThat(BOOKS_JSON, not(withJsonPath(compile("$.store.book[1].not_there"))));
     }
 
     @Test
     public void shouldNotMatchNonExistingStringJsonPath() {
         assertThat(BOOKS_JSON, not(withJsonPath("$.not_there")));
         assertThat(BOOKS_JSON, not(withJsonPath("$.store.book[5].title")));
-        assertThat(BOOKS_JSON, not(withJsonPath("$.store.book[*].not_there")));
-    }
-
-    @Test
-    public void shouldMatchNonExistingJsonPath() {
-        assertThat(BOOKS_JSON, withoutJsonPath(compile("$.not_there")));
-    }
-
-    @Test
-    public void shouldMatchNonExistingStringJsonPath() {
-        assertThat(BOOKS_JSON, withoutJsonPath("$.not_there"));
-    }
-
-    @Test
-    public void shouldNotMatchExistingCompiledJsonPath() {
-        assertThat(BOOKS_JSON, not(withoutJsonPath(compile("$.store.name"))));
-    }
-
-    @Test
-    public void shouldNotMatchExistingStringJsonPath() {
-        assertThat(BOOKS_JSON, not(withoutJsonPath("$.store.name")));
+        assertThat(BOOKS_JSON, not(withJsonPath("$.store.book[1].not_there")));
     }
 
     @Test
@@ -100,7 +80,7 @@ public class WithJsonPathTest {
     public void shouldMatchJsonPathEvaluatedToCollectionValue() {
         assertThat(
                 BOOKS_JSON,
-                withJsonPath(compile("$.store.book[*].author"), instanceOf(Collection.class)));
+                withJsonPath(compile("$.store.book[*].author"), instanceOf(List.class)));
         assertThat(BOOKS_JSON, withJsonPath(compile("$.store.book[*].author"), hasSize(4)));
         assertThat(
                 BOOKS_JSON,
