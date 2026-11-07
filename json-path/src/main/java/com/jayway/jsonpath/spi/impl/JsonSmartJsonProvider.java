@@ -12,17 +12,17 @@ import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
 
-public class JsonSmartProvider extends AbstractJsonProvider {
+public class JsonSmartJsonProvider extends AbstractJsonProvider {
 
     private Mode mode;
 
     private JSONParser parser;
 
-    public JsonSmartProvider() {
+    public JsonSmartJsonProvider() {
         this(Mode.SLACK);
     }
 
-    public JsonSmartProvider(Mode mode) {
+    public JsonSmartJsonProvider(Mode mode) {
         this.mode = mode;
         this.parser = new JSONParser(mode.intValue());
     }
