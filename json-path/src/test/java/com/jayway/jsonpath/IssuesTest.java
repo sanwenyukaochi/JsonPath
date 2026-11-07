@@ -17,6 +17,34 @@ import org.junit.jupiter.api.Test;
 public class IssuesTest {
 
     @Test
+    public void issue_36() {
+
+        String json =
+                """
+                {
+                    "arrayOfObjectsAndArrays": [
+                        {"k": ["json"]},
+                        {"k": ["path"]},
+                        {"k": ["is"]},
+                        {"k": ["cool"]}
+                    ],
+                    "arrayOfObjects": [
+                        {"k": "json"},
+                        {"k": "path"},
+                        {"k": "is"},
+                        {"k": "cool"}
+                    ]
+                }\
+                """;
+
+        Object o1 = JsonPath.read(json, "$.arrayOfObjectsAndArrays..k ");
+        Object o2 = JsonPath.read(json, "$.arrayOfObjects..k ");
+
+        assertEquals("[[\"json\"],[\"path\"],[\"is\"],[\"cool\"]]", o1.toString());
+        assertEquals("[\"json\",\"path\",\"is\",\"cool\"]", o2.toString());
+    }
+
+    @Test
     public void issue_11() throws Exception {
         assertThrows(
                 PathNotFoundException.class,
