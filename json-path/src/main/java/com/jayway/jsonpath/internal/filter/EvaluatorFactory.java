@@ -104,6 +104,12 @@ public class EvaluatorFactory {
                 return left.asStringNode().getString().compareTo(right.asStringNode().getString())
                         < 0;
             }
+            if (left.isOffsetDateTimeNode() && right.isOffsetDateTimeNode()) {
+                return left.asOffsetDateTimeNode()
+                                .getDate()
+                                .compareTo(right.asOffsetDateTimeNode().getDate())
+                        < 0;
+            }
             return false;
         }
     }
@@ -119,6 +125,12 @@ public class EvaluatorFactory {
                 return left.asStringNode().getString().compareTo(right.asStringNode().getString())
                         <= 0;
             }
+            if (left.isOffsetDateTimeNode() && right.isOffsetDateTimeNode()) {
+                return left.asOffsetDateTimeNode()
+                                .getDate()
+                                .compareTo(right.asOffsetDateTimeNode().getDate())
+                        <= 0;
+            }
             return false;
         }
     }
@@ -131,6 +143,11 @@ public class EvaluatorFactory {
                         > 0;
             } else if (left.isStringNode() && right.isStringNode()) {
                 return left.asStringNode().getString().compareTo(right.asStringNode().getString())
+                        > 0;
+            } else if (left.isOffsetDateTimeNode() && right.isOffsetDateTimeNode()) {
+                return left.asOffsetDateTimeNode()
+                                .getDate()
+                                .compareTo(right.asOffsetDateTimeNode().getDate())
                         > 0;
             }
             return false;
@@ -145,6 +162,11 @@ public class EvaluatorFactory {
                         >= 0;
             } else if (left.isStringNode() && right.isStringNode()) {
                 return left.asStringNode().getString().compareTo(right.asStringNode().getString())
+                        >= 0;
+            } else if (left.isOffsetDateTimeNode() && right.isOffsetDateTimeNode()) {
+                return left.asOffsetDateTimeNode()
+                                .getDate()
+                                .compareTo(right.asOffsetDateTimeNode().getDate())
                         >= 0;
             }
             return false;
