@@ -249,6 +249,7 @@ public class JsonPath {
     }
 
     @SuppressWarnings({"unchecked"})
+    @Deprecated
     public static <T> T read(URL jsonURL, String jsonPath, Predicate... filters)
             throws IOException {
         return new JsonContext().parse(jsonURL).read(jsonPath, filters);
