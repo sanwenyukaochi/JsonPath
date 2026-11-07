@@ -163,6 +163,12 @@ public class InlineFilterTest extends BaseTest {
         ints.add(2);
         ints.add(3);
 
+        List<Integer> hits = JsonPath.parse(ints).read("$[?(@)]");
+        assertThat(hits).containsExactly(0, 1, null, 2, 3);
+
+        hits = JsonPath.parse(ints).read("$[?(@ != null)]");
+        assertThat(hits).containsExactly(0, 1, 2, 3);
+
         List<Integer> isNull = JsonPath.parse(ints).read("$[?(!@)]");
         assertThat(isNull).containsExactly(new Integer[] {});
         assertThat(isNull).containsExactly(new Integer[] {});
