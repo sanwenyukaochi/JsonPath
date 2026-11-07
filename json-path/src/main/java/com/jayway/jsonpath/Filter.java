@@ -5,7 +5,9 @@ import java.util.List;
 
 public class Filter implements Predicate {
 
-    private List<Predicate> criteriaList = new ArrayList<Predicate>();
+    protected List<Predicate> criteriaList = new ArrayList<Predicate>();
+
+    private Filter() {}
 
     private Filter(Predicate criteria) {
         this.criteriaList.add(criteria);
@@ -40,5 +42,27 @@ public class Filter implements Predicate {
             sb.append(crit.toString());
         }
         return sb.toString();
+    }
+
+    public Filter or(final Predicate other) {
+        return new Filter() {
+            @Override
+            public boolean apply(PredicateContext ctx) {
+                boolean a = Filter.this.apply(ctx);
+                boolean b = other.apply(ctx);
+                return a || b;
+            }
+        };
+    }
+
+    public Filter and(final Predicate other) {
+        return new Filter() {
+            @Override
+            public boolean apply(PredicateContext ctx) {
+                boolean a = Filter.this.apply(ctx);
+                boolean b = other.apply(ctx);
+                return a && b;
+            }
+        };
     }
 }

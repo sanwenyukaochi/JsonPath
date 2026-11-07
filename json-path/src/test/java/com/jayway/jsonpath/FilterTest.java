@@ -4,6 +4,7 @@ import static com.jayway.jsonpath.Criteria.where;
 import static com.jayway.jsonpath.Filter.filter;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -444,5 +445,22 @@ public class FilterTest extends BaseTest {
                         filter(where("string-key").eq("string").and("$").matches(p))
                                 .apply(createPredicateContext(json)))
                 .isEqualTo(true);
+    }
+
+    @Test
+    public void or_and_filters_evaluates() {
+
+        Map<String, Object> model = new HashMap<String, Object>();
+        model.put("foo", true);
+        model.put("bar", false);
+
+        Filter isFoo = filter(where("foo").is(true));
+        Filter isBar = filter(where("bar").is(true));
+
+        Filter fooOrBar = filter(where("foo").exists(true)).or(where("bar").exists(true));
+        Filter fooAndBar = filter(where("foo").exists(true)).and(where("bar").exists(true));
+
+        assertThat(isFoo.or(isBar).apply(createPredicateContext(model))).isTrue();
+        assertThat(isFoo.and(isBar).apply(createPredicateContext(model))).isFalse();
     }
 }
