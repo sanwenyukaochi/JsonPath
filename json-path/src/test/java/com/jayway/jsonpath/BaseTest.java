@@ -3,6 +3,7 @@ package com.jayway.jsonpath;
 import com.jayway.jsonpath.internal.Path;
 import com.jayway.jsonpath.internal.spi.json.GsonJsonProvider;
 import com.jayway.jsonpath.internal.spi.json.JacksonJsonProvider;
+import com.jayway.jsonpath.internal.spi.json.JacksonTreeJsonProvider;
 import com.jayway.jsonpath.internal.spi.mapper.GsonMappingProvider;
 import com.jayway.jsonpath.internal.spi.mapper.JacksonMappingProvider;
 import com.jayway.jsonpath.internal.token.PredicateContextImpl;
@@ -22,6 +23,12 @@ public class BaseTest {
                     .jsonProvider(new JacksonJsonProvider())
                     .build();
 
+    public static final Configuration JACKSON_TREE_CONFIGURATION =
+            Configuration.builder()
+                    .mappingProvider(new JacksonMappingProvider())
+                    .jsonProvider(new JacksonTreeJsonProvider())
+                    .build();
+
     public static final Configuration JSON_SMART_CONFIGURATION =
             Configuration.defaultConfiguration();
 
@@ -30,7 +37,6 @@ public class BaseTest {
             {
                 "string-property": "string-value",
                 "int-max-property": 2147483647,
-                "long-max-property": 9223372036854775807,
                 "long-max-property": 9223372036854775807,
                 "boolean-property": true,
                 "null-property": null,

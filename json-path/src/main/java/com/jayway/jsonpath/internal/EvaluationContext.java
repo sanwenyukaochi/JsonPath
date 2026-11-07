@@ -13,6 +13,8 @@ public interface EvaluationContext {
 
     <T> T getValue();
 
+    <T> T getValue(boolean unwrap);
+
     <T> T getPath();
 
     List<String> getPathList();
