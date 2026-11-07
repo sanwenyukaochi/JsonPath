@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.Map;
 import org.hamcrest.Matcher;
 
-@Deprecated
 public class JsonAssert {
 
     public static JsonAsserter with(String json) {
