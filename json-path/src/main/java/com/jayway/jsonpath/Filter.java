@@ -1,6 +1,7 @@
 package com.jayway.jsonpath;
 
-import java.util.ArrayList;
+import com.jayway.jsonpath.spi.JsonProvider;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -12,8 +13,8 @@ public abstract class Filter<T> {
         return new MapFilter(criteria);
     }
 
-    public List<T> doFilter(List<T> filterItems) {
-        List<T> result = new ArrayList<T>();
+    public List doFilter(List<T> filterItems, JsonProvider jsonProvider) {
+        List result = jsonProvider.createList();
         for (T filterItem : filterItems) {
             if (accept(filterItem)) {
                 result.add(filterItem);

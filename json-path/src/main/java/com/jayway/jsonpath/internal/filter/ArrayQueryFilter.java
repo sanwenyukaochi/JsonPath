@@ -4,7 +4,6 @@ import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.spi.JsonProvider;
 
 import java.util.LinkedList;
-import java.util.List;
 
 public class ArrayQueryFilter extends PathTokenFilter {
 
@@ -21,7 +20,7 @@ public class ArrayQueryFilter extends PathTokenFilter {
 
         Filter filter = filters.poll();
 
-        return filter.doFilter((List) obj);
+        return filter.doFilter(jsonProvider.toList(obj), jsonProvider);
     }
 
     @Override
