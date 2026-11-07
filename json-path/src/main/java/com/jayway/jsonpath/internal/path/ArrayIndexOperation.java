@@ -7,8 +7,11 @@ import com.jayway.jsonpath.internal.Utils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class ArrayIndexOperation {
+
+    private static final Pattern COMMA = Pattern.compile("\\s*,\\s*");
 
     private final List<Integer> indexes;
 
@@ -38,13 +41,13 @@ public class ArrayIndexOperation {
 
         for (int i = 0; i < operation.length(); i++) {
             char c = operation.charAt(i);
-            if (!isDigit(c) && c != ',') {
+            if (!isDigit(c) && c != ',' && c != ' ') {
                 throw new InvalidPathException("Failed to parse ArrayIndexOperation: " + operation);
             }
         }
-        String[] tokens = operation.split(",");
+        String[] tokens = COMMA.split(operation, -1);
 
-        List<Integer> tempIndexes = new ArrayList<Integer>();
+        List<Integer> tempIndexes = new ArrayList<Integer>(tokens.length);
         for (String token : tokens) {
             tempIndexes.add(parseInteger(token));
         }

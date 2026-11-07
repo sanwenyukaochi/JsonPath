@@ -304,4 +304,31 @@ public class PathCompilerTest {
         List<String> result = JsonPath.read(json, "$.logs[?(@.x && @.y || @.id)]");
         assertThat(result).hasSize(1);
     }
+
+    @Test
+    public void accept_only_a_single_comma_between_indexes() {
+        assertThrows(
+                InvalidPathException.class,
+                () -> {
+                    compile("$['1', ,'3']");
+                });
+    }
+
+    @Test
+    public void array_indexes_must_be_separated_by_commas() {
+        assertThrows(
+                InvalidPathException.class,
+                () -> {
+                    compile("$[0, 1, 2 4]");
+                });
+    }
+
+    @Test
+    public void trailing_comma_after_list_is_not_accepted() {
+        assertThrows(
+                InvalidPathException.class,
+                () -> {
+                    compile("$['1','2',]");
+                });
+    }
 }
