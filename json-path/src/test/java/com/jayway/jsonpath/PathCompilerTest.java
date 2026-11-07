@@ -348,7 +348,7 @@ public class PathCompilerTest {
 {
     "logs": [
         {
-            "message": "\\"it\\"",
+            "message": "\\"it\\""
         }
     ]
 }\
@@ -364,7 +364,7 @@ public class PathCompilerTest {
 {
     "logs": [
         {
-            "message": "'it'",
+            "message": "'it'"
         }
     ]
 }\
@@ -382,7 +382,7 @@ public class PathCompilerTest {
 {
     "logs": [
         {
-            "message": "'it'",
+            "message": "'it'"
         }
     ]
 }\
