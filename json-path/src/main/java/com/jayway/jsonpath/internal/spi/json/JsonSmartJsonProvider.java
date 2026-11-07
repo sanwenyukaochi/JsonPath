@@ -1,6 +1,7 @@
 package com.jayway.jsonpath.internal.spi.json;
 
 import com.jayway.jsonpath.InvalidJsonException;
+import com.jayway.jsonpath.JsonPathException;
 import com.jayway.jsonpath.spi.json.Mode;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -47,7 +48,7 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
         } catch (ParseException e) {
             throw new InvalidJsonException(e);
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+            throw new JsonPathException(e);
         }
     }
 

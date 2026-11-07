@@ -1,6 +1,8 @@
 package com.jayway.jsonpath.spi.mapper;
 
-public class MappingException extends RuntimeException {
+import com.jayway.jsonpath.JsonPathException;
+
+public class MappingException extends JsonPathException {
 
     public MappingException(Throwable cause) {
         super(cause);
