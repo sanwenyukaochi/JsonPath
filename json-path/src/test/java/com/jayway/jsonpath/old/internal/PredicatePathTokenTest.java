@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
 import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.spi.json.JsonProviderFactory;
+import com.jayway.jsonpath.internal.spi.json.JsonSmartJsonProvider;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 public class PredicatePathTokenTest {
 
     private static final Object ARRAY =
-            JsonProviderFactory.createProvider()
+            new JsonSmartJsonProvider()
                     .parse(
 """
 [{
@@ -34,7 +34,7 @@ public class PredicatePathTokenTest {
 """);
 
     private static Object ARRAY2 =
-            JsonProviderFactory.createProvider()
+            new JsonSmartJsonProvider()
                     .parse(
 """
 [{

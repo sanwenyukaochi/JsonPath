@@ -10,7 +10,6 @@ import com.jayway.jsonpath.internal.PathCompiler;
 import com.jayway.jsonpath.internal.Utils;
 import com.jayway.jsonpath.spi.http.HttpProviderFactory;
 import com.jayway.jsonpath.spi.json.JsonProvider;
-import com.jayway.jsonpath.spi.json.JsonProviderFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -63,7 +62,6 @@ public class JsonPath {
                 }
             }
         } catch (RuntimeException e) {
-
             if (!optSuppressExceptions) {
                 throw e;
             }
@@ -133,13 +131,7 @@ public class JsonPath {
 
     @SuppressWarnings({"unchecked"})
     public <T> T read(InputStream jsonInputStream) throws IOException {
-        notNull(jsonInputStream, "json input stream can not be null");
-
-        try {
-            return read(JsonProviderFactory.createProvider().parse(jsonInputStream));
-        } finally {
-            Utils.closeQuietly(jsonInputStream);
-        }
+        return read(jsonInputStream, Configuration.defaultConfiguration());
     }
 
     @SuppressWarnings({"unchecked"})
