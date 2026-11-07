@@ -233,6 +233,13 @@ public final class Utils {
         return cs.toString().indexOf(searchChar.toString(), start);
     }
 
+    public static <T> T notNull(T object, String message) {
+        if (object == null) {
+            throw new IllegalArgumentException(message);
+        }
+        return object;
+    }
+
     public static <T> T notNull(T object, String message, Object... values) {
         if (object == null) {
             throw new IllegalArgumentException(String.format(message, values));
@@ -260,6 +267,13 @@ public final class Utils {
             }
         }
         return 1 == count;
+    }
+
+    public static <T extends CharSequence> T notEmpty(T chars, String message) {
+        if (chars == null || chars.length() == 0) {
+            throw new IllegalArgumentException(message);
+        }
+        return chars;
     }
 
     public static <T extends CharSequence> T notEmpty(T chars, String message, Object... values) {
