@@ -298,9 +298,9 @@ public class PathCompiler {
                             }
                             criteria.add(createCriteria(pathBuffer, operatorBuffer, valueBuffer));
 
-                            pathBuffer = new StringBuilder();
-                            operatorBuffer = new StringBuilder();
-                            valueBuffer = new StringBuilder();
+                            pathBuffer.setLength(0);
+                            operatorBuffer.setLength(0);
+                            valueBuffer.setLength(0);
 
                         } else if (operatorBuffer.length() > 0) {
                             valueBuffer.append(current);
@@ -363,7 +363,7 @@ public class PathCompiler {
                     case '\'':
                         if (propertyIsOpen) {
                             properties.add(buffer.toString());
-                            buffer = new StringBuilder();
+                            buffer.setLength(0);
                             propertyIsOpen = false;
                         } else {
                             propertyIsOpen = true;
@@ -404,7 +404,7 @@ public class PathCompiler {
                     current = chars[++i];
                 }
                 String function = buffer.toString();
-                buffer = new StringBuilder();
+                buffer.setLength(0);
                 if (!function.equals("size") && !function.equals("length")) {
                     throw new InvalidPathException(
                             "Invalid function: @."
@@ -445,11 +445,11 @@ public class PathCompiler {
                                     current = chars[++i];
                                 }
                                 numbers.add(Integer.parseInt(buffer.toString()));
-                                buffer = new StringBuilder();
+                                buffer.setLength(0);
                             } else {
 
                                 numbers.add(Integer.parseInt(buffer.toString()));
-                                buffer = new StringBuilder();
+                                buffer.setLength(0);
                                 current = chars[++i];
 
                                 while (Character.isDigit(current)
@@ -466,13 +466,13 @@ public class PathCompiler {
                                 } else {
                                     sliceBetween = true;
                                     numbers.add(Integer.parseInt(buffer.toString()));
-                                    buffer = new StringBuilder();
+                                    buffer.setLength(0);
                                 }
                             }
                             break;
                         case ',':
                             numbers.add(Integer.parseInt(buffer.toString()));
-                            buffer = new StringBuilder();
+                            buffer.setLength(0);
                             indexSequence = true;
                             break;
                         default:
