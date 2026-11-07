@@ -81,6 +81,7 @@ public class FilterCompilerTest {
         assertInvalidPathException("[?(@ == 'foo )]");
         assertInvalidPathException("[?(@ == 1' )]");
         assertInvalidPathException("[?(@.foo bar == 1)]");
+        assertInvalidPathException("[?(@.i == 5 @.i == 8)]");
     }
 
     private void assertInvalidPathException(String filter) {
@@ -88,7 +89,7 @@ public class FilterCompilerTest {
             compile(filter);
             throw new AssertionError("Expected " + filter + " to throw InvalidPathException");
         } catch (InvalidPathException e) {
-
+            e.printStackTrace();
         }
     }
 
