@@ -53,12 +53,14 @@ public class JSONEntityPathFunctionTest extends BaseFunctionTest {
     public void testLengthOfTextArray() {
 
         verifyFunction(conf, "$['text'].length()", TEXT_SERIES, 6);
+        verifyFunction(conf, "$['text'].size()", TEXT_SERIES, 6);
     }
 
     @Test
     public void testLengthOfNumberArray() {
 
         verifyFunction(conf, "$.numbers.length()", NUMBER_SERIES, 10);
+        verifyFunction(conf, "$.numbers.size()", NUMBER_SERIES, 10);
     }
 
     @Test

@@ -417,4 +417,10 @@ public class DeepScanTest extends BaseTest {
         assertEvaluationThrows(
                 "{\"foo\": {\"baz\": 4}}", "$..foo.bar", PathNotFoundException.class, conf);
     }
+
+    @Test
+    public void scan_with_a_function_filter() {
+        List result = JsonPath.parse(JSON_DOCUMENT).read("$..*[?(@.length() > 5)]");
+        assertThat(result).hasSize(1);
+    }
 }
