@@ -6,6 +6,7 @@ import static org.apache.commons.lang3.Validate.notEmpty;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import com.jayway.jsonpath.internal.IOUtils;
+import com.jayway.jsonpath.internal.Log;
 import com.jayway.jsonpath.internal.PathToken;
 import com.jayway.jsonpath.internal.PathTokenizer;
 import com.jayway.jsonpath.internal.filter.PathTokenFilter;
@@ -24,16 +25,19 @@ import org.apache.commons.lang3.StringUtils;
 public class JsonPath {
 
     private static Pattern DEFINITE_PATH_PATTERN =
-            Pattern.compile(".*(\\.\\.|\\*|\\[[\\\\/]|\\?|,|:\\s?\\]|\\[\\s?:|>|\\(|<|=|\\+).*");
+            Pattern.compile(".*(\\.\\.|\\*|\\[[\\\\/]|\\?|,|:\\s?]|\\[\\s?:|>|\\(|<|=|\\+).*");
+    private static Pattern INVALID_PATH_PATTERN = Pattern.compile("[^\\?\\+=\\-\\*/!]\\(");
 
     private PathTokenizer tokenizer;
     private LinkedList<Filter> filters;
 
-    public JsonPath(String jsonPath, Filter[] filters) {
-        if (jsonPath == null
-                || jsonPath.trim().length() == 0
-                || jsonPath.matches("[^\\?\\+\\=\\-\\*\\/\\!]\\(")) {
+    private JsonPath(String jsonPath, Filter[] filters) {
 
+        notNull(jsonPath, "path can not be null");
+        jsonPath = jsonPath.trim();
+        notEmpty(jsonPath, "path can not be empty");
+
+        if (INVALID_PATH_PATTERN.matcher(jsonPath).matches()) {
             throw new InvalidPathException("Invalid path");
         }
 
@@ -43,6 +47,10 @@ public class JsonPath {
                 "Filters in path ([?]) does not match provided filters.");
 
         this.tokenizer = new PathTokenizer(jsonPath);
+
+        if (Log.isDebugEnabled()) {
+            Log.debug("New JsonPath:\n{}", this.tokenizer.toString());
+        }
 
         this.filters = new LinkedList<Filter>();
         this.filters.addAll(asList(filters));

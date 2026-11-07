@@ -390,6 +390,45 @@ public class FilterTest {
     }
 
     @Test
+    public void not_empty_filter_evaluates() {
+
+        String json =
+                """
+                {
+                    "fields": [
+                        {
+                            "errors": [],
+                            "name": "",
+                            "empty": true
+                        },
+                        {
+                            "errors": [],
+                            "name": "foo"
+                        },
+                        {
+                            "errors": [
+                                "first",
+                                "second"
+                            ],
+                            "name": "invalid"
+                        }
+                    ]
+                }
+                """;
+
+        Object doc = JsonModel.model(json).getJsonObject();
+
+        List<Map<String, Object>> result =
+                JsonPath.read(doc, "$.fields[?]", filter(where("errors").notEmpty()));
+        assertEquals(1, result.size());
+        System.out.println(result);
+
+        result = JsonPath.read(doc, "$.fields[?]", filter(where("name").notEmpty()));
+        assertEquals(2, result.size());
+        System.out.println(result);
+    }
+
+    @Test
     public void collection_based_filters_cannot_be_applied_to_multi_level_expressions() {
         assertThrows(IllegalArgumentException.class, () -> where("$.store.*").size(4));
         assertThrows(IllegalArgumentException.class, () -> where("$.store.*").in("foo"));
