@@ -87,7 +87,7 @@ public class JsonPath {
         for (PathRef updateOperation : evaluationContext.updateOperations()) {
             updateOperation.set(newVal, configuration);
         }
-        return (T) jsonObject;
+        return resultByConfiguration(jsonObject, configuration, evaluationContext);
     }
 
     public <T> T delete(Object jsonObject, Configuration configuration) {
@@ -98,7 +98,7 @@ public class JsonPath {
         for (PathRef updateOperation : evaluationContext.updateOperations()) {
             updateOperation.delete(configuration);
         }
-        return (T) jsonObject;
+        return resultByConfiguration(jsonObject, configuration, evaluationContext);
     }
 
     public <T> T add(Object jsonObject, Object value, Configuration configuration) {
@@ -109,7 +109,7 @@ public class JsonPath {
         for (PathRef updateOperation : evaluationContext.updateOperations()) {
             updateOperation.add(value, configuration);
         }
-        return (T) jsonObject;
+        return resultByConfiguration(jsonObject, configuration, evaluationContext);
     }
 
     public <T> T put(Object jsonObject, String key, Object value, Configuration configuration) {
@@ -121,7 +121,7 @@ public class JsonPath {
         for (PathRef updateOperation : evaluationContext.updateOperations()) {
             updateOperation.put(key, value, configuration);
         }
-        return (T) jsonObject;
+        return resultByConfiguration(jsonObject, configuration, evaluationContext);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -284,5 +284,14 @@ public class JsonPath {
 
     public static DocumentContext parse(URL json, Configuration configuration) throws IOException {
         return new JsonReader(configuration).parse(json);
+    }
+
+    private <T> T resultByConfiguration(
+            Object jsonObject, Configuration configuration, EvaluationContext evaluationContext) {
+        if (configuration.containsOption(Option.AS_PATH_LIST)) {
+            return (T) evaluationContext.getPathList();
+        } else {
+            return (T) jsonObject;
+        }
     }
 }
