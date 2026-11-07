@@ -10,7 +10,7 @@ import com.jayway.jsonpath.internal.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
-class PropertyPathToken extends PathToken {
+public class PropertyPathToken extends PathToken {
 
     private final List<String> properties;
     private final String stringDelimiter;
