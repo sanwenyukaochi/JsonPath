@@ -96,7 +96,7 @@ public class JsonModelTest {
 
         assertEquals("value", model.get("$child.key"));
         assertEquals(1, model.<Integer>get("$items[1]"));
-        assertEquals(doc, JsonProviderFactory.getInstance().parse(model.toJson()));
+        assertEquals(doc, JsonProviderFactory.getInstance().parse(model.getJson()));
     }
 
     @Test
