@@ -14,7 +14,9 @@ public class EvaluatorFactory {
     static {
         evaluators.put(RelationalOperator.EXISTS, new ExistsEvaluator());
         evaluators.put(RelationalOperator.NE, new NotEqualsEvaluator());
+        evaluators.put(RelationalOperator.TSNE, new TypeSafeNotEqualsEvaluator());
         evaluators.put(RelationalOperator.EQ, new EqualsEvaluator());
+        evaluators.put(RelationalOperator.TSEQ, new TypeSafeEqualsEvaluator());
         evaluators.put(RelationalOperator.LT, new LessThanEvaluator());
         evaluators.put(RelationalOperator.LTE, new LessThanEqualsEvaluator());
         evaluators.put(RelationalOperator.GT, new GreaterThanEvaluator());
@@ -51,6 +53,13 @@ public class EvaluatorFactory {
         }
     }
 
+    private static class TypeSafeNotEqualsEvaluator implements Evaluator {
+        @Override
+        public boolean evaluate(ValueNode left, ValueNode right, Predicate.PredicateContext ctx) {
+            return !evaluators.get(RelationalOperator.TSEQ).evaluate(left, right, ctx);
+        }
+    }
+
     private static class EqualsEvaluator implements Evaluator {
         @Override
         public boolean evaluate(ValueNode left, ValueNode right, Predicate.PredicateContext ctx) {
@@ -59,6 +68,16 @@ public class EvaluatorFactory {
             } else {
                 return left.equals(right);
             }
+        }
+    }
+
+    private static class TypeSafeEqualsEvaluator implements Evaluator {
+        @Override
+        public boolean evaluate(ValueNode left, ValueNode right, Predicate.PredicateContext ctx) {
+            if (!left.getClass().equals(right.getClass())) {
+                return false;
+            }
+            return evaluators.get(RelationalOperator.EQ).evaluate(left, right, ctx);
         }
     }
 
