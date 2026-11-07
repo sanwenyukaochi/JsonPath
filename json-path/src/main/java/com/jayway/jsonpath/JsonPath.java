@@ -103,7 +103,7 @@ public class JsonPath {
         InputStream in = null;
         try {
             in = HttpProviderFactory.getProvider().get(jsonURL);
-            return read(configuration.jsonProvider().parse(in), configuration);
+            return read(in, "UTF-8", configuration);
         } finally {
             Utils.closeQuietly(in);
         }
@@ -123,7 +123,7 @@ public class JsonPath {
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(jsonFile);
-            return read(configuration.jsonProvider().parse(fis), configuration);
+            return read(fis, configuration);
         } finally {
             Utils.closeQuietly(fis);
         }
@@ -140,7 +140,22 @@ public class JsonPath {
         notNull(configuration, "configuration can not be null");
 
         try {
-            return read(configuration.jsonProvider().parse(jsonInputStream), configuration);
+            return read(jsonInputStream, "UTF-8", configuration);
+        } finally {
+            Utils.closeQuietly(jsonInputStream);
+        }
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public <T> T read(InputStream jsonInputStream, String charset, Configuration configuration)
+            throws IOException {
+        notNull(jsonInputStream, "json input stream can not be null");
+        notNull(charset, "charset can not be null");
+        notNull(configuration, "configuration can not be null");
+
+        try {
+            return read(
+                    configuration.jsonProvider().parse(jsonInputStream, charset), configuration);
         } finally {
             Utils.closeQuietly(jsonInputStream);
         }

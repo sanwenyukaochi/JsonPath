@@ -3,6 +3,7 @@ package com.jayway.jsonpath.internal.spi.json;
 import com.jayway.jsonpath.InvalidJsonException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,10 +53,10 @@ public class JacksonJsonProvider extends AbstractJsonProvider {
     }
 
     @Override
-    public Object parse(InputStream jsonStream) throws InvalidJsonException {
+    public Object parse(InputStream jsonStream, String charset) throws InvalidJsonException {
         try {
-            return objectReader.readValue(jsonStream);
-        } catch (JacksonException e) {
+            return objectReader.readValue(new InputStreamReader(jsonStream, charset));
+        } catch (IOException | JacksonException e) {
             throw new InvalidJsonException(e);
         }
     }
