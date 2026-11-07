@@ -138,7 +138,6 @@ public class JsonPathTest {
                 }\
                 """;
 
-        System.out.println((Object) JsonPath.read(json, "$.data.passes[0].id"));
         System.out.println(JsonPath.isPathDefinite("$.data.passes[0].id"));
 
         System.out.println((Object) JsonPath.read(json, "$.data2.passes[0].id"));

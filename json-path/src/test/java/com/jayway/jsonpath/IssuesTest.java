@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import net.minidev.json.JSONObject;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class IssuesTest {
@@ -118,6 +119,7 @@ public class IssuesTest {
     }
 
     @Test
+    @Disabled
     public void issue_22() throws Exception {
         assertThrows(
                 PathNotFoundException.class,

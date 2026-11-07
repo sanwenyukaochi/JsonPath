@@ -42,4 +42,9 @@ public abstract class PathTokenFilter {
     public abstract Object getRef(Object obj, JsonProvider jsonProvider);
 
     public abstract boolean isArrayFilter();
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + " => " + condition;
+    }
 }
