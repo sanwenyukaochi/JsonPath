@@ -27,6 +27,7 @@ public class PathCompiler {
     private static final char PERIOD = '.';
     private static final char BRACKET_OPEN = '[';
     private static final char BRACKET_CLOSE = ']';
+    private static final char SPACE = ' ';
     private static final Cache cache = new Cache(200);
 
     public static Path tokenize(String path, Filter... filters) {
@@ -54,6 +55,8 @@ public class PathCompiler {
             char current = chars[i];
 
             switch (current) {
+                case SPACE:
+                    throw new InvalidPathException("Space not allowed in path");
                 case DOCUMENT:
                     fragment = "$";
                     i++;
@@ -130,7 +133,7 @@ public class PathCompiler {
         int skipCount = 0;
         while (index < chars.length) {
             char current = chars[index];
-            if (current == PERIOD || current == BRACKET_OPEN) {
+            if (current == PERIOD || current == BRACKET_OPEN || current == SPACE) {
                 break;
             }
             index++;
