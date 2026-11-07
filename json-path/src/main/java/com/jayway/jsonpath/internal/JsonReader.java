@@ -1,7 +1,7 @@
 package com.jayway.jsonpath.internal;
 
-import static org.apache.commons.lang3.Validate.notEmpty;
-import static org.apache.commons.lang3.Validate.notNull;
+import static com.jayway.jsonpath.internal.Utils.notEmpty;
+import static com.jayway.jsonpath.internal.Utils.notNull;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Filter;
@@ -63,7 +63,7 @@ public class JsonReader implements ParseContext, ReadContext {
             fis = new FileInputStream(json);
             parse(fis);
         } finally {
-            IOUtils.closeQuietly(fis);
+            Utils.closeQuietly(fis);
         }
         return this;
     }

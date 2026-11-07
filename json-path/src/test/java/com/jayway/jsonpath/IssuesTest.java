@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.jayway.jsonpath.internal.IOUtils;
+import com.jayway.jsonpath.internal.Utils;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -119,7 +119,7 @@ public class IssuesTest {
             is.close();
         } catch (Exception e) {
             e.printStackTrace();
-            IOUtils.closeQuietly(is);
+            Utils.closeQuietly(is);
         }
     }
 
