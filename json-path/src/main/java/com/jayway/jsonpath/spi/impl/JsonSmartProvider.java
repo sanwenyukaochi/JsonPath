@@ -8,7 +8,6 @@ import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 import net.minidev.json.JSONArray;
-import net.minidev.json.JSONAware;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
@@ -64,12 +63,15 @@ public class JsonSmartProvider extends AbstractJsonProvider {
 
     @Override
     public String toJson(Object obj) {
-        if (!(obj instanceof JSONAware)) {
-            throw new InvalidJsonException();
-        }
-        JSONAware aware = (JSONAware) obj;
 
-        return aware.toJSONString();
+        if (obj instanceof Map) {
+            return JSONObject.toJSONString((Map<String, ? extends Object>) obj);
+        } else if (obj instanceof List) {
+            return JSONArray.toJSONString((List<? extends Object>) obj);
+        } else {
+            throw new UnsupportedOperationException(
+                    obj.getClass().getName() + " can not be converted to JSON");
+        }
     }
 
     public Mode getMode() {

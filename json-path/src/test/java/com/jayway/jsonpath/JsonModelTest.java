@@ -1,8 +1,20 @@
 package com.jayway.jsonpath;
 
-import com.jayway.jsonpath.spi.JsonProviderFactory;
+import static java.util.Arrays.asList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.jayway.jsonpath.spi.JsonProviderFactory;
+import java.io.ByteArrayInputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 public class JsonModelTest {
 
@@ -48,53 +60,74 @@ public class JsonModelTest {
             }\
             """;
 
-    public static final JsonModel MODEL = new JsonModel(DOCUMENT);
-
     @Test
-    public void a_path_can_be_read() throws Exception {
-
-        JsonPath path = JsonPath.compile("$.store.book[*].title");
-
-        JsonModel model = new JsonModel(DOCUMENT);
-
-        Object result = model.get(path);
-
-        System.out.println(JsonProviderFactory.getInstance().toJson(result));
+    public void a_json_document_can_be_fetched_with_a_URL(@TempDir Path directory)
+            throws Exception {
+        Path response = directory.resolve("response.json");
+        Files.writeString(
+                response,
+                """
+                {"status":"REQUEST_DENIED"}\
+                """);
+        URL url = response.toUri().toURL();
+        assertEquals("REQUEST_DENIED", JsonModel.create(url).get("status"));
     }
 
     @Test
-    public void test2() throws Exception {
-        JsonPath path = JsonPath.compile("$..");
-
-        JsonModel model = new JsonModel(DOCUMENT);
-
-        System.out.println(model.getJson(path));
+    public void a_json_document_can_be_fetched_with_a_InputStream() throws Exception {
+        ByteArrayInputStream bis = new ByteArrayInputStream(DOCUMENT.getBytes());
+        assertEquals("Nigel Rees", JsonModel.create(bis).get("store.book[0].author"));
     }
 
     @Test
-    public void test3() throws Exception {
-        JsonPath path = JsonPath.compile("$..[0]");
-
-        System.out.println(MODEL.getJson(path));
+    public void test_a_sub_model_can_be_fetched_and_read() throws Exception {
+        JsonModel model = JsonModel.create(DOCUMENT);
+        assertEquals("Nigel Rees", model.getSubModel("$store.book[0]").get("author"));
+        assertEquals(
+                "Nigel Rees", model.getSubModel(JsonPath.compile("$store.book[0]")).get("author"));
     }
 
     @Test
-    public void test4() throws Exception {
-        JsonPath path = JsonPath.compile("$..*");
+    public void maps_and_list_can_queried() throws Exception {
+        Map<String, Object> doc = new HashMap<String, Object>();
+        doc.put("items", asList(0, 1, 2));
+        doc.put("child", Collections.singletonMap("key", "value"));
 
-        System.out.println("--------------------------------");
+        JsonModel model = JsonModel.create(doc);
 
-        JsonModel model = new JsonModel(DOCUMENT);
-        System.out.println(model.getJson(path));
+        assertEquals("value", model.get("$child.key"));
+        assertEquals(1, model.<Integer>get("$items[1]"));
+        assertEquals(doc, JsonProviderFactory.getInstance().parse(model.toJson()));
     }
 
     @Test
-    public void test5() throws Exception {
+    public void map_a_json_model() throws Exception {
 
-        JsonModel model = new JsonModel(DOCUMENT);
+        JsonModel model = JsonModel.create(DOCUMENT);
 
-        JsonModel model2 = model.getSubModel("store.book[0]");
+        List<Book> booksList = model.map("$.store.book[0,1]").toListOf(Book.class);
 
-        System.out.println(model2.getJson());
+        Set<Book> bookSet = model.map("$.store.book[0,1]").toSetOf(Book.class);
+
+        Book book = model.map("$.store.book[1]").to(Book.class);
+
+        assertEquals("fiction", book.category);
+        assertEquals("Evelyn Waugh", book.author);
+        assertEquals("Sword of Honour", book.title);
+        assertEquals(12.99D, book.price);
+
+        List<Book> booksList2 = model.map("$.store.book[*]").toListOf(Book.class);
+
+        List<Book> booksList3 = model.map("$.store.book[*]").toList().of(Book.class);
+
+        System.out.println("asd");
+    }
+
+    public static class Book {
+        public String category;
+        public String author;
+        public String title;
+        public String isbn;
+        public Double price;
     }
 }
