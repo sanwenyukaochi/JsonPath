@@ -11,7 +11,7 @@ import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.internal.PathCompiler;
-import com.jayway.jsonpath.spi.json.JsonProviderFactory;
+import com.jayway.jsonpath.internal.spi.json.JsonSmartJsonProvider;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
@@ -63,7 +63,7 @@ public class JsonPathTest {
 }\
 """;
 
-    public static final Object OBJ_DOCUMENT = JsonProviderFactory.createProvider().parse(DOCUMENT);
+    public static final Object OBJ_DOCUMENT = new JsonSmartJsonProvider().parse(DOCUMENT);
 
     private static final String PRODUCT_JSON =
 """

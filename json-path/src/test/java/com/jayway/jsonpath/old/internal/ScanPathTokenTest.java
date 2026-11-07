@@ -6,14 +6,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.internal.PathCompiler;
-import com.jayway.jsonpath.spi.json.JsonProviderFactory;
+import com.jayway.jsonpath.internal.spi.json.JsonSmartJsonProvider;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class ScanPathTokenTest {
 
     public static final Object DOCUMENT =
-            JsonProviderFactory.createProvider()
+            new JsonSmartJsonProvider()
                     .parse(
 """
 {
@@ -60,7 +60,7 @@ public class ScanPathTokenTest {
 """);
 
     public static final Object DOCUMENT2 =
-            JsonProviderFactory.createProvider()
+            new JsonSmartJsonProvider()
                     .parse(
 """
 {

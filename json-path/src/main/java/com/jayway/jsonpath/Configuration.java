@@ -3,8 +3,8 @@ package com.jayway.jsonpath;
 import static com.jayway.jsonpath.internal.Utils.notNull;
 import static java.util.Arrays.asList;
 
+import com.jayway.jsonpath.internal.spi.json.JsonSmartJsonProvider;
 import com.jayway.jsonpath.spi.json.JsonProvider;
-import com.jayway.jsonpath.spi.json.JsonProviderFactory;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
@@ -15,7 +15,7 @@ public class Configuration {
             new Defaults() {
                 @Override
                 public JsonProvider provider() {
-                    return JsonProviderFactory.createProvider();
+                    return new JsonSmartJsonProvider();
                 }
 
                 @Override
