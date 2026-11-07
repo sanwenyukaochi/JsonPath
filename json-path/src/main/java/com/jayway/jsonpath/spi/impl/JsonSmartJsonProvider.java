@@ -18,8 +18,6 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
 
     private Mode mode;
 
-    private JSONParser parser;
-
     private JsonReaderI<?> containerFactory = JSONValue.defaultReader.DEFAULT;
 
     public JsonSmartJsonProvider() {
@@ -28,7 +26,6 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
 
     public JsonSmartJsonProvider(Mode mode) {
         this.mode = mode;
-        this.parser = new JSONParser(mode.intValue());
     }
 
     public Map<String, Object> createMap() {
@@ -41,7 +38,7 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
 
     public Object parse(String json) {
         try {
-            return parser.parse(json, containerFactory);
+            return createParser().parse(json, containerFactory);
         } catch (ParseException e) {
             throw new InvalidJsonException(e);
         }
@@ -50,7 +47,7 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
     @Override
     public Object parse(Reader jsonReader) throws InvalidJsonException {
         try {
-            return parser.parse(jsonReader, containerFactory);
+            return createParser().parse(jsonReader, containerFactory);
         } catch (ParseException e) {
             throw new InvalidJsonException(e);
         }
@@ -59,7 +56,7 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
     @Override
     public Object parse(InputStream jsonStream) throws InvalidJsonException {
         try {
-            return parser.parse(new InputStreamReader(jsonStream), containerFactory);
+            return createParser().parse(new InputStreamReader(jsonStream), containerFactory);
         } catch (ParseException e) {
             throw new InvalidJsonException(e);
         }
@@ -80,5 +77,9 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
 
     public Mode getMode() {
         return mode;
+    }
+
+    private JSONParser createParser() {
+        return new JSONParser(mode.intValue());
     }
 }
