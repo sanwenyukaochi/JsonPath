@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.jayway.jsonpath.InvalidPathException;
 import java.io.InputStream;
 import org.junit.jupiter.api.Test;
 
@@ -194,13 +195,20 @@ public class JsonAssertTest {
     @Test
     public void testNotDefined() throws Exception {
         JsonAsserter asserter = JsonAssert.with("{\"foo\":\"bar\"}");
-        asserter.assertEquals("$.foo", "bar");
-        asserter.assertEquals("$foo", "bar");
         asserter.assertNotDefined("$.xxx");
-        asserter.assertNotDefined("$xxx");
     }
 
     private InputStream getResourceAsStream(String resourceName) {
         return getClass().getClassLoader().getResourceAsStream(resourceName);
+    }
+
+    @Test
+    public void assert_that_invalid_path_is_thrown() {
+        assertThrows(
+                InvalidPathException.class,
+                () -> {
+                    JsonAsserter asserter = JsonAssert.with("{\"foo\":\"bar\"}");
+                    asserter.assertEquals("$foo", "bar");
+                });
     }
 }
