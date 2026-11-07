@@ -12,12 +12,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Configuration {
-
-    private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
 
     private static Defaults DEFAULTS = null;
 
@@ -184,12 +180,14 @@ public class Configuration {
         }
 
         public Configuration build() {
-            Defaults defaults = getEffectiveDefaults();
-            if (jsonProvider == null) {
-                jsonProvider = defaults.jsonProvider();
-            }
-            if (mappingProvider == null) {
-                mappingProvider = defaults.mappingProvider();
+            if (jsonProvider == null || mappingProvider == null) {
+                final Defaults defaults = getEffectiveDefaults();
+                if (jsonProvider == null) {
+                    jsonProvider = defaults.jsonProvider();
+                }
+                if (mappingProvider == null) {
+                    mappingProvider = defaults.mappingProvider();
+                }
             }
             return new Configuration(jsonProvider, mappingProvider, options, evaluationListener);
         }
