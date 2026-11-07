@@ -49,6 +49,9 @@ public class GsonMappingProvider implements MappingProvider {
 
     @Override
     public <T> T map(Object source, Class<T> targetType, Configuration configuration) {
+        if (source == null) {
+            return null;
+        }
         try {
             return factory.call().getAdapter(targetType).fromJsonTree((JsonElement) source);
         } catch (Exception e) {
@@ -58,6 +61,9 @@ public class GsonMappingProvider implements MappingProvider {
 
     @Override
     public <T> T map(Object source, TypeRef<T> targetType, Configuration configuration) {
+        if (source == null) {
+            return null;
+        }
         try {
             return (T)
                     factory.call()
