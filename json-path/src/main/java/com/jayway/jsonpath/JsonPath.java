@@ -292,6 +292,7 @@ public class JsonPath {
         return new ParseContextImpl().parse(json);
     }
 
+    @Deprecated
     public static DocumentContext parse(URL json) throws IOException {
         return new ParseContextImpl().parse(json);
     }
@@ -312,6 +313,7 @@ public class JsonPath {
         return new ParseContextImpl(configuration).parse(json);
     }
 
+    @Deprecated
     public static DocumentContext parse(URL json, Configuration configuration) throws IOException {
         return new ParseContextImpl(configuration).parse(json);
     }
