@@ -90,6 +90,7 @@ public class NullHandlingTest {
                         .parse(json)
                         .read("a[?(@.b==5)].d");
 
-        System.out.println(result);
+        Assertions.assertThat(result).hasSize(1);
+        Assertions.assertThat(result.get(0)).isNull();
     }
 }

@@ -14,7 +14,6 @@ import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled
 public class HttpProviderTest {
 
     private static final String EXPECTED =
@@ -26,6 +25,7 @@ public class HttpProviderTest {
             """;
 
     @Test
+    @Disabled
     public void http_get() throws Exception {
         HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         byte[] response = EXPECTED.getBytes(StandardCharsets.UTF_8);
