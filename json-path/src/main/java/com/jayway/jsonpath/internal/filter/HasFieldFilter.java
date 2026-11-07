@@ -7,16 +7,10 @@ import java.util.Map;
 
 public class HasFieldFilter extends PathTokenFilter {
 
+    private final String trimmedCondition;
+
     public HasFieldFilter(String condition) {
         super(condition);
-    }
-
-    @Override
-    public Object filter(Object obj, JsonProvider jsonProvider) {
-
-        List<Object> src = jsonProvider.toList(obj);
-        List<Object> result = jsonProvider.createList();
-
         String trimmedCondition = condition;
 
         if (condition.contains("['")) {
@@ -24,7 +18,14 @@ public class HasFieldFilter extends PathTokenFilter {
             trimmedCondition = trimmedCondition.replace("']", "");
         }
 
-        trimmedCondition = trim(trimmedCondition, 5, 2);
+        this.trimmedCondition = trim(trimmedCondition, 5, 2);
+    }
+
+    @Override
+    public Object filter(Object obj, JsonProvider jsonProvider) {
+
+        List<Object> src = jsonProvider.toList(obj);
+        List<Object> result = jsonProvider.createList();
 
         for (Object item : src) {
             if (jsonProvider.isMap(item)) {
