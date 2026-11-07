@@ -5,11 +5,8 @@ import static java.lang.ClassLoader.getSystemResourceAsStream;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import org.apache.commons.io.IOUtils;
 
 public class ResourceHelpers {
@@ -17,18 +14,16 @@ public class ResourceHelpers {
         try {
             return IOUtils.toString(getSystemResourceAsStream(resource));
         } catch (IOException e) {
-            throw new AssertionError("Resource not found", e);
+            throw new AssertionError("Resource not found: " + e.getMessage());
         }
     }
 
     public static File resourceAsFile(String resource) {
         try {
             URL systemResource = getSystemResource(resource);
-            URI uri = systemResource.toURI();
-            Path path = Paths.get(uri);
-            return path.toFile();
+            return new File(systemResource.toURI());
         } catch (URISyntaxException e) {
-            throw new AssertionError("URI syntax error", e);
+            throw new AssertionError("URI syntax error:" + e.getMessage());
         }
     }
 }

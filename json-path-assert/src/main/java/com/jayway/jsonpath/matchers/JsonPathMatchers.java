@@ -1,15 +1,16 @@
 package com.jayway.jsonpath.matchers;
 
 import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.describedAs;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.instanceOf;
 
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Predicate;
 import com.jayway.jsonpath.ReadContext;
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 import org.hamcrest.Matcher;
 
 public class JsonPathMatchers {
@@ -19,13 +20,11 @@ public class JsonPathMatchers {
     }
 
     public static Matcher<? super Object> hasJsonPath(String jsonPath) {
-        return describedAs(
-                "has json path %0",
-                hasJsonPath(jsonPath, not(anyOf(nullValue(), empty()))), jsonPath);
+        return describedAs("has json path %0", isJson(withJsonPath(jsonPath)), jsonPath);
     }
 
     public static <T> Matcher<? super Object> hasJsonPath(
-            final String jsonPath, final Matcher<T> resultMatcher) {
+            String jsonPath, Matcher<T> resultMatcher) {
         return isJson(withJsonPath(jsonPath, resultMatcher));
     }
 
@@ -34,18 +33,18 @@ public class JsonPathMatchers {
     }
 
     public static Matcher<Object> isJson() {
-        return isJson(withJsonPath("$..*"));
+        return isJson(withJsonPath("$", anyOf(instanceOf(Map.class), instanceOf(List.class))));
     }
 
-    public static Matcher<Object> isJson(final Matcher<? super ReadContext> matcher) {
+    public static Matcher<Object> isJson(Matcher<? super ReadContext> matcher) {
         return new IsJson<Object>(matcher);
     }
 
-    public static Matcher<String> isJsonString(final Matcher<? super ReadContext> matcher) {
+    public static Matcher<String> isJsonString(Matcher<? super ReadContext> matcher) {
         return new IsJson<String>(matcher);
     }
 
-    public static Matcher<File> isJsonFile(final Matcher<? super ReadContext> matcher) {
+    public static Matcher<File> isJsonFile(Matcher<? super ReadContext> matcher) {
         return new IsJson<File>(matcher);
     }
 
@@ -55,8 +54,7 @@ public class JsonPathMatchers {
 
     public static Matcher<? super ReadContext> withJsonPath(JsonPath jsonPath) {
         return describedAs(
-                "with json path %0",
-                withJsonPath(jsonPath, not(anyOf(nullValue(), empty()))), jsonPath.getPath());
+                "with json path %0", withJsonPath(jsonPath, anything()), jsonPath.getPath());
     }
 
     public static Matcher<? super ReadContext> withoutJsonPath(
@@ -74,7 +72,7 @@ public class JsonPathMatchers {
     }
 
     public static <T> Matcher<? super ReadContext> withJsonPath(
-            final JsonPath jsonPath, final Matcher<T> resultMatcher) {
+            JsonPath jsonPath, Matcher<T> resultMatcher) {
         return new WithJsonPath<T>(jsonPath, resultMatcher);
     }
 }
