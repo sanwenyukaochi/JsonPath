@@ -4,7 +4,7 @@ public interface ReadContext {
 
     Object json();
 
-    <T> T read(String path, Filter... filters);
+    <T> T read(String path, Predicate... filters);
 
     <T> T read(JsonPath path);
 }

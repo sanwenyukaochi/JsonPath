@@ -51,4 +51,18 @@ public class BaseTest {
                 "@id": "ID"
             }
             """;
+
+    public Predicate.PredicateContext createPredicateContext(final Object check) {
+        return new Predicate.PredicateContext() {
+            @Override
+            public Object target() {
+                return check;
+            }
+
+            @Override
+            public Configuration configuration() {
+                return Configuration.defaultConfiguration();
+            }
+        };
+    }
 }
