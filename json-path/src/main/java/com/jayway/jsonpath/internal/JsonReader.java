@@ -120,11 +120,33 @@ public class JsonReader implements ParseContext, ReadContext {
         return convert(read(path), type, configuration);
     }
 
+    public ReadContext limit(int maxResults) {
+        return withListeners(new LimitingEvaluationListener(maxResults));
+    }
+
     public ReadContext withListeners(EvaluationListener... listener) {
-        return new JsonReader(json, configuration.evaluationListener(listener));
+        return new JsonReader(json, configuration.setEvaluationListeners(listener));
     }
 
     private <T> T convert(Object obj, Class<T> targetType, Configuration configuration) {
         return configuration.mappingProvider().map(obj, targetType, configuration);
+    }
+
+    private final class LimitingEvaluationListener implements EvaluationListener {
+
+        final int limit;
+
+        private LimitingEvaluationListener(int limit) {
+            this.limit = limit;
+        }
+
+        @Override
+        public EvaluationContinuation resultFound(FoundResult found) {
+            if (found.index() == limit - 1) {
+                return EvaluationContinuation.ABORT;
+            } else {
+                return EvaluationContinuation.CONTINUE;
+            }
+        }
     }
 }

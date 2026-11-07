@@ -57,14 +57,14 @@ public class Configuration {
         notNull(jsonProvider, "jsonProvider can not be null");
         notNull(mappingProvider, "mappingProvider can not be null");
         notNull(options, "setOptions can not be null");
-        notNull(evaluationListeners, "evaluationListener can not be null");
+        notNull(evaluationListeners, "evaluationListeners can not be null");
         this.jsonProvider = jsonProvider;
         this.mappingProvider = mappingProvider;
         this.options = Collections.unmodifiableSet(options);
         this.evaluationListeners = Collections.unmodifiableCollection(evaluationListeners);
     }
 
-    public Configuration evaluationListener(EvaluationListener... evaluationListener) {
+    public Configuration addEvaluationListeners(EvaluationListener... evaluationListener) {
         return Configuration.builder()
                 .jsonProvider(jsonProvider)
                 .mappingProvider(mappingProvider)
@@ -73,7 +73,16 @@ public class Configuration {
                 .build();
     }
 
-    public Collection<EvaluationListener> evaluationListeners() {
+    public Configuration setEvaluationListeners(EvaluationListener... evaluationListener) {
+        return Configuration.builder()
+                .jsonProvider(jsonProvider)
+                .mappingProvider(mappingProvider)
+                .options(options)
+                .evaluationListener(evaluationListener)
+                .build();
+    }
+
+    public Collection<EvaluationListener> getEvaluationListeners() {
         return evaluationListeners;
     }
 
