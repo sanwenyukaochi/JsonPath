@@ -392,4 +392,12 @@ public class PathCompilerTest {
         List<String> result = parse.read(compile);
         assertThat(result).containsExactly("'it'");
     }
+
+    @Test
+    public void a_function_can_be_compiled() {
+        assertThat(compile("$.aaa.foo()").toString()).isEqualTo("$['aaa'].foo()");
+        assertThat(compile("$.aaa.foo(5)").toString()).isEqualTo("$['aaa'].foo(...)");
+        assertThat(compile("$.aaa.foo($.bar)").toString()).isEqualTo("$['aaa'].foo(...)");
+        assertThat(compile("$.aaa.foo(5,10,15)").toString()).isEqualTo("$['aaa'].foo(...)");
+    }
 }
