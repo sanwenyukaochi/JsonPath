@@ -34,6 +34,9 @@ public class PathCompiler {
     private static final char BRACKET_CLOSE = ']';
     private static final char SPACE = ' ';
     private static final Cache cache = new Cache(200);
+    private static final String[] OPERATORS = {
+        "==", ">=", "<=", "!=", "<", ">",
+    };
 
     public static Path compile(String path, Predicate... filters) {
         notEmpty(path, "Path may not be null empty");
@@ -41,13 +44,20 @@ public class PathCompiler {
 
         LinkedList<Predicate> filterList = new LinkedList<Predicate>(asList(filters));
 
-        if (path.charAt(0) != '$') {
+        if (path.charAt(0) != '$' && path.charAt(0) != '@') {
             path = "$." + path;
         }
 
-        String cacheKey = path + filterList.toString();
+        boolean isRootPath = (path.charAt(0) == '$');
+
+        if (path.charAt(0) == '@') {
+            path = "$" + path.substring(1);
+        }
+
+        String cacheKey = path + isRootPath + filterList.toString();
         Path p = cache.get(cacheKey);
         if (p != null) {
+            logger.debug("Using cached path");
             return p;
         }
 
@@ -115,7 +125,7 @@ public class PathCompiler {
 
         } while (i < path.length());
 
-        Path pa = new CompiledPath(root);
+        Path pa = new CompiledPath(root, isRootPath);
 
         cache.put(cacheKey, pa);
 
@@ -215,7 +225,7 @@ public class PathCompiler {
 
                 switch (current) {
                     case '?':
-                        return analyzeCriteriaSequence();
+                        return analyzeCriteriaSequence2();
                     case '\'':
                         return analyzeProperty();
                     default:
@@ -234,100 +244,58 @@ public class PathCompiler {
             throw new InvalidPathException("Could not analyze path component: " + pathFragment);
         }
 
-        private PathToken analyzeCriteriaSequence() {
-            StringBuilder pathBuffer = new StringBuilder();
-            StringBuilder operatorBuffer = new StringBuilder();
-            StringBuilder valueBuffer = new StringBuilder();
-            List<Predicate> criteria = new ArrayList<Predicate>();
+        private int findNext(char charToFind, boolean disregardStringContent) {
+            int x = i;
+            boolean inProperty = false;
 
-            int bracketCount = 0;
+            char analyzing;
+            boolean found = false;
+            while (!found) {
+                analyzing = pathFragment.charAt(x);
 
-            boolean functionBracketOpened = false;
-            boolean functionBracketClosed = false;
-            boolean propertyOpen = false;
-
-            current = pathFragment.charAt(++i);
-
-            while (current != ']' || bracketCount != 0) {
-
-                switch (current) {
-                    case '[':
-                        bracketCount++;
-                        pathBuffer.append(current);
-                        break;
-
-                    case ']':
-                        bracketCount--;
-                        pathBuffer.append(current);
-                        break;
-
-                    case '@':
-                        pathBuffer.append('$');
-                        break;
-
-                    case '(':
-                        if (!propertyOpen) {
-                            functionBracketOpened = true;
-                            break;
-                        }
-
-                    case ')':
-                        if (!propertyOpen) {
-                            functionBracketClosed = true;
-                            break;
-                        }
-
-                    default:
-                        if ('\'' == current) {
-                            if (propertyOpen) {
-                                propertyOpen = false;
-                            } else {
-                                propertyOpen = true;
-                            }
-                        }
-                        if (bracketCount == 0 && isOperatorChar(current)) {
-                            operatorBuffer.append(current);
-
-                        } else if (bracketCount == 0 && isLogicOperatorChar(current)) {
-
-                            if (isLogicOperatorChar(pathFragment.charAt(i + 1))) {
-                                ++i;
-                            }
-                            criteria.add(createCriteria(pathBuffer, operatorBuffer, valueBuffer));
-
-                            pathBuffer.setLength(0);
-                            operatorBuffer.setLength(0);
-                            valueBuffer.setLength(0);
-
-                        } else if (operatorBuffer.length() > 0) {
-                            valueBuffer.append(current);
-                        } else {
-                            pathBuffer.append(current);
-                        }
-
-                        break;
+                if (analyzing == '\'' && disregardStringContent) {
+                    inProperty = !inProperty;
                 }
-                current = pathFragment.charAt(++i);
+                if (!inProperty) {
+                    found = (analyzing == charToFind);
+                }
+                x++;
             }
-
-            if (!functionBracketOpened || !functionBracketClosed) {
-                throw new InvalidPathException(
-                        "Function wrapping brackets are not matching. A filter function must match [?(<statement>)]");
-            }
-
-            criteria.add(createCriteria(pathBuffer, operatorBuffer, valueBuffer));
-
-            Filter filter2 = Filter.filter(criteria);
-
-            return new PredicatePathToken(filter2);
+            return x - 1;
         }
 
-        private static Criteria createCriteria(
-                StringBuilder pathBuffer, StringBuilder operatorBuffer, StringBuilder valueBuffer) {
-            return Criteria.create(
-                    pathBuffer.toString().trim(),
-                    operatorBuffer.toString().trim(),
-                    valueBuffer.toString().trim());
+        private PathToken analyzeCriteriaSequence2() {
+
+            List<Predicate> predicates = new ArrayList<Predicate>();
+
+            int startPos = findNext('(', true) + 1;
+            int stopPos = findNext(')', true);
+
+            String[] split = pathFragment.substring(startPos, stopPos).split("&&");
+
+            for (String criteria : split) {
+                int operatorIndex = -1;
+                String left = "";
+                String operator = "";
+                String right = "";
+                for (int y = 0; y < OPERATORS.length; y++) {
+                    operatorIndex = criteria.indexOf(OPERATORS[y]);
+                    if (operatorIndex != -1) {
+                        operator = OPERATORS[y];
+                        break;
+                    }
+                }
+                if (!operator.isEmpty()) {
+                    left = criteria.substring(0, operatorIndex).trim();
+                    right = criteria.substring(operatorIndex + operator.length()).trim();
+                } else {
+                    left = criteria.trim();
+                }
+                predicates.add(Criteria.create(left, operator, right));
+            }
+            i = stopPos;
+
+            return new PredicatePathToken(Filter.filter(predicates));
         }
 
         private static boolean isAnd(char c) {

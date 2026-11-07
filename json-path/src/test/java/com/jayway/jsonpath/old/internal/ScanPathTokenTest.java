@@ -116,7 +116,7 @@ public class ScanPathTokenTest {
 
         List<String> result =
                 PathCompiler.compile("$..[*]")
-                        .evaluate(DOCUMENT, Configuration.defaultConfiguration())
+                        .evaluate(DOCUMENT, DOCUMENT, Configuration.defaultConfiguration())
                         .getPathList();
 
         assertThat(result)
@@ -171,7 +171,7 @@ public class ScanPathTokenTest {
 
         List<String> result =
                 PathCompiler.compile("$.store.book[0]..*")
-                        .evaluate(DOCUMENT, Configuration.defaultConfiguration())
+                        .evaluate(DOCUMENT, DOCUMENT, Configuration.defaultConfiguration())
                         .getPathList();
 
         assertThat(result)
@@ -190,7 +190,7 @@ public class ScanPathTokenTest {
 
         List<String> result =
                 PathCompiler.compile("$.phoneNumbers[0]..*")
-                        .evaluate(DOCUMENT2, Configuration.defaultConfiguration())
+                        .evaluate(DOCUMENT2, DOCUMENT, Configuration.defaultConfiguration())
                         .getPathList();
 
         assertThat(result)
@@ -202,7 +202,7 @@ public class ScanPathTokenTest {
 
         List<String> result =
                 PathCompiler.compile("$..[?(@.address.city == 'Stockholm')]")
-                        .evaluate(DOCUMENT, Configuration.defaultConfiguration())
+                        .evaluate(DOCUMENT, DOCUMENT, Configuration.defaultConfiguration())
                         .getPathList();
 
         assertThat(result).containsOnly("$['store']['bicycle']", "$['store']['book'][2]");
@@ -213,7 +213,7 @@ public class ScanPathTokenTest {
 
         List<String> result =
                 PathCompiler.compile("$..[?(@.isbn)]")
-                        .evaluate(DOCUMENT, Configuration.defaultConfiguration())
+                        .evaluate(DOCUMENT, DOCUMENT, Configuration.defaultConfiguration())
                         .getPathList();
 
         assertThat(result).containsOnly("$['store']['book'][2]");
@@ -224,7 +224,7 @@ public class ScanPathTokenTest {
 
         List<String> result =
                 PathCompiler.compile("$..[(@.length - 1)]")
-                        .evaluate(DOCUMENT, Configuration.defaultConfiguration())
+                        .evaluate(DOCUMENT, DOCUMENT, Configuration.defaultConfiguration())
                         .getPathList();
 
         assertThat(result)

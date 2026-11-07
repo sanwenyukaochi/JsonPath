@@ -6,7 +6,9 @@ public interface Predicate {
 
     public interface PredicateContext {
 
-        Object target();
+        Object contextDocument();
+
+        Object rootDocument();
 
         Configuration configuration();
     }
