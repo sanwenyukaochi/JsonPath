@@ -792,7 +792,9 @@ public abstract class ValueNode {
 
         @Override
         public String toString() {
-            return path.toString();
+            return existsCheck && !shouldExist
+                    ? Utils.concat("!", path.toString())
+                    : path.toString();
         }
 
         public ValueNode evaluate(Predicate.PredicateContext ctx) {
