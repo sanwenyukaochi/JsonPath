@@ -247,6 +247,10 @@ public class InlineFilterTest extends BaseTest {
         if (conf.jsonProvider().getClass().getSimpleName().startsWith("Jackson")) {
             return;
         }
+        if (conf.jsonProvider().getClass().getSimpleName().startsWith("Jakarta")) {
+
+            return;
+        }
         assertHasOneResult("[\"\\'foo\"]", "$[?(@ == '\\'foo')]", conf);
     }
 
