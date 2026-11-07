@@ -96,7 +96,7 @@ public class JsonAsserterImpl implements JsonAsserter {
 
     @Override
     public <T> JsonAsserter assertEquals(String path, T expected, String message) {
-        return null;
+        return assertThat(path, equalTo(expected), message);
     }
 
     public <T> JsonAsserter assertNotNull(String path) {
