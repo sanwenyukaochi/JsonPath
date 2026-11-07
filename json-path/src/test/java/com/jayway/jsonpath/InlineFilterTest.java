@@ -37,4 +37,12 @@ public class InlineFilterTest extends BaseTest {
         List none2 = reader.read("store.book[ ?(@.category != @) ]", List.class);
         assertThat(none2.size()).isEqualTo(0);
     }
+
+    @Test
+    public void document_queries_are_cached() {
+
+        Object read = reader.read("$.store.book[?(@.display-price <= $.max-price)]");
+
+        System.out.println(read);
+    }
 }

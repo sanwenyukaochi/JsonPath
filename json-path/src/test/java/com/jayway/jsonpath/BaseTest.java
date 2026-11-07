@@ -1,8 +1,11 @@
 package com.jayway.jsonpath;
 
+import com.jayway.jsonpath.internal.Path;
 import com.jayway.jsonpath.internal.spi.json.GsonJsonProvider;
 import com.jayway.jsonpath.internal.spi.mapper.GsonMappingProvider;
 import com.jayway.jsonpath.internal.token.PredicateContextImpl;
+
+import java.util.HashMap;
 
 public class BaseTest {
     public static final Configuration GSON_CONFIGURATION =
@@ -66,6 +69,8 @@ public class BaseTest {
             """;
 
     public Predicate.PredicateContext createPredicateContext(final Object check) {
-        return new PredicateContextImpl(check, check, Configuration.defaultConfiguration());
+
+        return new PredicateContextImpl(
+                check, check, Configuration.defaultConfiguration(), new HashMap<Path, Object>());
     }
 }
