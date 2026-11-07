@@ -6,6 +6,7 @@ import com.jayway.jsonpath.JsonPathException;
 
 public class CacheProvider {
     private static Cache cache;
+    private static boolean cachingEnabled;
 
     public static void setCache(Cache cache) {
         notNull(cache, "Cache may not be null");
@@ -16,6 +17,7 @@ public class CacheProvider {
             } else {
                 CacheProvider.cache = cache;
             }
+            cachingEnabled = !(CacheProvider.cache instanceof NOOPCache);
         }
     }
 
@@ -31,6 +33,6 @@ public class CacheProvider {
     }
 
     private static Cache getDefaultCache() {
-        return new LRUCache(200);
+        return new LRUCache(400);
     }
 }

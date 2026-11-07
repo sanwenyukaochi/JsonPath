@@ -28,6 +28,10 @@ public abstract class Filter implements Predicate {
         return new AndFilter(this, other);
     }
 
+    public static Filter parse(String filter) {
+        return FilterCompiler.compile(filter);
+    }
+
     private static final class SingleFilter extends Filter {
 
         private final Predicate predicate;
@@ -142,9 +146,5 @@ public abstract class Filter implements Predicate {
             sb.append(")]");
             return sb.toString();
         }
-    }
-
-    public static Filter parse(String filter) {
-        return FilterCompiler.compile(filter);
     }
 }

@@ -246,8 +246,6 @@ public class PathCompilerTest {
 }\
 """;
 
-        System.out.println(JsonPath.parse(json).json().toString());
-
         List<String> result = JsonPath.read(json, "$.logs[?(@.message == 'it\\\\')].message");
 
         assertThat(result).containsExactly("it\\");
