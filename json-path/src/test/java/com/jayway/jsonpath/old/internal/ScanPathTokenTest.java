@@ -5,14 +5,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.internal.PathCompiler;
-import com.jayway.jsonpath.internal.spi.json.JsonSmartJsonProvider;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class ScanPathTokenTest {
 
     public static final Object DOCUMENT =
-            new JsonSmartJsonProvider()
+            Configuration.defaultConfiguration()
+                    .jsonProvider()
                     .parse(
 """
 {
@@ -59,7 +59,8 @@ public class ScanPathTokenTest {
 """);
 
     public static final Object DOCUMENT2 =
-            new JsonSmartJsonProvider()
+            Configuration.defaultConfiguration()
+                    .jsonProvider()
                     .parse(
 """
 {

@@ -1,12 +1,12 @@
 package com.jayway.jsonpath.old.internal;
 
 import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.internal.spi.json.JsonSmartJsonProvider;
 
 public class TestBase {
 
     public static final Object ARRAY =
-            new JsonSmartJsonProvider()
+            Configuration.defaultConfiguration()
+                    .jsonProvider()
                     .parse(
 """
 [{
@@ -27,7 +27,8 @@ public class TestBase {
 """);
 
     public static final Object DOC =
-            new JsonSmartJsonProvider()
+            Configuration.defaultConfiguration()
+                    .jsonProvider()
                     .parse(
 """
 { "store": {
