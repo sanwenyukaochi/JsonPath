@@ -150,6 +150,15 @@ public abstract class PathRef implements Comparable<PathRef> {
         public Object getAccessor() {
             return index;
         }
+
+        @Override
+        public int compareTo(PathRef o) {
+            if (o instanceof ArrayIndexPathRef) {
+                ArrayIndexPathRef pf = (ArrayIndexPathRef) o;
+                return Integer.compare(pf.index, this.index);
+            }
+            return super.compareTo(o);
+        }
     }
 
     private static class ObjectPropertyPathRef extends PathRef {
