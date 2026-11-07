@@ -5,7 +5,7 @@ import com.jayway.jsonpath.spi.JsonProvider;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class ArrayIndexFilter extends Filter {
+public class ArrayIndexFilter extends PathTokenFilter {
 
     private static final Pattern SINGLE_ARRAY_INDEX_PATTERN = Pattern.compile("\\[\\d+\\]");
 

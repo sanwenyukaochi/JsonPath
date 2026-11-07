@@ -1,12 +1,13 @@
 package com.jayway.jsonpath;
 
+import static java.util.Arrays.asList;
 import static org.apache.commons.lang.Validate.isTrue;
 import static org.apache.commons.lang.Validate.notEmpty;
 import static org.apache.commons.lang.Validate.notNull;
 
 import com.jayway.jsonpath.internal.PathToken;
 import com.jayway.jsonpath.internal.PathTokenizer;
-import com.jayway.jsonpath.internal.filter.Filter;
+import com.jayway.jsonpath.internal.filter.PathTokenFilter;
 import com.jayway.jsonpath.spi.JsonProvider;
 import com.jayway.jsonpath.spi.JsonProviderFactory;
 import java.io.BufferedReader;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -26,9 +28,16 @@ public class JsonPath {
     private static Pattern DEFINITE_PATH_PATTERN =
             Pattern.compile(".*(\\.\\.|\\*|\\[[\\\\/]|\\?|,|:\\s?\\]|\\[\\s?:|>|\\(|<|=|\\+).*");
 
+    private static final Filter[] NO_FILTERS = new Filter[0];
+
     private PathTokenizer tokenizer;
+    private LinkedList<Filter> filters;
 
     private JsonPath(String jsonPath) {
+        this(jsonPath, new Filter[0]);
+    }
+
+    public JsonPath(String jsonPath, Filter[] filters) {
         if (jsonPath == null
                 || jsonPath.trim().isEmpty()
                 || jsonPath.matches("[^\\?\\+\\=\\-\\*\\/\\!]\\(")) {
@@ -36,6 +45,9 @@ public class JsonPath {
             throw new InvalidPathException("Invalid path");
         }
         this.tokenizer = new PathTokenizer(jsonPath);
+
+        this.filters = new LinkedList<Filter>();
+        this.filters.addAll(asList(filters));
     }
 
     PathTokenizer getTokenizer() {
@@ -59,7 +71,7 @@ public class JsonPath {
         if (!(jsonObject instanceof Map) && !(jsonObject instanceof List)) {
             throw new IllegalArgumentException("Invalid container object");
         }
-
+        LinkedList<Filter> contextFilters = new LinkedList<Filter>(filters);
         JsonProvider jsonProvider = JsonProviderFactory.getInstance();
 
         Object result = jsonObject;
@@ -67,8 +79,8 @@ public class JsonPath {
         boolean inArrayContext = false;
 
         for (PathToken pathToken : tokenizer) {
-            Filter filter = pathToken.getFilter();
-            result = filter.filter(result, jsonProvider, inArrayContext);
+            PathTokenFilter filter = pathToken.getFilter();
+            result = filter.filter(result, jsonProvider, contextFilters, inArrayContext);
 
             if (!inArrayContext) {
                 inArrayContext = filter.isArrayFilter();
@@ -122,49 +134,50 @@ public class JsonPath {
         }
     }
 
-    public static JsonPath compile(String jsonPath) {
+    public static JsonPath compile(String jsonPath, Filter... filters) {
         notEmpty(jsonPath, "json can not be null or empty");
 
-        return new JsonPath(jsonPath);
+        return new JsonPath(jsonPath, filters);
     }
 
     @SuppressWarnings({"unchecked"})
-    public static <T> T read(String json, String jsonPath) {
+    public static <T> T read(String json, String jsonPath, Filter... filters) {
         notEmpty(json, "json can not be null or empty");
         notEmpty(jsonPath, "jsonPath can not be null or empty");
 
-        return (T) compile(jsonPath).read(json);
+        return (T) compile(jsonPath, filters).read(json);
     }
 
     @SuppressWarnings({"unchecked"})
-    public static <T> T read(Object json, String jsonPath) {
+    public static <T> T read(Object json, String jsonPath, Filter... filters) {
         notNull(json, "json can not be null");
         notNull(jsonPath, "jsonPath can not be null");
 
-        return (T) compile(jsonPath).read(json);
+        return (T) compile(jsonPath, filters).read(json);
     }
 
     @SuppressWarnings({"unchecked"})
-    public static <T> T read(URL jsonURL, String jsonPath) throws IOException {
+    public static <T> T read(URL jsonURL, String jsonPath, Filter... filters) throws IOException {
         notNull(jsonURL, "json URL can not be null");
         notEmpty(jsonPath, "jsonPath can not be null or empty");
 
-        return (T) compile(jsonPath).read(jsonURL);
+        return (T) compile(jsonPath, filters).read(jsonURL);
     }
 
     @SuppressWarnings({"unchecked"})
-    public static <T> T read(File jsonFile, String jsonPath) throws IOException {
+    public static <T> T read(File jsonFile, String jsonPath, Filter... filters) throws IOException {
         notNull(jsonFile, "json file can not be null");
         notEmpty(jsonPath, "jsonPath can not be null or empty");
 
-        return (T) compile(jsonPath).read(jsonFile);
+        return (T) compile(jsonPath, filters).read(jsonFile);
     }
 
     @SuppressWarnings({"unchecked"})
-    public static <T> T read(InputStream jsonInputStream, String jsonPath) throws IOException {
+    public static <T> T read(InputStream jsonInputStream, String jsonPath, Filter... filters)
+            throws IOException {
         notNull(jsonInputStream, "json input stream can not be null");
         notEmpty(jsonPath, "jsonPath can not be null or empty");
 
-        return (T) compile(jsonPath).read(jsonInputStream);
+        return (T) compile(jsonPath, filters).read(jsonInputStream);
     }
 }

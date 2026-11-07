@@ -2,12 +2,13 @@ package com.jayway.jsonpath.internal.filter;
 
 public class FilterFactory {
 
-    private static final Filter DOCUMENT_FILTER = new PassthroughFilter("$", false);
-    private static final Filter ALL_ARRAY_ITEMS_FILTER = new PassthroughFilter("[*]", true);
-    private static final Filter WILDCARD_FILTER = new WildcardFilter("*");
-    private static final Filter SCAN_FILTER = new ScanFilter("..");
+    private static final PathTokenFilter DOCUMENT_FILTER = new PassthroughFilter("$", false);
+    private static final PathTokenFilter ALL_ARRAY_ITEMS_FILTER =
+            new PassthroughFilter("[*]", true);
+    private static final PathTokenFilter WILDCARD_FILTER = new WildcardFilter("*");
+    private static final PathTokenFilter SCAN_FILTER = new ScanFilter("..");
 
-    public static Filter createFilter(String pathFragment) {
+    public static PathTokenFilter createFilter(String pathFragment) {
 
         if ("$".equals(pathFragment)) {
 
@@ -28,6 +29,10 @@ public class FilterFactory {
         } else if (!pathFragment.contains("[")) {
 
             return new FieldFilter(pathFragment);
+
+        } else if (pathFragment.equals("[?]")) {
+
+            return new ArrayQueryFilter(pathFragment);
 
         } else if (pathFragment.contains("[")) {
 

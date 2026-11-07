@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ArrayEvalFilter extends Filter {
+public class ArrayEvalFilter extends PathTokenFilter {
 
     private static final Pattern PATTERN = Pattern.compile("(.*?)\\s?([=<>]+)\\s?(.*)");
 

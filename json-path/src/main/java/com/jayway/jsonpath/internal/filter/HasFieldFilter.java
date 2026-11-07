@@ -5,7 +5,7 @@ import com.jayway.jsonpath.spi.JsonProvider;
 import java.util.List;
 import java.util.Map;
 
-public class HasFieldFilter extends Filter {
+public class HasFieldFilter extends PathTokenFilter {
 
     public HasFieldFilter(String condition) {
         super(condition);
