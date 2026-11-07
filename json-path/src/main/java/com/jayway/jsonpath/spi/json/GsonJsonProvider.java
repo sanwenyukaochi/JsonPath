@@ -6,7 +6,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.internal.LazilyParsedNumber;
 import com.jayway.jsonpath.InvalidJsonException;
 import com.jayway.jsonpath.JsonPathException;
 
@@ -14,6 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -61,25 +61,38 @@ public class GsonJsonProvider extends AbstractJsonProvider {
         return o;
     }
 
+    private static boolean isPrimitiveNumber(final Number n) {
+        return n instanceof Integer
+                || n instanceof Double
+                || n instanceof Long
+                || n instanceof BigDecimal
+                || n instanceof BigInteger;
+    }
+
     private static Number unwrapNumber(final Number n) {
         Number unwrapped;
 
-        if (n instanceof LazilyParsedNumber) {
-            LazilyParsedNumber lpn = (LazilyParsedNumber) n;
-            BigDecimal bigDecimal = new BigDecimal(lpn.toString());
+        if (!isPrimitiveNumber(n)) {
+            BigDecimal bigDecimal = new BigDecimal(n.toString());
             if (bigDecimal.scale() <= 0) {
                 if (bigDecimal.compareTo(new BigDecimal(Integer.MAX_VALUE)) <= 0) {
                     unwrapped = bigDecimal.intValue();
-                } else {
+                } else if (bigDecimal.compareTo(new BigDecimal(Long.MAX_VALUE)) <= 0) {
                     unwrapped = bigDecimal.longValue();
+                } else {
+                    unwrapped = bigDecimal;
                 }
             } else {
-                unwrapped = bigDecimal.doubleValue();
+                final double doubleValue = bigDecimal.doubleValue();
+                if (BigDecimal.valueOf(doubleValue).compareTo(bigDecimal) != 0) {
+                    unwrapped = bigDecimal;
+                } else {
+                    unwrapped = doubleValue;
+                }
             }
         } else {
             unwrapped = n;
         }
-
         return unwrapped;
     }
 
