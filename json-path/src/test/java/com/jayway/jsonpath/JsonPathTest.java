@@ -310,7 +310,7 @@ public class JsonPathTest {
 
         Object books = JsonPath.<List<String>>read(DOCUMENT, "$..book");
 
-        System.out.println("test");
+        System.out.println(books);
     }
 
     @Test
