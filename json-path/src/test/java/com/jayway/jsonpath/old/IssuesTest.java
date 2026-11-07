@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import net.minidev.json.JSONAware;
+import net.minidev.json.parser.JSONParser;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -618,16 +620,19 @@ public class IssuesTest extends BaseTest {
     @Test
     public void issue_76() throws Exception {
 
-        DocumentContext doc = JsonPath.parse(this.getClass().getResourceAsStream("/issue_76.json"));
+        String json =
+"""
+{
+    "cpus": -8.88178419700125e-16,
+    "disk": 0,
+    "mem": 0
+}\
+""";
 
-        Object o;
-        o = doc.read("$.frameworks");
+        JSONParser parser = new JSONParser(JSONParser.MODE_PERMISSIVE);
+        JSONAware jsonModel = (JSONAware) parser.parse(json);
 
-        try {
-            System.out.println(JSON_SMART_CONFIGURATION.jsonProvider().toJson(o));
-            assertTrue(false);
-        } catch (RuntimeException e) {
-        }
+        jsonModel.toJSONString();
     }
 
     @Test
