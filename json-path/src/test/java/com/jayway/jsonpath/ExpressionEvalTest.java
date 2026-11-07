@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.jayway.jsonpath.internal.filter.eval.ExpressionEvaluator;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.junit.jupiter.api.Test;
 
 public class ExpressionEvalTest {
@@ -25,6 +27,44 @@ public class ExpressionEvalTest {
         assertFalse(ExpressionEvaluator.eval(2, "<=", "1"));
         assertFalse(ExpressionEvaluator.eval(1, "==", "2"));
         assertFalse(ExpressionEvaluator.eval(1, "!=", "1"));
+    }
+
+    @Test
+    public void bigint_eval() throws Exception {
+
+        assertTrue(ExpressionEvaluator.eval(new BigInteger("1"), "==", "1"));
+        assertTrue(ExpressionEvaluator.eval(new BigInteger("2"), "!=", "1"));
+        assertTrue(ExpressionEvaluator.eval(new BigInteger("2"), ">", "1"));
+        assertTrue(ExpressionEvaluator.eval(new BigInteger("2"), ">=", "1"));
+        assertTrue(ExpressionEvaluator.eval(new BigInteger("2"), ">=", "2"));
+        assertTrue(ExpressionEvaluator.eval(new BigInteger("1"), "<", "2"));
+        assertTrue(ExpressionEvaluator.eval(new BigInteger("2"), "<=", "2"));
+
+        assertFalse(ExpressionEvaluator.eval(new BigInteger("1"), ">", "2"));
+        assertFalse(ExpressionEvaluator.eval(new BigInteger("1"), ">=", "2"));
+        assertFalse(ExpressionEvaluator.eval(new BigInteger("2"), "<", "1"));
+        assertFalse(ExpressionEvaluator.eval(new BigInteger("2"), "<=", "1"));
+        assertFalse(ExpressionEvaluator.eval(new BigInteger("1"), "==", "2"));
+        assertFalse(ExpressionEvaluator.eval(new BigInteger("1"), "!=", "1"));
+    }
+
+    @Test
+    public void bigdec_eval() throws Exception {
+
+        assertTrue(ExpressionEvaluator.eval(new BigDecimal("1.1"), "==", "1.1"));
+        assertTrue(ExpressionEvaluator.eval(new BigDecimal("2"), "!=", "1"));
+        assertTrue(ExpressionEvaluator.eval(new BigDecimal("2"), ">", "1"));
+        assertTrue(ExpressionEvaluator.eval(new BigDecimal("2"), ">=", "1"));
+        assertTrue(ExpressionEvaluator.eval(new BigDecimal("2"), ">=", "2"));
+        assertTrue(ExpressionEvaluator.eval(new BigDecimal("1"), "<", "2"));
+        assertTrue(ExpressionEvaluator.eval(new BigDecimal("2"), "<=", "2"));
+
+        assertFalse(ExpressionEvaluator.eval(new BigDecimal("1"), ">", "2"));
+        assertFalse(ExpressionEvaluator.eval(new BigDecimal("1"), ">=", "2"));
+        assertFalse(ExpressionEvaluator.eval(new BigDecimal("2"), "<", "1"));
+        assertFalse(ExpressionEvaluator.eval(new BigDecimal("2"), "<=", "1"));
+        assertFalse(ExpressionEvaluator.eval(new BigDecimal("1"), "==", "2"));
+        assertFalse(ExpressionEvaluator.eval(new BigDecimal("1"), "!=", "1"));
     }
 
     @Test
