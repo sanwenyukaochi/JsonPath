@@ -1,4 +1,4 @@
-package com.jayway.jsonpath.internal.compiler;
+package com.jayway.jsonpath.internal.token;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;

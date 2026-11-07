@@ -65,7 +65,7 @@ public class NullHandlingTest {
         List<Integer> result =
                 JsonPath.using(
                                 Configuration.defaultConfiguration()
-                                        .options(Option.SUPPRESS_EXCEPTIONS))
+                                        .setOptions(Option.SUPPRESS_EXCEPTIONS))
                         .parse(DOCUMENT)
                         .read("$.children[*].age");
 
@@ -86,7 +86,7 @@ public class NullHandlingTest {
         List<Object> result =
                 JsonPath.using(
                                 Configuration.defaultConfiguration()
-                                        .options(Option.DEFAULT_PATH_LEAF_TO_NULL))
+                                        .setOptions(Option.DEFAULT_PATH_LEAF_TO_NULL))
                         .parse(json)
                         .read("a[?(@.b==5)].d");
 

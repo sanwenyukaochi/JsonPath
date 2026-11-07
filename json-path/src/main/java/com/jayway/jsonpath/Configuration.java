@@ -45,7 +45,7 @@ public class Configuration {
             JsonProvider jsonProvider, MappingProvider mappingProvider, EnumSet<Option> options) {
         notNull(jsonProvider, "jsonProvider can not be null");
         notNull(mappingProvider, "mappingProvider can not be null");
-        notNull(options, "options can not be null");
+        notNull(options, "setOptions can not be null");
         this.jsonProvider = jsonProvider;
         this.mappingProvider = mappingProvider;
         this.options = Collections.unmodifiableSet(options);
@@ -63,16 +63,16 @@ public class Configuration {
         return jsonProvider;
     }
 
-    public MappingProvider mappingProvider() {
-        return mappingProvider;
-    }
-
     public Configuration mappingProvider(MappingProvider newMappingProvider) {
         return Configuration.builder()
                 .jsonProvider(jsonProvider)
                 .mappingProvider(newMappingProvider)
                 .options(options)
                 .build();
+    }
+
+    public MappingProvider mappingProvider() {
+        return mappingProvider;
     }
 
     public Configuration addOptions(Option... options) {
@@ -86,7 +86,7 @@ public class Configuration {
                 .build();
     }
 
-    public Configuration options(Option... options) {
+    public Configuration setOptions(Option... options) {
         return Configuration.builder()
                 .jsonProvider(jsonProvider)
                 .mappingProvider(mappingProvider)

@@ -264,7 +264,7 @@ public class IssuesTest {
         List<Object> res =
                 JsonPath.using(
                                 Configuration.defaultConfiguration()
-                                        .options(Option.DEFAULT_PATH_LEAF_TO_NULL))
+                                        .setOptions(Option.DEFAULT_PATH_LEAF_TO_NULL))
                         .parse(json)
                         .read("a[?(@.b==5)].d");
         Assertions.assertThat(res).hasSize(1).containsNull();
@@ -421,7 +421,7 @@ public class IssuesTest {
         Assertions.assertThat(
                         JsonPath.using(
                                         Configuration.defaultConfiguration()
-                                                .options(Option.SUPPRESS_EXCEPTIONS))
+                                                .setOptions(Option.SUPPRESS_EXCEPTIONS))
                                 .parse(json)
                                 .<Object>read("nonExistingProperty"))
                 .isNull();
@@ -455,7 +455,7 @@ public class IssuesTest {
         String json = "{\"a\": {}}";
 
         Configuration configuration =
-                Configuration.defaultConfiguration().options(Option.SUPPRESS_EXCEPTIONS);
+                Configuration.defaultConfiguration().setOptions(Option.SUPPRESS_EXCEPTIONS);
         Assertions.assertThat(JsonPath.using(configuration).parse(json).<Object>read("a.x"))
                 .isNull();
 
