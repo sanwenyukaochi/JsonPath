@@ -4,7 +4,7 @@ import com.jayway.jsonpath.spi.JsonProvider;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.lang3.SerializationUtils;
 
 public abstract class AbstractJsonProvider implements JsonProvider {
 

@@ -4,7 +4,7 @@ import static com.jayway.jsonpath.JsonModel.model;
 
 import com.jayway.jsonpath.spi.impl.JacksonProvider;
 import java.io.Serializable;
-import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
 
 public class JsonProviderTest {
