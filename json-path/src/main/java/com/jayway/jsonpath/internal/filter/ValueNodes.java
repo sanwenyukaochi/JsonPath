@@ -11,6 +11,7 @@ import com.jayway.jsonpath.internal.path.PathCompiler;
 import com.jayway.jsonpath.internal.path.PredicateContextImpl;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -319,6 +320,54 @@ public interface ValueNodes {
             } else {
                 return number.compareTo(that.number) == 0;
             }
+        }
+    }
+
+    class OffsetDateTimeNode extends ValueNode {
+
+        private final OffsetDateTime dateTime;
+
+        OffsetDateTimeNode(OffsetDateTime dateTime) {
+            this.dateTime = dateTime;
+        }
+
+        OffsetDateTimeNode(CharSequence date) {
+            dateTime = OffsetDateTime.parse(date);
+        }
+
+        @Override
+        public StringNode asStringNode() {
+            return new StringNode(dateTime.toString(), false);
+        }
+
+        public OffsetDateTime getDate() {
+            return dateTime;
+        }
+
+        @Override
+        public Class<?> type(Predicate.PredicateContext ctx) {
+            return OffsetDateTimeNode.class;
+        }
+
+        public boolean isOffsetDateTimeNode() {
+            return true;
+        }
+
+        public OffsetDateTimeNode asOffsetDateTimeNode() {
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return dateTime.toString();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof OffsetDateTimeNode) && !(o instanceof StringNode)) return false;
+            OffsetDateTimeNode that = ((ValueNode) o).asOffsetDateTimeNode();
+            return dateTime.compareTo(that.dateTime) == 0;
         }
     }
 
@@ -643,6 +692,8 @@ public interface ValueNodes {
                         return ValueNode.createStringNode(res.toString(), false);
                     else if (res instanceof Boolean)
                         return ValueNode.createBooleanNode(res.toString());
+                    else if (res instanceof OffsetDateTime)
+                        return ValueNode.createOffsetDateTimeNode(res.toString());
                     else if (res == null) return NULL_NODE;
                     else if (ctx.configuration().jsonProvider().isArray(res))
                         return ValueNode.createJsonNode(
@@ -656,7 +707,11 @@ public interface ValueNodes {
                                         .map(res, Map.class, ctx.configuration()));
                     else
                         throw new JsonPathException(
-                                "Could not convert " + res.toString() + " to a ValueNode");
+                                "Could not convert "
+                                        + res.getClass().toString()
+                                        + ":"
+                                        + res.toString()
+                                        + " to a ValueNode");
                 } catch (PathNotFoundException e) {
                     return UNDEFINED;
                 }
