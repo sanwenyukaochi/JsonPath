@@ -1,7 +1,12 @@
 package com.jayway.jsonpath.internal.function;
 
+import com.jayway.jsonpath.internal.EvaluationContext;
 import com.jayway.jsonpath.internal.Path;
 import com.jayway.jsonpath.internal.function.latebinding.ILateBindingValue;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class Parameter {
     private ParamType type;
@@ -60,5 +65,33 @@ public class Parameter {
 
     public void setJson(String json) {
         this.json = json;
+    }
+
+    public static <T> List<T> toList(
+            final Class<T> type, final EvaluationContext ctx, final List<Parameter> parameters) {
+        List<T> values = new ArrayList();
+        if (null != parameters) {
+            for (Parameter param : parameters) {
+                consume(type, ctx, values, param.getValue());
+            }
+        }
+        return values;
+    }
+
+    public static void consume(
+            Class expectedType, EvaluationContext ctx, Collection collection, Object value) {
+        if (ctx.configuration().jsonProvider().isArray(value)) {
+            for (Object o : ctx.configuration().jsonProvider().toIterable(value)) {
+                if (o != null && expectedType.isAssignableFrom(o.getClass())) {
+                    collection.add(o);
+                } else if (o != null && expectedType == String.class) {
+                    collection.add(o.toString());
+                }
+            }
+        } else {
+            if (value != null && expectedType.isAssignableFrom(value.getClass())) {
+                collection.add(value);
+            }
+        }
     }
 }

@@ -5,7 +5,9 @@ import com.jayway.jsonpath.internal.EvaluationAbortException;
 import com.jayway.jsonpath.internal.EvaluationContext;
 import com.jayway.jsonpath.internal.Path;
 import com.jayway.jsonpath.internal.PathRef;
-
+import com.jayway.jsonpath.internal.function.ParamType;
+import com.jayway.jsonpath.internal.function.Parameter;
+import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,13 +20,39 @@ public class CompiledPath implements Path {
     private final boolean isRootPath;
 
     public CompiledPath(RootPathToken root, boolean isRootPath) {
-        this.root = root;
+        this.root = invertScannerFunctionRelationship(root);
         this.isRootPath = isRootPath;
     }
 
     @Override
     public boolean isRootPath() {
         return isRootPath;
+    }
+
+    private RootPathToken invertScannerFunctionRelationship(final RootPathToken path) {
+        if (path.isFunctionPath() && path.next() instanceof ScanPathToken) {
+            PathToken token = path;
+            PathToken prior = null;
+            while (null != (token = token.next()) && !(token instanceof FunctionPathToken)) {
+                prior = token;
+            }
+
+            if (token instanceof FunctionPathToken) {
+                prior.setNext(null);
+                path.setTail(prior);
+
+                Parameter parameter = new Parameter();
+                parameter.setPath(new CompiledPath(path, true));
+                parameter.setType(ParamType.PATH);
+                ((FunctionPathToken) token).setParameters(Arrays.asList(parameter));
+                RootPathToken functionRoot = new RootPathToken('$');
+                functionRoot.setTail(token);
+                functionRoot.setNext(token);
+
+                return functionRoot;
+            }
+        }
+        return path;
     }
 
     @Override
