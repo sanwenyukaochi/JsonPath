@@ -97,7 +97,7 @@ public class JsonPathTest {
     @Test
     public void array_start_expands() throws Exception {
         assertThat(
-                JsonPath.<List<String>>read(ARRAY_EXPAND, "$[?(@['parent'] = 'ONE')].child.name"),
+                JsonPath.<List<String>>read(ARRAY_EXPAND, "$[?(@['parent'] == 'ONE')].child.name"),
                 hasItems("NAME_ONE"));
     }
 
@@ -117,7 +117,7 @@ public class JsonPathTest {
 
     @Test
     public void filter_an_array() throws Exception {
-        List<Object> matches = JsonPath.read(ARRAY, "$.[?(@.value = 1)]");
+        List<Object> matches = JsonPath.read(ARRAY, "$.[?(@.value == 1)]");
 
         assertEquals(1, matches.size());
         System.out.println(matches);
@@ -268,7 +268,8 @@ public class JsonPathTest {
     public void dot_in_predicate_works() throws Exception {
 
         assertThat(
-                JsonPath.<List<String>>read(PRODUCT_JSON, "$.product[?(@.version='4.0')].codename"),
+                JsonPath.<List<String>>read(
+                        PRODUCT_JSON, "$.product[?(@.version=='4.0')].codename"),
                 hasItems("Montreal"));
     }
 
@@ -277,7 +278,7 @@ public class JsonPathTest {
 
         assertThat(
                 JsonPath.<List<String>>read(
-                        PRODUCT_JSON, "$.product[?(@.attr.with.dot='A')].codename"),
+                        PRODUCT_JSON, "$.product[?(@.attr.with.dot=='A')].codename"),
                 hasItems("Seattle"));
     }
 
@@ -285,11 +286,11 @@ public class JsonPathTest {
     public void all_books_with_category_reference() throws Exception {
 
         assertThat(
-                JsonPath.<List<String>>read(DOCUMENT, "$..book[?(@.category='reference')].title"),
+                JsonPath.<List<String>>read(DOCUMENT, "$..book[?(@.category=='reference')].title"),
                 hasItems("Sayings of the Century"));
         assertThat(
                 JsonPath.<List<String>>read(
-                        DOCUMENT, "$.store.book[?(@.category='reference')].title"),
+                        DOCUMENT, "$.store.book[?(@.category=='reference')].title"),
                 hasItems("Sayings of the Century"));
     }
 
