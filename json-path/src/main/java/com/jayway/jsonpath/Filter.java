@@ -13,11 +13,11 @@ public abstract class Filter<T> {
         return new MapFilter(criteria);
     }
 
-    public List doFilter(List<T> filterItems, JsonProvider jsonProvider) {
-        List result = jsonProvider.createList();
+    public Object doFilter(Iterable<T> filterItems, JsonProvider jsonProvider) {
+        Object result = jsonProvider.createArray();
         for (T filterItem : filterItems) {
             if (accept(filterItem)) {
-                result.add(filterItem);
+                jsonProvider.setProperty(result, jsonProvider.length(result), filterItem);
             }
         }
         return result;

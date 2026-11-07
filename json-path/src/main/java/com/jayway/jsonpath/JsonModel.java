@@ -65,7 +65,7 @@ public class JsonModel {
     }
 
     public boolean isList() {
-        return jsonProvider.isList(jsonObject);
+        return jsonProvider.isArray(jsonObject);
     }
 
     public boolean isMap() {
@@ -110,7 +110,7 @@ public class JsonModel {
     }
 
     public ArrayOps opsForArray() {
-        isTrue(jsonProvider.isList(jsonObject), "This JsonModel is not a JSON array");
+        isTrue(jsonProvider.isArray(jsonObject), "This JsonModel is not a JSON array");
         return opsForArray(JSON_PATH_ROOT);
     }
 

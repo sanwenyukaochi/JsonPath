@@ -32,13 +32,13 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
         return new JSONObject();
     }
 
-    public List<Object> createList() {
+    public List<Object> createArray() {
         return new JSONArray();
     }
 
     public Object parse(String json) {
         try {
-            return parser.parse(json, JSONValue.defaultReader.DEFAULT_ORDERED);
+            return parser.parse(json, JSONValue.defaultReader.DEFAULT);
         } catch (ParseException e) {
             throw new InvalidJsonException(e);
         }
@@ -47,7 +47,7 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
     @Override
     public Object parse(Reader jsonReader) throws InvalidJsonException {
         try {
-            return parser.parse(jsonReader, JSONValue.defaultReader.DEFAULT_ORDERED);
+            return parser.parse(jsonReader, JSONValue.defaultReader.DEFAULT);
         } catch (ParseException e) {
             throw new InvalidJsonException(e);
         }
@@ -57,7 +57,7 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
     public Object parse(InputStream jsonStream) throws InvalidJsonException {
         try {
             return parser.parse(
-                    new InputStreamReader(jsonStream), JSONValue.defaultReader.DEFAULT_ORDERED);
+                    new InputStreamReader(jsonStream), JSONValue.defaultReader.DEFAULT);
         } catch (ParseException e) {
             throw new InvalidJsonException(e);
         }

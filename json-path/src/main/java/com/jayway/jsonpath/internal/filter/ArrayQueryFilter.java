@@ -2,7 +2,6 @@ package com.jayway.jsonpath.internal.filter;
 
 import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.spi.JsonProvider;
-
 import java.util.LinkedList;
 
 public class ArrayQueryFilter extends PathTokenFilter {
@@ -20,7 +19,7 @@ public class ArrayQueryFilter extends PathTokenFilter {
 
         Filter filter = filters.poll();
 
-        return filter.doFilter(jsonProvider.toList(obj), jsonProvider);
+        return filter.doFilter(jsonProvider.toIterable(obj), jsonProvider);
     }
 
     @Override

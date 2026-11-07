@@ -1,11 +1,9 @@
 package com.jayway.jsonpath.spi;
 
 import com.jayway.jsonpath.InvalidJsonException;
-
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.List;
-import java.util.Map;
+import java.util.Collection;
 
 public interface JsonProvider {
 
@@ -19,21 +17,25 @@ public interface JsonProvider {
 
     String toJson(Object obj);
 
-    Map<String, Object> createMap();
+    Object createMap();
 
-    List<Object> createList();
+    Iterable createArray();
 
     Object clone(Object model);
 
     boolean isContainer(Object obj);
 
-    boolean isList(Object obj);
+    boolean isArray(Object obj);
 
-    List<Object> toList(Object list);
+    int length(Object obj);
 
-    Map<String, Object> toMap(Object map);
+    Iterable<Object> toIterable(Object obj);
 
-    Object getMapValue(Object map, String key);
+    Collection<String> getPropertyKeys(Object obj);
+
+    Object getProperty(Object obj, Object key);
+
+    void setProperty(Object obj, Object key, Object value);
 
     boolean isMap(Object obj);
 }

@@ -72,7 +72,7 @@ public class JacksonProvider extends AbstractJsonProvider implements MappingProv
     }
 
     @Override
-    public List<Object> createList() {
+    public List<Object> createArray() {
         return new LinkedList<Object>();
     }
 
