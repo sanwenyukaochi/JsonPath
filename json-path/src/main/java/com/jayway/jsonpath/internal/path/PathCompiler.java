@@ -107,7 +107,6 @@ public class PathCompiler {
         }
 
         RootPathToken pathToken = PathTokenFactory.createRootPathToken(path.currentChar());
-        PathTokenAppender appender = pathToken.getPathTokenAppender();
 
         if (path.currentIsTail()) {
             return pathToken;
@@ -119,6 +118,7 @@ public class PathCompiler {
             fail("Illegal character at position " + path.position() + " expected '.' or '[");
         }
 
+        PathTokenAppender appender = pathToken.getPathTokenAppender();
         readNextToken(appender);
 
         return pathToken;
@@ -233,7 +233,6 @@ public class PathCompiler {
     }
 
     private List<Parameter> parseFunctionParameters(String funcName) {
-        PathToken currentToken;
         ParamType type = null;
 
         Integer groupParen = 1, groupBracket = 0, groupBrace = 0, groupQuote = 0;
