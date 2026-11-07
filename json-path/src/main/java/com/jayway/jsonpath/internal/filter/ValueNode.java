@@ -7,6 +7,7 @@ import static com.jayway.jsonpath.internal.filter.ValueNodes.JsonNode;
 import static com.jayway.jsonpath.internal.filter.ValueNodes.NULL_NODE;
 import static com.jayway.jsonpath.internal.filter.ValueNodes.NullNode;
 import static com.jayway.jsonpath.internal.filter.ValueNodes.NumberNode;
+import static com.jayway.jsonpath.internal.filter.ValueNodes.OffsetDateTimeNode;
 import static com.jayway.jsonpath.internal.filter.ValueNodes.PathNode;
 import static com.jayway.jsonpath.internal.filter.ValueNodes.PatternNode;
 import static com.jayway.jsonpath.internal.filter.ValueNodes.PredicateNode;
@@ -21,6 +22,7 @@ import com.jayway.jsonpath.JsonPathException;
 import com.jayway.jsonpath.Predicate;
 import com.jayway.jsonpath.internal.Path;
 import com.jayway.jsonpath.internal.path.PathCompiler;
+import java.time.OffsetDateTime;
 import java.util.regex.Pattern;
 import net.minidev.json.parser.JSONParser;
 
@@ -116,6 +118,14 @@ public abstract class ValueNode {
         throw new InvalidPathException("Expected class node");
     }
 
+    public boolean isOffsetDateTimeNode() {
+        return false;
+    }
+
+    public OffsetDateTimeNode asOffsetDateTimeNode() {
+        throw new InvalidPathException("Expected offsetDateTime node");
+    }
+
     private static boolean isPath(Object o) {
         if (o == null || !(o instanceof String)) {
             return false;
@@ -158,6 +168,7 @@ public abstract class ValueNode {
     }
 
     public static ValueNode toValueNode(Object o) {
+
         if (o == null) return NULL_NODE;
         if (o instanceof ValueNode) return (ValueNode) o;
         if (o instanceof Class) return createClassNode((Class) o);
@@ -168,6 +179,7 @@ public abstract class ValueNode {
         else if (o instanceof Number) return createNumberNode(o.toString());
         else if (o instanceof Boolean) return createBooleanNode(o.toString());
         else if (o instanceof Pattern) return createPatternNode((Pattern) o);
+        else if (o instanceof OffsetDateTime) return createOffsetDateTimeNode(o.toString());
         else throw new JsonPathException("Could not determine value type");
     }
 
@@ -205,6 +217,10 @@ public abstract class ValueNode {
 
     public static PatternNode createPatternNode(Pattern pattern) {
         return new PatternNode(pattern);
+    }
+
+    public static OffsetDateTimeNode createOffsetDateTimeNode(CharSequence charSequence) {
+        return new OffsetDateTimeNode(charSequence);
     }
 
     public static UndefinedNode createUndefinedNode() {
