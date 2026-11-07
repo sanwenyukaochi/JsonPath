@@ -26,8 +26,10 @@ import com.jayway.jsonpath.Predicate.PredicateContext;
 import com.jayway.jsonpath.internal.Utils;
 import com.jayway.jsonpath.spi.cache.LRUCache;
 import com.jayway.jsonpath.spi.json.GsonJsonProvider;
+import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.GsonMappingProvider;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import com.jayway.jsonpath.spi.mapper.MappingException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -1135,5 +1137,35 @@ public class IssuesTest extends BaseTest {
 
         Assertions.assertThat(doc.<Object>read("$.jsonArr[0].name")).isEqualTo("nOne");
         Assertions.assertThat(doc.<Object>read("$.jsonArr[1].name")).isEqualTo("Jayway");
+    }
+
+    @Test
+    public void issue_378() {
+
+        String json =
+"""
+{
+    "nodes": {
+        "unnamed1": {
+            "ntpServers": [
+                "1.2.3.4"
+            ]
+        }
+    }
+}\
+""";
+
+        Configuration configuration =
+                Configuration.builder()
+                        .jsonProvider(new JacksonJsonNodeJsonProvider())
+                        .mappingProvider(new JacksonMappingProvider())
+                        .build();
+
+        DocumentContext ctx = JsonPath.using(configuration).parse(json);
+
+        String path = "$.nodes[*][?(!([\"1.2.3.4\"] subsetof @.ntpServers))].ntpServers";
+        JsonPath jsonPath = JsonPath.compile(path);
+
+        ctx.read(jsonPath);
     }
 }
