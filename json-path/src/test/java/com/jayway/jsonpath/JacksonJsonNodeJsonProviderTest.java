@@ -10,6 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import tools.jackson.databind.node.ObjectNode;
 
 public class JacksonJsonNodeJsonProviderTest extends BaseTest {
@@ -125,5 +126,19 @@ public class JacksonJsonNodeJsonProviderTest extends BaseTest {
 
     public static class Gen {
         public String eric;
+    }
+
+    @Test
+    public void always_return_same_object() {
+        DocumentContext context = using(JACKSON_JSON_NODE_CONFIGURATION).parse(JSON_DOCUMENT);
+        ObjectNode node1 = context.read("$");
+        ObjectNode child1 = new ObjectNode(JsonNodeFactory.instance);
+        child1.put("name", "test");
+        context.put("$", "child", child1);
+        ObjectNode node2 = context.read("$");
+        ObjectNode child2 = context.read("$.child");
+
+        assertThat(node1).isSameAs(node2);
+        assertThat(child1).isSameAs(child2);
     }
 }
