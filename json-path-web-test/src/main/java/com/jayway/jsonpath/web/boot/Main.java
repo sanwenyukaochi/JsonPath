@@ -43,7 +43,13 @@ public class Main {
         WebAppContext webAppContext = new WebAppContext();
         webAppContext.setServer(server);
         webAppContext.setContextPath("/");
-        webAppContext.setBaseResourceAsString(Main.class.getResource("/webapp").toExternalForm());
+        String resourceBase = System.getProperty("resourceBase");
+        if (resourceBase != null) {
+            webAppContext.setBaseResourceAsString(resourceBase);
+        } else {
+            webAppContext.setBaseResourceAsString(
+                    Main.class.getResource("/webapp").toExternalForm());
+        }
 
         Handler.Sequence handlers = new Handler.Sequence();
         handlers.setHandlers(new Handler[] {context, webAppContext});
