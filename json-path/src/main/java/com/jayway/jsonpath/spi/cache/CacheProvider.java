@@ -1,21 +1,36 @@
 package com.jayway.jsonpath.spi.cache;
 
+import static com.jayway.jsonpath.internal.Utils.notNull;
+
 import com.jayway.jsonpath.JsonPathException;
 
 public class CacheProvider {
-    private static Cache cache = new LRUCache(200);
+    private static Cache cache;
 
     public static void setCache(Cache cache) {
-        if (cache != null) {
-            CacheProvider.cache = cache;
+        notNull(cache, "Cache may not be null");
+        synchronized (CacheProvider.class) {
+            if (CacheProvider.cache != null) {
+                throw new JsonPathException(
+                        "Cache provider must be configured before cache is accessed.");
+            } else {
+                CacheProvider.cache = cache;
+            }
         }
     }
 
     public static Cache getCache() {
-        try {
-            return cache;
-        } catch (Exception e) {
-            throw new JsonPathException("Failed to get cache", e);
+        if (CacheProvider.cache == null) {
+            synchronized (CacheProvider.class) {
+                if (CacheProvider.cache == null) {
+                    CacheProvider.cache = getDefaultCache();
+                }
+            }
         }
+        return CacheProvider.cache;
+    }
+
+    private static Cache getDefaultCache() {
+        return new LRUCache(200);
     }
 }
