@@ -15,6 +15,9 @@ public class CharacterIndex {
     private static final char PERIOD = '.';
     private static final char REGEX = '/';
 
+    private static final char SCI_E = 'E';
+    private static final char SCI_e = 'e';
+
     private final CharSequence charSequence;
     private int position;
     private int endPosition;
@@ -309,7 +312,8 @@ public class CharacterIndex {
 
     public boolean isNumberCharacter(int readPosition) {
         char c = charAt(readPosition);
-        return Character.isDigit(c) || c == MINUS || c == PERIOD;
+
+        return Character.isDigit(c) || c == MINUS || c == PERIOD || c == SCI_E || c == SCI_e;
     }
 
     public CharacterIndex skipBlanks() {
