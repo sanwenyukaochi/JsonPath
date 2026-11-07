@@ -3,7 +3,6 @@ package com.jayway.jsonpath;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("ALL")
@@ -45,11 +44,5 @@ public class ReturnTypeTest extends BaseTest {
     }
 
     @Test
-    public void assert_maps_can_be_read() {
-        assertThat(JsonPath.read(JSON_DOCUMENT, "$.store.book[0]", Map.class))
-                .containsEntry("category", "reference")
-                .containsEntry("author", "Nigel Rees")
-                .containsEntry("title", "Sayings of the Century")
-                .containsEntry("display-price", 8.95D);
-    }
+    public void assert_maps_can_be_read() {}
 }

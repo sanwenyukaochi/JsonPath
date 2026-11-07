@@ -6,6 +6,7 @@ import static java.util.Arrays.asList;
 import com.jayway.jsonpath.Criteria;
 import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.InvalidPathException;
+import com.jayway.jsonpath.Predicate;
 import com.jayway.jsonpath.internal.compiler.ArrayPathToken;
 import com.jayway.jsonpath.internal.compiler.FilterPathToken;
 import com.jayway.jsonpath.internal.compiler.PathToken;
@@ -34,11 +35,11 @@ public class PathCompiler {
     private static final char SPACE = ' ';
     private static final Cache cache = new Cache(200);
 
-    public static Path compile(String path, Filter... filters) {
+    public static Path compile(String path, Predicate... filters) {
         notEmpty(path, "Path may not be null empty");
         path = path.trim();
 
-        LinkedList<Filter> filterList = new LinkedList<Filter>(asList(filters));
+        LinkedList<Predicate> filterList = new LinkedList<Predicate>(asList(filters));
 
         if (!path.startsWith("$")) {
             path = "$." + path;
@@ -182,15 +183,15 @@ public class PathCompiler {
         private int i;
         private char current;
 
-        private final LinkedList<Filter> filterList;
+        private final LinkedList<Predicate> filterList;
         private final String pathFragment;
 
-        PathComponentAnalyzer(String pathFragment, LinkedList<Filter> filterList) {
+        PathComponentAnalyzer(String pathFragment, LinkedList<Predicate> filterList) {
             this.pathFragment = pathFragment;
             this.filterList = filterList;
         }
 
-        static PathToken analyze(String pathFragment, LinkedList<Filter> filterList) {
+        static PathToken analyze(String pathFragment, LinkedList<Predicate> filterList) {
             return new PathComponentAnalyzer(pathFragment, filterList).analyze();
         }
 
@@ -203,7 +204,7 @@ public class PathCompiler {
             else if ("[?]".equals(pathFragment)) return new FilterPathToken(filterList.poll());
             else if (FILTER_PATTERN.matcher(pathFragment).matches()) {
                 final int criteriaCount = Utils.countMatches(pathFragment, "?");
-                List<Filter> filters = new ArrayList<Filter>(criteriaCount);
+                List<Predicate> filters = new ArrayList<Predicate>(criteriaCount);
                 for (int i = 0; i < criteriaCount; i++) {
                     filters.add(filterList.poll());
                 }
@@ -240,7 +241,7 @@ public class PathCompiler {
             StringBuilder pathBuffer = new StringBuilder();
             StringBuilder operatorBuffer = new StringBuilder();
             StringBuilder valueBuffer = new StringBuilder();
-            List<Criteria> criteria = new ArrayList<Criteria>();
+            List<Predicate> criteria = new ArrayList<Predicate>();
 
             int bracketCount = 0;
 

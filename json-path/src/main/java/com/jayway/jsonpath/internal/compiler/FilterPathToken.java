@@ -4,8 +4,8 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
 import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.InvalidPathException;
+import com.jayway.jsonpath.Predicate;
 import java.util.Collection;
 
 public class FilterPathToken extends PathToken {
@@ -14,13 +14,13 @@ public class FilterPathToken extends PathToken {
         "[?]", "[?,?]", "[?,?,?]", "[?,?,?,?]", "[?,?,?,?,?]"
     };
 
-    private final Collection<Filter> filters;
+    private final Collection<Predicate> filters;
 
-    public FilterPathToken(Filter filter) {
+    public FilterPathToken(Predicate filter) {
         this.filters = asList(filter);
     }
 
-    public FilterPathToken(Collection<Filter> filters) {
+    public FilterPathToken(Collection<Predicate> filters) {
         this.filters = filters;
     }
 
@@ -43,11 +43,24 @@ public class FilterPathToken extends PathToken {
         }
     }
 
-    public boolean accept(Object obj, Configuration configuration) {
+    public boolean accept(final Object obj, final Configuration configuration) {
         boolean accept = true;
 
-        for (Filter filter : filters) {
-            if (!filter.apply(obj, configuration)) {
+        Predicate.PredicateContext ctx =
+                new Predicate.PredicateContext() {
+                    @Override
+                    public Object target() {
+                        return obj;
+                    }
+
+                    @Override
+                    public Configuration configuration() {
+                        return configuration;
+                    }
+                };
+
+        for (Predicate filter : filters) {
+            if (!filter.apply(ctx)) {
                 accept = false;
                 break;
             }
