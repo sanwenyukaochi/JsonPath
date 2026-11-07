@@ -1,11 +1,11 @@
-package com.jayway.jsonpath.spi.converter;
+package com.jayway.jsonpath.internal.spi.mapper;
 
 import static com.jayway.jsonpath.internal.Utils.notNull;
 
 import com.jayway.jsonpath.Configuration;
 import java.util.Set;
 
-public interface Converter {
+public interface Mapper {
 
     Set<ConvertiblePair> getConvertibleTypes();
 

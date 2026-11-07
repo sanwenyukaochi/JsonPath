@@ -24,6 +24,10 @@ public class JacksonJsonProvider extends AbstractJsonProvider {
     protected ObjectMapper objectMapper;
     protected ObjectReader objectReader;
 
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
+
     public JacksonJsonProvider() {
         this(defaultObjectMapper, defaultObjectReader);
     }
