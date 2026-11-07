@@ -4,9 +4,12 @@ import static com.jayway.jsonpath.JsonPath.using;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jayway.jsonpath.spi.mapper.MappingException;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ArrayNode;
@@ -142,7 +145,6 @@ public class JacksonJsonNodeJsonProviderTest extends BaseTest {
         assertThat(child1).isSameAs(child2);
     }
 
-    @Test
     public void empty_array_check_works() throws IOException {
         String json =
 """
@@ -182,5 +184,24 @@ public class JacksonJsonNodeJsonProviderTest extends BaseTest {
                                 "$[?(@.groups[?(@.type == 'phase' && @.name == 'alpha')] empty false)]");
         assertThat(node.size()).isEqualTo(1);
         assertThat(node.get(0).get("name").asText()).isEqualTo("a");
+    }
+
+    @Test
+    public void setPropertyWithPOJO() {
+        DocumentContext context = JsonPath.using(JACKSON_JSON_NODE_CONFIGURATION).parse("{}");
+        UUID uuid = UUID.randomUUID();
+        context.put("$", "data", new Data(uuid));
+        String id = context.read("$.data.id", String.class);
+        assertThat(id).isEqualTo(uuid.toString());
+    }
+
+    public static final class Data {
+        @JsonProperty("id")
+        UUID id;
+
+        @JsonCreator
+        Data(@JsonProperty("id") final UUID id) {
+            this.id = id;
+        }
     }
 }
