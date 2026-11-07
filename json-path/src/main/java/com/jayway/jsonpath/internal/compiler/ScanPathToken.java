@@ -1,5 +1,7 @@
 package com.jayway.jsonpath.internal.compiler;
 
+import com.jayway.jsonpath.spi.json.JsonProvider;
+
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -35,7 +37,7 @@ public class ScanPathToken extends PathToken {
         }
     }
 
-    public void walk(
+    public static void walk(
             String currentPath,
             Object model,
             EvaluationContextImpl ctx,
@@ -48,7 +50,7 @@ public class ScanPathToken extends PathToken {
         }
     }
 
-    public void walkArray(
+    public static void walkArray(
             String currentPath,
             Object model,
             EvaluationContextImpl ctx,
@@ -75,7 +77,7 @@ public class ScanPathToken extends PathToken {
         }
     }
 
-    public void walkObject(
+    public static void walkObject(
             String currentPath,
             Object model,
             EvaluationContextImpl ctx,
@@ -90,78 +92,24 @@ public class ScanPathToken extends PathToken {
         for (String property : properties) {
             String evalPath = currentPath + "['" + property + "']";
             Object propertyModel = ctx.jsonProvider().getMapValue(model, property);
-            walk(evalPath, propertyModel, ctx, predicate, predicateMatches);
+            if (propertyModel != JsonProvider.UNDEFINED) {
+                walk(evalPath, propertyModel, ctx, predicate, predicateMatches);
+            }
         }
     }
 
-    private Predicate createScanPredicate(final PathToken target, final EvaluationContextImpl ctx) {
+    private static Predicate createScanPredicate(
+            final PathToken target, final EvaluationContextImpl ctx) {
         if (target instanceof PropertyPathToken) {
-            return new Predicate() {
-                private PropertyPathToken propertyPathToken = (PropertyPathToken) target;
-
-                @Override
-                public Class<?> clazz() {
-                    return PropertyPathToken.class;
-                }
-
-                @Override
-                public boolean matches(Object model) {
-                    Collection<String> keys = ctx.jsonProvider().getPropertyKeys(model);
-                    return keys.containsAll(propertyPathToken.getProperties());
-                }
-            };
+            return new PropertyPathTokenPredicate(target, ctx);
         } else if (target instanceof ArrayPathToken) {
-            return new Predicate() {
-
-                @Override
-                public Class<?> clazz() {
-                    return ArrayPathToken.class;
-                }
-
-                @Override
-                public boolean matches(Object model) {
-                    return ctx.jsonProvider().isArray(model);
-                }
-            };
+            return new ArrayPathTokenPredicate(ctx);
         } else if (target instanceof WildcardPathToken) {
-            return new Predicate() {
-
-                @Override
-                public Class<?> clazz() {
-                    return WildcardPathToken.class;
-                }
-
-                @Override
-                public boolean matches(Object model) {
-                    return true;
-                }
-            };
+            return new WildcardPathTokenPredicate();
         } else if (target instanceof FilterPathToken) {
-            return new Predicate() {
-                private FilterPathToken filterPathToken = (FilterPathToken) target;
-
-                @Override
-                public Class<?> clazz() {
-                    return FilterPathToken.class;
-                }
-
-                @Override
-                public boolean matches(Object model) {
-                    return filterPathToken.accept(model, ctx.configuration());
-                }
-            };
+            return new FilterPathTokenPredicate(target, ctx);
         } else {
-            return new Predicate() {
-                @Override
-                public Class<?> clazz() {
-                    return null;
-                }
-
-                @Override
-                public boolean matches(Object model) {
-                    return false;
-                }
-            };
+            return FALSE_PREDICATE;
         }
     }
 
@@ -175,9 +123,93 @@ public class ScanPathToken extends PathToken {
         return "..";
     }
 
-    private interface Predicate {
+    private static interface Predicate {
         Class<?> clazz();
 
         boolean matches(Object model);
+    }
+
+    private static final Predicate FALSE_PREDICATE =
+            new Predicate() {
+                @Override
+                public Class<?> clazz() {
+                    return null;
+                }
+
+                @Override
+                public boolean matches(Object model) {
+                    return false;
+                }
+            };
+
+    private static final class FilterPathTokenPredicate implements Predicate {
+        private final EvaluationContextImpl ctx;
+        private FilterPathToken filterPathToken;
+
+        private FilterPathTokenPredicate(PathToken target, EvaluationContextImpl ctx) {
+            this.ctx = ctx;
+            filterPathToken = (FilterPathToken) target;
+        }
+
+        @Override
+        public Class<?> clazz() {
+            return FilterPathToken.class;
+        }
+
+        @Override
+        public boolean matches(Object model) {
+            return filterPathToken.accept(model, ctx.configuration());
+        }
+    }
+
+    private static final class WildcardPathTokenPredicate implements Predicate {
+        @Override
+        public Class<?> clazz() {
+            return WildcardPathToken.class;
+        }
+
+        @Override
+        public boolean matches(Object model) {
+            return true;
+        }
+    }
+
+    private static final class ArrayPathTokenPredicate implements Predicate {
+        private final EvaluationContextImpl ctx;
+
+        private ArrayPathTokenPredicate(EvaluationContextImpl ctx) {
+            this.ctx = ctx;
+        }
+
+        @Override
+        public Class<?> clazz() {
+            return ArrayPathToken.class;
+        }
+
+        @Override
+        public boolean matches(Object model) {
+            return ctx.jsonProvider().isArray(model);
+        }
+    }
+
+    private static final class PropertyPathTokenPredicate implements Predicate {
+        private final EvaluationContextImpl ctx;
+        private PropertyPathToken propertyPathToken;
+
+        private PropertyPathTokenPredicate(PathToken target, EvaluationContextImpl ctx) {
+            this.ctx = ctx;
+            propertyPathToken = (PropertyPathToken) target;
+        }
+
+        @Override
+        public Class<?> clazz() {
+            return PropertyPathToken.class;
+        }
+
+        @Override
+        public boolean matches(Object model) {
+            Collection<String> keys = ctx.jsonProvider().getPropertyKeys(model);
+            return keys.containsAll(propertyPathToken.getProperties());
+        }
     }
 }

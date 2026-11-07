@@ -34,8 +34,6 @@ public interface JsonProvider {
 
     Object getMapValue(Object obj, String key);
 
-    Object getMapValue(Object obj, String key, boolean signalUndefined);
-
     void setProperty(Object obj, Object key, Object value);
 
     boolean isMap(Object obj);
