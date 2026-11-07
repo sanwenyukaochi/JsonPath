@@ -1,6 +1,5 @@
 package com.jayway.jsonpath.spi.json;
 
-import com.google.gson.JsonObject;
 import com.jayway.jsonpath.InvalidJsonException;
 import com.jayway.jsonpath.JsonPathException;
 import java.io.InputStream;
@@ -61,7 +60,7 @@ public class JsonOrgJsonProvider extends AbstractJsonProvider {
 
     @Override
     public Object createMap() {
-        return new JsonObject();
+        return new JSONObject();
     }
 
     @Override
