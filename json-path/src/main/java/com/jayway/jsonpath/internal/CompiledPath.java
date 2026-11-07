@@ -33,7 +33,10 @@ public class CompiledPath implements Path {
         }
 
         EvaluationContextImpl ctx = new EvaluationContextImpl(this, rootDocument, configuration);
-        root.evaluate("", document, ctx);
+        try {
+            root.evaluate("", document, ctx);
+        } catch (EvaluationAbortException abort) {
+        }
 
         return ctx;
     }
