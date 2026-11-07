@@ -33,10 +33,6 @@ public class Filter implements Predicate {
         return true;
     }
 
-    public void addCriteria(Criteria criteria) {
-        criteriaList.add(criteria);
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
