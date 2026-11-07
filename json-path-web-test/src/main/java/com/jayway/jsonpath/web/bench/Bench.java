@@ -52,7 +52,7 @@ public class Bench {
             } else if (res instanceof Boolean) {
                 result = res.toString();
             } else {
-                result = res != null ? JsonProviderFactory.createProvider().toJson(res) : null;
+                result = res != null ? JsonProviderFactory.createProvider().toJson(res) : "null";
             }
             return new Result("jayway", time, result, error);
         }
