@@ -115,7 +115,7 @@ subprojects {
             add("api", "org.hamcrest:hamcrest-library:3.0")
             add("implementation", "org.apache.commons:commons-lang3:3.21.0")
             add("testImplementation", "commons-io:commons-io:2.22.0")
-            add("testImplementation", "org.slf4j:slf4j-api:2.0.20")
+            add("implementation", "org.slf4j:slf4j-api:2.0.20")
             add("testImplementation", "ch.qos.logback:logback-classic:1.6.6")
         }
         add(
@@ -123,7 +123,7 @@ subprojects {
             platform("org.junit:junit-bom:6.1.3"),
         )
         add("testImplementation", "commons-io:commons-io")
-        add("testImplementation", "org.slf4j:slf4j-api")
+        add("implementation", "org.slf4j:slf4j-api")
         add("testImplementation", "ch.qos.logback:logback-classic")
         add("testImplementation", "org.hamcrest:hamcrest-library")
         add("testImplementation", "org.junit.jupiter:junit-jupiter")
