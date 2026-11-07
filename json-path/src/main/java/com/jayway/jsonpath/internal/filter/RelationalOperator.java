@@ -2,6 +2,8 @@ package com.jayway.jsonpath.internal.filter;
 
 import com.jayway.jsonpath.InvalidPathException;
 
+import java.util.Locale;
+
 public enum RelationalOperator {
     GTE(">="),
     LTE("<="),
@@ -34,8 +36,9 @@ public enum RelationalOperator {
     }
 
     public static RelationalOperator fromString(String operatorString) {
+        String upperCaseOperatorString = operatorString.toUpperCase(Locale.ROOT);
         for (RelationalOperator operator : RelationalOperator.values()) {
-            if (operator.operatorString.equals(operatorString.toUpperCase())) {
+            if (operator.operatorString.equals(upperCaseOperatorString)) {
                 return operator;
             }
         }
