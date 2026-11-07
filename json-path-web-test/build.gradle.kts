@@ -1,3 +1,7 @@
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Properties
+
 plugins {
     application
 }
@@ -26,4 +30,27 @@ dependencies {
     implementation("com.nebhale.jsonpath:jsonpath:1.2")
     implementation("io.gatling:jsonpath_2.12:0.7.0")
     runtimeOnly("org.slf4j:slf4j-simple:2.0.20")
+}
+
+val buildInfoDirectory = layout.buildDirectory.dir("generated/build-info")
+val buildInfoVersion = version.toString()
+val createBuildInfoFile by tasks.registering {
+    outputs.dir(buildInfoDirectory)
+    outputs.upToDateWhen { false }
+    doLast {
+        val buildInfoFile = buildInfoDirectory.get().file("build-info.properties").asFile
+        buildInfoFile.parentFile.mkdirs()
+        val properties = Properties()
+        properties.setProperty("version", buildInfoVersion)
+        properties.setProperty("timestamp", SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date()))
+        buildInfoFile.writer().use { properties.store(it, null) }
+    }
+}
+
+sourceSets.main {
+    resources.srcDir(buildInfoDirectory)
+}
+
+tasks.processResources {
+    dependsOn(createBuildInfoFile)
 }
