@@ -150,7 +150,7 @@ public class JacksonJsonNodeJsonProvider extends AbstractJsonProvider {
         if (!jsonObject.has(key)) {
             return UNDEFINED;
         } else {
-            return unwrap(o);
+            return o;
         }
     }
 
