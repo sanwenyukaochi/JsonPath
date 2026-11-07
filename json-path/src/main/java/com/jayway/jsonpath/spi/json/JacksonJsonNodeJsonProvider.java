@@ -263,8 +263,7 @@ public class JacksonJsonNodeJsonProvider extends AbstractJsonProvider {
         } else if (value == null) {
             objectNode.set(key.toString(), null);
         } else {
-            throw new IllegalArgumentException(
-                    "Cannot handle object type: " + value.getClass().getName());
+            objectNode.set(key.toString(), createJsonElement(value));
         }
     }
 }
