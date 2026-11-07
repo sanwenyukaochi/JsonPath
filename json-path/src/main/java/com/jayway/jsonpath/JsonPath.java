@@ -66,7 +66,7 @@ public class JsonPath {
             throw new IllegalArgumentException("Invalid container object");
         }
         LinkedList<Filter> contextFilters = new LinkedList<Filter>(filters);
-        JsonProvider jsonProvider = JsonProviderFactory.getInstance();
+        JsonProvider jsonProvider = JsonProviderFactory.createProvider();
 
         Object result = jsonObject;
 
@@ -87,7 +87,7 @@ public class JsonPath {
     public <T> T read(String json) {
         notEmpty(json, "json can not be null or empty");
 
-        return (T) read(JsonProviderFactory.getInstance().parse(json));
+        return (T) read(JsonProviderFactory.createProvider().parse(json));
     }
 
     @SuppressWarnings({"unchecked"})
@@ -97,7 +97,7 @@ public class JsonPath {
         BufferedReader in = null;
         try {
             in = new BufferedReader(new InputStreamReader(jsonURL.openStream()));
-            return (T) read(JsonProviderFactory.getInstance().parse(in));
+            return (T) read(JsonProviderFactory.createProvider().parse(in));
         } finally {
             IOUtils.closeQuietly(in);
         }
@@ -111,7 +111,7 @@ public class JsonPath {
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(jsonFile);
-            return (T) read(JsonProviderFactory.getInstance().parse(fis));
+            return (T) read(JsonProviderFactory.createProvider().parse(fis));
         } finally {
             IOUtils.closeQuietly(fis);
         }
@@ -122,7 +122,7 @@ public class JsonPath {
         notNull(jsonInputStream, "json input stream can not be null");
 
         try {
-            return (T) read(JsonProviderFactory.getInstance().parse(jsonInputStream));
+            return (T) read(JsonProviderFactory.createProvider().parse(jsonInputStream));
         } finally {
             IOUtils.closeQuietly(jsonInputStream);
         }

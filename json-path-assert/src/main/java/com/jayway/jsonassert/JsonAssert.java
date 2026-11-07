@@ -20,7 +20,7 @@ import org.hamcrest.Matcher;
 
 public class JsonAssert {
 
-    private static JsonProvider jsonProvider = JsonProviderFactory.getInstance();
+    private static JsonProvider jsonProvider = JsonProviderFactory.createProvider();
 
     public static void setJsonProvider(JsonProvider jsonProvider) {
         JsonAssert.jsonProvider = jsonProvider;
