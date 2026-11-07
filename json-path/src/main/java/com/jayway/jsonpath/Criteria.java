@@ -201,8 +201,7 @@ public class Criteria implements Predicate {
             @Override
             boolean eval(Object expected, final Object actual, final PredicateContext ctx) {
                 Predicate exp = (Predicate) expected;
-                return exp.apply(
-                        new PredicateContextImpl(actual, ctx.rootDocument(), ctx.configuration()));
+                return exp.apply(new PredicateContextImpl(actual, ctx.root(), ctx.configuration()));
             }
         },
         NOT_EMPTY {
@@ -285,7 +284,7 @@ public class Criteria implements Predicate {
                                 .jsonProvider(ctx.configuration().jsonProvider())
                                 .options()
                                 .build();
-                path.evaluate(ctx.contextDocument(), ctx.rootDocument(), c).getValue();
+                path.evaluate(ctx.item(), ctx.root(), c).getValue();
                 return exists;
             } catch (PathNotFoundException e) {
                 return !exists;
@@ -293,21 +292,14 @@ public class Criteria implements Predicate {
         } else {
             try {
                 final Object actual =
-                        path.evaluate(
-                                        ctx.contextDocument(),
-                                        ctx.rootDocument(),
-                                        ctx.configuration())
-                                .getValue();
+                        path.evaluate(ctx.item(), ctx.root(), ctx.configuration()).getValue();
 
                 Object expectedVal = expected;
                 if (expected instanceof Path) {
                     Path expectedPath = (Path) expected;
-                    Object doc =
-                            expectedPath.isRootPath() ? ctx.rootDocument() : ctx.contextDocument();
+                    Object doc = expectedPath.isRootPath() ? ctx.root() : ctx.item();
                     expectedVal =
-                            expectedPath
-                                    .evaluate(doc, ctx.rootDocument(), ctx.configuration())
-                                    .getValue();
+                            expectedPath.evaluate(doc, ctx.root(), ctx.configuration()).getValue();
                 }
 
                 return criteriaType.eval(expectedVal, actual, ctx);

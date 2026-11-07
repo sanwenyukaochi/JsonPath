@@ -54,7 +54,7 @@ public class Configuration {
     public Configuration jsonProvider(JsonProvider newJsonProvider) {
         return Configuration.builder()
                 .jsonProvider(newJsonProvider)
-                .conversionProvider(mappingProvider)
+                .mappingProvider(mappingProvider)
                 .options(options)
                 .build();
     }
@@ -63,14 +63,14 @@ public class Configuration {
         return jsonProvider;
     }
 
-    public MappingProvider conversionProvider() {
+    public MappingProvider mappingProvider() {
         return mappingProvider;
     }
 
-    public Configuration conversionProvider(MappingProvider newMappingProvider) {
+    public Configuration mappingProvider(MappingProvider newMappingProvider) {
         return Configuration.builder()
                 .jsonProvider(jsonProvider)
-                .conversionProvider(newMappingProvider)
+                .mappingProvider(newMappingProvider)
                 .options(options)
                 .build();
     }
@@ -81,7 +81,7 @@ public class Configuration {
         opts.addAll(asList(options));
         return Configuration.builder()
                 .jsonProvider(jsonProvider)
-                .conversionProvider(mappingProvider)
+                .mappingProvider(mappingProvider)
                 .options(opts)
                 .build();
     }
@@ -89,7 +89,7 @@ public class Configuration {
     public Configuration options(Option... options) {
         return Configuration.builder()
                 .jsonProvider(jsonProvider)
-                .conversionProvider(mappingProvider)
+                .mappingProvider(mappingProvider)
                 .options(options)
                 .build();
     }
@@ -124,7 +124,7 @@ public class Configuration {
             return this;
         }
 
-        public ConfigurationBuilder conversionProvider(MappingProvider provider) {
+        public ConfigurationBuilder mappingProvider(MappingProvider provider) {
             this.mappingProvider = provider;
             return this;
         }
