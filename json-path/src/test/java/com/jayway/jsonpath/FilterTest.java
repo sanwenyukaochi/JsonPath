@@ -554,4 +554,25 @@ public class FilterTest extends BaseTest {
                         JSON_DOCUMENT, "$.store.book[?(@.category in ['reference', 'fiction'])]");
         assertThat(list).hasSize(4);
     }
+
+    @Test
+    public void int_eq_string_evals() {
+        assertThat(filter(where("int-key").eq("1")).apply(createPredicateContext(json)))
+                .isEqualTo(true);
+        assertThat(filter(where("int-key").eq("666")).apply(createPredicateContext(json)))
+                .isEqualTo(false);
+
+        assertThat(Filter.parse("[?(1 == '1')]").apply(createPredicateContext(json)))
+                .isEqualTo(true);
+        assertThat(Filter.parse("[?('1' == 1)]").apply(createPredicateContext(json)))
+                .isEqualTo(true);
+
+        assertThat(Filter.parse("[?(1 === '1')]").apply(createPredicateContext(json)))
+                .isEqualTo(false);
+        assertThat(Filter.parse("[?('1' === 1)]").apply(createPredicateContext(json)))
+                .isEqualTo(false);
+
+        assertThat(Filter.parse("[?(1 === 1)]").apply(createPredicateContext(json)))
+                .isEqualTo(true);
+    }
 }

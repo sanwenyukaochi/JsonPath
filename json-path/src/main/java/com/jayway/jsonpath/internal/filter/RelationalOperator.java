@@ -6,7 +6,11 @@ public enum RelationalOperator {
     GTE(">="),
     LTE("<="),
     EQ("=="),
+
+    TSEQ("==="),
     NE("!="),
+
+    TSNE("!=="),
     LT("<"),
     GT(">"),
     REGEX("=~"),
