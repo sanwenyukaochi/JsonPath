@@ -4,8 +4,6 @@ public class ExpressionEvaluator {
 
     public static <T> boolean eval(T actual, String comparator, String expected) {
 
-        comparator = comparator.trim();
-
         if (actual instanceof Long) {
 
             Long a = (Long) actual;
