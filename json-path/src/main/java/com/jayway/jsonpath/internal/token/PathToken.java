@@ -35,7 +35,7 @@ public abstract class PathToken {
                         propertyVal = null;
                     } else {
                         if (ctx.options().contains(Option.SUPPRESS_EXCEPTIONS)
-                                && !ctx.options().contains(Option.REQUIRE_PROPERTIES)) {
+                                || !ctx.options().contains(Option.REQUIRE_PROPERTIES)) {
                             return;
                         } else {
                             throw new PathNotFoundException("No results for path: " + evalPath);
