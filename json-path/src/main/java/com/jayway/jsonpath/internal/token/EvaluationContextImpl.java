@@ -1,4 +1,4 @@
-package com.jayway.jsonpath.internal.compiler;
+package com.jayway.jsonpath.internal.token;
 
 import static com.jayway.jsonpath.internal.Utils.notNull;
 
