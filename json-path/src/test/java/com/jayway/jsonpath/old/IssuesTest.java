@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.google.gson.JsonObject;
 import com.jayway.jsonpath.BaseTest;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Criteria;
@@ -972,5 +973,18 @@ public class IssuesTest extends BaseTest {
         List<Double> numbers = JsonPath.read(json, "$.store.book[?(@.price <= 90)].price");
 
         Assertions.assertThat(numbers).containsExactly(8.95D, 12.99D, 8.99D, 22.99D);
+    }
+
+    @Test
+    public void github_89() {
+        assertThrows(
+                PathNotFoundException.class,
+                () -> {
+                    com.google.gson.JsonObject json = new JsonObject();
+                    json.addProperty("foo", "bar");
+
+                    JsonPath path = JsonPath.compile("$.foo");
+                    String object = path.read(json);
+                });
     }
 }
