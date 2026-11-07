@@ -21,7 +21,7 @@ public class ScanPathToken extends PathToken {
         walk(currentPath, model, ctx, predicate, predicateMatches);
 
         PathToken next = next();
-        if (next instanceof FilterPathToken) {
+        if (next instanceof PredicatePathToken) {
             if (next.isLeaf()) {
                 for (Map.Entry<String, Object> match : predicateMatches.entrySet()) {
                     ctx.addResult(match.getKey(), match.getValue());
@@ -66,7 +66,7 @@ public class ScanPathToken extends PathToken {
         for (Object evalModel : models) {
             String evalPath = currentPath + "[" + idx + "]";
 
-            if (predicate.clazz().equals(FilterPathToken.class)) {
+            if (predicate.clazz().equals(PredicatePathToken.class)) {
                 if (predicate.matches(evalModel)) {
                     predicateMatches.put(evalPath, evalModel);
                 }
@@ -106,7 +106,7 @@ public class ScanPathToken extends PathToken {
             return new ArrayPathTokenPredicate(ctx);
         } else if (target instanceof WildcardPathToken) {
             return new WildcardPathTokenPredicate();
-        } else if (target instanceof FilterPathToken) {
+        } else if (target instanceof PredicatePathToken) {
             return new FilterPathTokenPredicate(target, ctx);
         } else {
             return FALSE_PREDICATE;
@@ -144,21 +144,21 @@ public class ScanPathToken extends PathToken {
 
     private static final class FilterPathTokenPredicate implements Predicate {
         private final EvaluationContextImpl ctx;
-        private FilterPathToken filterPathToken;
+        private PredicatePathToken predicatePathToken;
 
         private FilterPathTokenPredicate(PathToken target, EvaluationContextImpl ctx) {
             this.ctx = ctx;
-            filterPathToken = (FilterPathToken) target;
+            predicatePathToken = (PredicatePathToken) target;
         }
 
         @Override
         public Class<?> clazz() {
-            return FilterPathToken.class;
+            return PredicatePathToken.class;
         }
 
         @Override
         public boolean matches(Object model) {
-            return filterPathToken.accept(model, ctx.configuration());
+            return predicatePathToken.accept(model, ctx.configuration());
         }
     }
 

@@ -8,7 +8,7 @@ import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.Predicate;
 import java.util.Collection;
 
-public class FilterPathToken extends PathToken {
+public class PredicatePathToken extends PathToken {
 
     private static final String[] FRAGMENTS = {
         "[?]", "[?,?]", "[?,?,?]", "[?,?,?,?]", "[?,?,?,?,?]"
@@ -16,30 +16,39 @@ public class FilterPathToken extends PathToken {
 
     private final Collection<Predicate> filters;
 
-    public FilterPathToken(Predicate filter) {
+    public PredicatePathToken(Predicate filter) {
         this.filters = asList(filter);
     }
 
-    public FilterPathToken(Collection<Predicate> filters) {
+    public PredicatePathToken(Collection<Predicate> filters) {
         this.filters = filters;
     }
 
     @Override
     public void evaluate(String currentPath, Object model, EvaluationContextImpl ctx) {
-        if (!ctx.jsonProvider().isArray(model)) {
+        if (ctx.jsonProvider().isMap(model)) {
+            if (accept(model, ctx.configuration())) {
+                if (isLeaf()) {
+                    ctx.addResult(currentPath, model);
+                } else {
+                    next().evaluate(currentPath, model, ctx);
+                }
+            }
+        } else if (ctx.jsonProvider().isArray(model)) {
+            int idx = 0;
+            Iterable<Object> objects = ctx.jsonProvider().toIterable(model);
+
+            for (Object idxModel : objects) {
+                if (accept(idxModel, ctx.configuration())) {
+                    handleArrayIndex(idx, currentPath, model, ctx);
+                }
+                idx++;
+            }
+        } else {
             throw new InvalidPathException(
                     format(
-                            "Filter: %s can only be applied to arrays. Current context is: %s",
+                            "Filter: %s can not be applied to primitives. Current context is: %s",
                             toString(), model));
-        }
-        int idx = 0;
-        Iterable<Object> objects = ctx.jsonProvider().toIterable(model);
-
-        for (Object idxModel : objects) {
-            if (accept(idxModel, ctx.configuration())) {
-                handleArrayIndex(idx, currentPath, model, ctx);
-            }
-            idx++;
         }
     }
 

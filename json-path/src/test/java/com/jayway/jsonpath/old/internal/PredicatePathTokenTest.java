@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
-public class FilterPathTokenTest {
+public class PredicatePathTokenTest {
 
     private static final Object ARRAY =
             JsonProviderFactory.createProvider()
