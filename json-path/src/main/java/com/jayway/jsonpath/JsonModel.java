@@ -99,14 +99,14 @@ public class JsonModel {
 
     @SuppressWarnings({"unchecked"})
     public <T> T get(String jsonPath, Filter... filters) {
-        return (T) get(JsonPath.compile(jsonPath, filters));
+        return get(JsonPath.compile(jsonPath, filters));
     }
 
     @SuppressWarnings({"unchecked"})
     public <T> T get(JsonPath jsonPath) {
         notNull(jsonPath, "jsonPath can not be null");
 
-        return (T) jsonPath.read(jsonObject);
+        return jsonPath.read(jsonProvider, jsonObject);
     }
 
     public ArrayOps opsForArray() {
@@ -187,7 +187,7 @@ public class JsonModel {
     public JsonModel getSubModelDetached(JsonPath jsonPath) {
         notNull(jsonPath, "jsonPath can not be null");
 
-        Object subModel = jsonPath.read(jsonObject);
+        Object subModel = jsonPath.read(jsonProvider, jsonObject);
 
         if (!jsonProvider.isContainer(subModel)) {
             throw new InvalidModelException(
@@ -216,40 +216,60 @@ public class JsonModel {
         return new DefaultMappingModelReader(JsonModel.this.get(jsonPath));
     }
 
-    public static JsonModel model(String json) {
+    public static JsonModel model(JsonProvider jsonProvider, String json) {
+        notNull(jsonProvider, "jsonProvider can not be null");
         notEmpty(json, "json can not be null or empty");
 
-        return new JsonModel(json, JsonProviderFactory.createProvider());
+        return new JsonModel(json, jsonProvider);
+    }
+
+    public static JsonModel model(String json) {
+        return model(JsonProviderFactory.createProvider(), json);
     }
 
     public static JsonModel create(String json) {
         return model(json);
     }
 
-    public static JsonModel model(Object jsonObject) {
+    public static JsonModel model(JsonProvider jsonProvider, Object jsonObject) {
+        notNull(jsonProvider, "jsonProvider can not be null");
         notNull(jsonObject, "jsonObject can not be null");
+        return new JsonModel(jsonObject, jsonProvider);
+    }
 
-        return new JsonModel(jsonObject, JsonProviderFactory.createProvider());
+    public static JsonModel model(Object jsonObject) {
+        return model(JsonProviderFactory.createProvider(), jsonObject);
     }
 
     public static JsonModel create(Object jsonObject) {
         return model(jsonObject);
     }
 
-    public static JsonModel model(URL url) throws IOException {
+    public static JsonModel model(JsonProvider jsonProvider, URL url) throws IOException {
+        notNull(jsonProvider, "jsonProvider can not be null");
         notNull(url, "url can not be null");
 
-        return new JsonModel(url, JsonProviderFactory.createProvider());
+        return new JsonModel(url, jsonProvider);
+    }
+
+    public static JsonModel model(URL url) throws IOException {
+        return model(JsonProviderFactory.createProvider(), url);
     }
 
     public static JsonModel create(URL url) throws IOException {
         return model(url);
     }
 
-    public static JsonModel model(InputStream jsonInputStream) throws IOException {
+    public static JsonModel model(JsonProvider jsonProvider, InputStream jsonInputStream)
+            throws IOException {
+        notNull(jsonProvider, "jsonProvider can not be null");
         notNull(jsonInputStream, "jsonInputStream can not be null");
 
-        return new JsonModel(jsonInputStream, JsonProviderFactory.createProvider());
+        return new JsonModel(jsonInputStream, jsonProvider);
+    }
+
+    public static JsonModel model(InputStream jsonInputStream) throws IOException {
+        return model(JsonProviderFactory.createProvider(), jsonInputStream);
     }
 
     public static JsonModel create(InputStream jsonInputStream) throws IOException {
@@ -262,8 +282,6 @@ public class JsonModel {
         if (!jsonPath.isPathDefinite()) {
             throw new IndefinitePathException(jsonPath.getPath());
         }
-
-        JsonProvider jsonProvider = JsonProviderFactory.createProvider();
 
         Object modelRef = jsonObject;
 
