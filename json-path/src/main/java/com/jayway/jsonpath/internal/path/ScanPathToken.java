@@ -50,6 +50,7 @@ public class ScanPathToken extends PathToken {
                 int idx = 0;
                 for (Object evalModel : models) {
                     String evalPath = currentPath + "[" + idx + "]";
+                    next.setUpstreamArrayIndex(idx);
                     next.evaluate(evalPath, parent, evalModel, ctx);
                     idx++;
                 }

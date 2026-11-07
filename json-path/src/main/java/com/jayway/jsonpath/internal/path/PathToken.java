@@ -15,6 +15,11 @@ public abstract class PathToken {
     private PathToken next;
     private Boolean definite = null;
     private Boolean upstreamDefinite = null;
+    private int upstreamArrayIndex = -1;
+
+    public void setUpstreamArrayIndex(int idx) {
+        upstreamArrayIndex = idx;
+    }
 
     PathToken appendTailToken(PathToken next) {
         this.next = next;
@@ -57,7 +62,11 @@ public abstract class PathToken {
             }
             PathRef pathRef = ctx.forUpdate() ? PathRef.create(model, property) : PathRef.NO_OP;
             if (isLeaf()) {
-                ctx.addResult(evalPath, pathRef, propertyVal);
+                String idx = "[" + String.valueOf(upstreamArrayIndex) + "]";
+                if (idx.equals("[-1]")
+                        || ctx.getRoot().getTail().prev().getPathFragment().equals(idx)) {
+                    ctx.addResult(evalPath, pathRef, propertyVal);
+                }
             } else {
                 next().evaluate(evalPath, pathRef, propertyVal, ctx);
             }
