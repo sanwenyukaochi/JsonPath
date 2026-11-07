@@ -26,9 +26,10 @@ public class ComplianceTests {
                 }\
                 """;
 
-        assertThat(JsonPath.<String>read(json, "$.a"), is(equalTo("a")));
+        assertThat(JsonPath.<String>read(json, "$.a"), equalTo("a"));
         assertThat(JsonPath.<List<String>>read(json, "$.*"), hasItems("a", "b", "e"));
         assertThat(JsonPath.<List<String>>read(json, "$['*']"), hasItems("a", "b", "e"));
+        assertThat(JsonPath.<String>read(json, "$['a']"), equalTo("a"));
     }
 
     @Test
