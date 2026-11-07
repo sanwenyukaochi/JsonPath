@@ -12,6 +12,10 @@ public interface WriteContext {
 
     DocumentContext set(JsonPath path, Object newValue);
 
+    DocumentContext convert(String path, ValueConverter valueConverter, Predicate... filters);
+
+    DocumentContext convert(JsonPath path, ValueConverter valueConverter);
+
     DocumentContext delete(String path, Predicate... filters);
 
     DocumentContext delete(JsonPath path);
@@ -23,4 +27,9 @@ public interface WriteContext {
     DocumentContext put(String path, String key, Object value, Predicate... filters);
 
     DocumentContext put(JsonPath path, String key, Object value);
+
+    DocumentContext renameKey(
+            String path, String oldKeyName, String newKeyName, Predicate... filters);
+
+    DocumentContext renameKey(JsonPath path, String oldKeyName, String newKeyName);
 }
