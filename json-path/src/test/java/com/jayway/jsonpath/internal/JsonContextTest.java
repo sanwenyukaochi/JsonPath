@@ -9,7 +9,7 @@ import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class JsonReaderTest extends BaseTest {
+public class JsonContextTest extends BaseTest {
 
     @Test
     public void cached_path_with_predicates() {

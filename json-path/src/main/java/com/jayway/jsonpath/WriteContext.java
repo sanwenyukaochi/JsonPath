@@ -12,9 +12,9 @@ public interface WriteContext {
 
     DocumentContext set(JsonPath path, Object newValue);
 
-    DocumentContext convert(String path, ValueConverter valueConverter, Predicate... filters);
+    DocumentContext map(String path, MapFunction mapFunction, Predicate... filters);
 
-    DocumentContext convert(JsonPath path, ValueConverter valueConverter);
+    DocumentContext map(JsonPath path, MapFunction mapFunction);
 
     DocumentContext delete(String path, Predicate... filters);
 

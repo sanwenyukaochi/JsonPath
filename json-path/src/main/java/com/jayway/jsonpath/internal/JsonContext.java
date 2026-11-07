@@ -9,12 +9,12 @@ import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.EvaluationListener;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.MapFunction;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.Predicate;
 import com.jayway.jsonpath.ReadContext;
 import com.jayway.jsonpath.TypeRef;
-import com.jayway.jsonpath.ValueConverter;
 import com.jayway.jsonpath.spi.cache.Cache;
 import com.jayway.jsonpath.spi.cache.CacheProvider;
 import java.io.File;
@@ -26,23 +26,23 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JsonReader implements ParseContext, DocumentContext {
+public class JsonContext implements ParseContext, DocumentContext {
 
-    private static final Logger logger = LoggerFactory.getLogger(JsonReader.class);
+    private static final Logger logger = LoggerFactory.getLogger(JsonContext.class);
 
     private final Configuration configuration;
     private Object json;
 
-    public JsonReader() {
+    public JsonContext() {
         this(Configuration.defaultConfiguration());
     }
 
-    public JsonReader(Configuration configuration) {
+    public JsonContext(Configuration configuration) {
         notNull(configuration, "configuration can not be null");
         this.configuration = configuration;
     }
 
-    private JsonReader(Object json, Configuration configuration) {
+    private JsonContext(Object json, Configuration configuration) {
         notNull(json, "json can not be null");
         notNull(configuration, "configuration can not be null");
         this.configuration = configuration;
@@ -158,7 +158,7 @@ public class JsonReader implements ParseContext, DocumentContext {
     }
 
     public ReadContext withListeners(EvaluationListener... listener) {
-        return new JsonReader(json, configuration.setEvaluationListeners(listener));
+        return new JsonContext(json, configuration.setEvaluationListeners(listener));
     }
 
     private <T> T convert(Object obj, Class<T> targetType, Configuration configuration) {
@@ -187,15 +187,14 @@ public class JsonReader implements ParseContext, DocumentContext {
     }
 
     @Override
-    public DocumentContext convert(
-            String path, ValueConverter valueConverter, Predicate... filters) {
-        convert(compile(path, filters), valueConverter);
+    public DocumentContext map(String path, MapFunction mapFunction, Predicate... filters) {
+        map(compile(path, filters), mapFunction);
         return this;
     }
 
     @Override
-    public DocumentContext convert(JsonPath path, ValueConverter valueConverter) {
-        path.convert(json, valueConverter, configuration);
+    public DocumentContext map(JsonPath path, MapFunction mapFunction) {
+        path.map(json, mapFunction, configuration);
         return this;
     }
 
@@ -272,7 +271,6 @@ public class JsonReader implements ParseContext, DocumentContext {
     }
 
     private final class LimitingEvaluationListener implements EvaluationListener {
-
         final int limit;
 
         private LimitingEvaluationListener(int limit) {
