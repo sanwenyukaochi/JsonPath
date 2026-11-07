@@ -153,7 +153,7 @@ public class JsonAssertTest {
 
     @Test
     public void an_empty_collection() throws Exception {
-        with(JSON).assertThat("$.store.book[?(@.category = 'x')]", emptyCollection());
+        with(JSON).assertThat("$.store.book[?(@.category == 'x')]", emptyCollection());
     }
 
     @Test
