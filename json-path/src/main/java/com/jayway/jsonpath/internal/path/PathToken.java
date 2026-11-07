@@ -192,7 +192,8 @@ public abstract class PathToken {
             PathRef parent,
             Object model,
             EvaluationContextImpl ctx) {
-        ctx.addResult(currentPath, parent, pathFunction.invoke(currentPath, parent, model, ctx));
+        ctx.addResult(
+                currentPath, parent, pathFunction.invoke(currentPath, parent, model, ctx, null));
     }
 
     public abstract void evaluate(

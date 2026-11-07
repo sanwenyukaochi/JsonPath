@@ -3,6 +3,7 @@ package com.jayway.jsonpath.internal.path;
 import static java.util.Collections.singletonList;
 
 import com.jayway.jsonpath.Predicate;
+import com.jayway.jsonpath.internal.function.Parameter;
 import java.util.Collection;
 import java.util.List;
 
@@ -46,7 +47,7 @@ public class PathTokenFactory {
         return new PredicatePathToken(predicate);
     }
 
-    public static PathToken createFunctionPathToken(String function) {
-        return new FunctionPathToken((function));
+    public static PathToken createFunctionPathToken(String function, List<Parameter> parameters) {
+        return new FunctionPathToken(function, parameters);
     }
 }
