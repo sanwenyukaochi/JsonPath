@@ -7,7 +7,7 @@ import static com.jayway.jsonpath.internal.Utils.notEmpty;
 import static com.jayway.jsonpath.internal.Utils.notNull;
 
 import com.jayway.jsonpath.internal.EvaluationContext;
-import com.jayway.jsonpath.internal.JsonReader;
+import com.jayway.jsonpath.internal.JsonContext;
 import com.jayway.jsonpath.internal.Path;
 import com.jayway.jsonpath.internal.PathCompiler;
 import com.jayway.jsonpath.internal.PathRef;
@@ -106,15 +106,14 @@ public class JsonPath {
         return resultByConfiguration(jsonObject, configuration, evaluationContext);
     }
 
-    public <T> T convert(
-            Object jsonObject, ValueConverter valueConverter, Configuration configuration) {
+    public <T> T map(Object jsonObject, MapFunction mapFunction, Configuration configuration) {
         notNull(jsonObject, "json can not be null");
         notNull(configuration, "configuration can not be null");
-        notNull(valueConverter, "valueConverter can not be null");
+        notNull(mapFunction, "mapFunction can not be null");
         EvaluationContext evaluationContext =
                 path.evaluate(jsonObject, jsonObject, configuration, true);
         for (PathRef updateOperation : evaluationContext.updateOperations()) {
-            updateOperation.convert(valueConverter, configuration);
+            updateOperation.convert(mapFunction, configuration);
         }
         return resultByConfiguration(jsonObject, configuration, evaluationContext);
     }
@@ -245,74 +244,74 @@ public class JsonPath {
 
     @SuppressWarnings({"unchecked"})
     public static <T> T read(String json, String jsonPath, Predicate... filters) {
-        return new JsonReader().parse(json).read(jsonPath, filters);
+        return new JsonContext().parse(json).read(jsonPath, filters);
     }
 
     @SuppressWarnings({"unchecked"})
     public static <T> T read(URL jsonURL, String jsonPath, Predicate... filters)
             throws IOException {
-        return new JsonReader().parse(jsonURL).read(jsonPath, filters);
+        return new JsonContext().parse(jsonURL).read(jsonPath, filters);
     }
 
     @SuppressWarnings({"unchecked"})
     public static <T> T read(File jsonFile, String jsonPath, Predicate... filters)
             throws IOException {
-        return new JsonReader().parse(jsonFile).read(jsonPath, filters);
+        return new JsonContext().parse(jsonFile).read(jsonPath, filters);
     }
 
     @SuppressWarnings({"unchecked"})
     public static <T> T read(InputStream jsonInputStream, String jsonPath, Predicate... filters)
             throws IOException {
-        return new JsonReader().parse(jsonInputStream).read(jsonPath, filters);
+        return new JsonContext().parse(jsonInputStream).read(jsonPath, filters);
     }
 
     public static ParseContext using(Configuration configuration) {
-        return new JsonReader(configuration);
+        return new JsonContext(configuration);
     }
 
     @Deprecated
     public static ParseContext using(JsonProvider provider) {
-        return new JsonReader(Configuration.builder().jsonProvider(provider).build());
+        return new JsonContext(Configuration.builder().jsonProvider(provider).build());
     }
 
     public static DocumentContext parse(Object json) {
-        return new JsonReader().parse(json);
+        return new JsonContext().parse(json);
     }
 
     public static DocumentContext parse(String json) {
-        return new JsonReader().parse(json);
+        return new JsonContext().parse(json);
     }
 
     public static DocumentContext parse(InputStream json) {
-        return new JsonReader().parse(json);
+        return new JsonContext().parse(json);
     }
 
     public static DocumentContext parse(File json) throws IOException {
-        return new JsonReader().parse(json);
+        return new JsonContext().parse(json);
     }
 
     public static DocumentContext parse(URL json) throws IOException {
-        return new JsonReader().parse(json);
+        return new JsonContext().parse(json);
     }
 
     public static DocumentContext parse(Object json, Configuration configuration) {
-        return new JsonReader(configuration).parse(json);
+        return new JsonContext(configuration).parse(json);
     }
 
     public static DocumentContext parse(String json, Configuration configuration) {
-        return new JsonReader(configuration).parse(json);
+        return new JsonContext(configuration).parse(json);
     }
 
     public static DocumentContext parse(InputStream json, Configuration configuration) {
-        return new JsonReader(configuration).parse(json);
+        return new JsonContext(configuration).parse(json);
     }
 
     public static DocumentContext parse(File json, Configuration configuration) throws IOException {
-        return new JsonReader(configuration).parse(json);
+        return new JsonContext(configuration).parse(json);
     }
 
     public static DocumentContext parse(URL json, Configuration configuration) throws IOException {
-        return new JsonReader(configuration).parse(json);
+        return new JsonContext(configuration).parse(json);
     }
 
     private <T> T resultByConfiguration(

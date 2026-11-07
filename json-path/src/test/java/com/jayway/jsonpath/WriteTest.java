@@ -284,23 +284,6 @@ public class WriteTest extends BaseTest {
     }
 
     @Test
-    public void multi_match_path_can_be_converted() {
-        ValueConverter valueConverter = new ToStringValueConverterImpl();
-        List<Double> doubleResult = parse(JSON_DOCUMENT).read("$..display-price");
-        for (Double dRes : doubleResult) {
-            assertThat(dRes).isInstanceOf(Double.class);
-        }
-        List<String> stringResult =
-                parse(JSON_DOCUMENT)
-                        .convert("$..display-price", valueConverter)
-                        .read("$..display-price");
-        for (String sRes : stringResult) {
-            assertThat(sRes).isInstanceOf(String.class);
-            assertThat(sRes.endsWith("converted")).isTrue();
-        }
-    }
-
-    @Test
     public void multiple_properties_cannot_be_renamed() {
         assertThrows(
                 InvalidModificationException.class,
@@ -332,52 +315,66 @@ public class WriteTest extends BaseTest {
                 });
     }
 
+    private class ToStringMapFunction implements MapFunction {
+
+        @Override
+        public Object map(Object currentValue, Configuration configuration) {
+            return currentValue.toString() + "converted";
+        }
+    }
+
     @Test
-    public void object_can_be_converted() {
+    public void multi_match_path_can_be_mapped() {
+        MapFunction mapFunction = new ToStringMapFunction();
+        List<Double> doubleResult = parse(JSON_DOCUMENT).read("$..display-price");
+        for (Double dRes : doubleResult) {
+            assertThat(dRes).isInstanceOf(Double.class);
+        }
+        List<String> stringResult =
+                parse(JSON_DOCUMENT).map("$..display-price", mapFunction).read("$..display-price");
+        for (String sRes : stringResult) {
+            assertThat(sRes).isInstanceOf(String.class);
+            assertThat(sRes.endsWith("converted")).isTrue();
+        }
+    }
+
+    @Test
+    public void object_can_be_mapped() {
         TypeRef<List<String>> typeRef = new TypeRef<List<String>>() {};
-        ValueConverter valueConverter = new ToStringValueConverterImpl();
+        MapFunction mapFunction = new ToStringMapFunction();
         DocumentContext documentContext =
                 JsonPath.using(JACKSON_CONFIGURATION).parse(JSON_DOCUMENT);
         Object list = documentContext.read("$..book");
         assertThat(list).isInstanceOf(List.class);
-        String result =
-                documentContext.convert("$..book", valueConverter).read("$..book", typeRef).get(0);
+        String result = documentContext.map("$..book", mapFunction).read("$..book", typeRef).get(0);
         assertThat(result).isInstanceOf(String.class);
         assertThat(result).endsWith("converted");
     }
 
     @Test
-    public void rootCannotBeConverted() {
+    public void rootCannotBeMapped() {
         assertThrows(
                 InvalidModificationException.class,
                 () -> {
-                    ValueConverter valueConverter =
-                            new ValueConverter() {
+                    MapFunction mapFunction =
+                            new MapFunction() {
                                 @Override
-                                public Object convert(
+                                public Object map(
                                         Object currentValue, Configuration configuration) {
                                     return currentValue.toString() + "converted";
                                 }
                             };
-                    Object o = parse(JSON_DOCUMENT).convert("$", valueConverter).json();
+                    Object o = parse(JSON_DOCUMENT).map("$", mapFunction).json();
                 });
     }
 
     @Test
-    public void single_match_value_can_be_converted() {
-        ValueConverter valueConverter = new ToStringValueConverterImpl();
+    public void single_match_value_can_be_mapped() {
+        MapFunction mapFunction = new ToStringMapFunction();
         String stringResult =
                 parse(JSON_DOCUMENT)
-                        .convert("$.string-property", valueConverter)
+                        .map("$.string-property", mapFunction)
                         .read("$.string-property");
         assertThat(stringResult.endsWith("converted")).isTrue();
-    }
-
-    private class ToStringValueConverterImpl implements ValueConverter {
-
-        @Override
-        public Object convert(Object currentValue, Configuration configuration) {
-            return currentValue.toString() + "converted";
-        }
     }
 }
