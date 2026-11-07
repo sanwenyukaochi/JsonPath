@@ -6,9 +6,11 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import com.jayway.jsonpath.BaseTest;
 import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.PathNotFoundException;
@@ -370,5 +372,22 @@ public class JsonPathTest extends BaseTest {
         assertThat(
                 JsonPath.<List<String>>read(DOCUMENT, "$..[?(@.bicycle.numberOfGears)]"),
                 hasSize(0));
+    }
+
+    @Test
+    public void invalid_paths_throw_invalid_path_exception() throws Exception {
+        for (String path : new String[] {"$.", "$.results[?"}) {
+            try {
+                JsonPath.compile(path);
+            } catch (InvalidPathException e) {
+
+            } catch (Exception e) {
+                fail(
+                        "Expected an InvalidPathException trying to compile '"
+                                + path
+                                + "', but got a "
+                                + e.getClass().getName());
+            }
+        }
     }
 }
