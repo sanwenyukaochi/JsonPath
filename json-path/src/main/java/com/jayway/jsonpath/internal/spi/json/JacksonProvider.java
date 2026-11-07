@@ -1,7 +1,6 @@
 package com.jayway.jsonpath.internal.spi.json;
 
 import com.jayway.jsonpath.InvalidJsonException;
-import com.jayway.jsonpath.spi.json.Mode;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -39,10 +38,6 @@ public class JacksonProvider extends AbstractJsonProvider {
     public JacksonProvider(ObjectMapper objectMapper, ObjectReader objectReader) {
         this.objectMapper = objectMapper;
         this.objectReader = objectReader;
-    }
-
-    public Mode getMode() {
-        return Mode.STRICT;
     }
 
     @Override

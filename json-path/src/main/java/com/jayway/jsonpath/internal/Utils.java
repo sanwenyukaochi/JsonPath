@@ -143,39 +143,6 @@ public final class Utils {
         return o.toString();
     }
 
-    public static <T extends Serializable> T clone(T object) {
-        if (object == null) {
-            return null;
-        }
-        byte[] objectData = serialize(object);
-        ByteArrayInputStream bais = new ByteArrayInputStream(objectData);
-
-        ClassLoaderAwareObjectInputStream in = null;
-        try {
-
-            in = new ClassLoaderAwareObjectInputStream(bais, object.getClass().getClassLoader());
-
-            @SuppressWarnings("unchecked")
-            T readObject = (T) in.readObject();
-            return readObject;
-
-        } catch (ClassNotFoundException ex) {
-            throw new RuntimeException(
-                    "ClassNotFoundException while reading cloned object data", ex);
-        } catch (IOException ex) {
-            throw new RuntimeException("IOException while reading cloned object data", ex);
-        } finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (IOException ex) {
-                throw new RuntimeException(
-                        "IOException on closing cloned object data InputStream.", ex);
-            }
-        }
-    }
-
     public static void serialize(Serializable obj, OutputStream outputStream) {
         if (outputStream == null) {
             throw new IllegalArgumentException("The OutputStream must not be null");
