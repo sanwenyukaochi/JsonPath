@@ -1,20 +1,20 @@
 package com.jayway.jsonpath.internal.path;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.Predicate;
 import com.jayway.jsonpath.internal.PathRef;
 import java.util.Collection;
+import java.util.Collections;
 
 public class PredicatePathToken extends PathToken {
 
     private final Collection<Predicate> predicates;
 
     PredicatePathToken(Predicate filter) {
-        this.predicates = asList(filter);
+        this.predicates = Collections.singletonList(filter);
     }
 
     PredicatePathToken(Collection<Predicate> predicates) {

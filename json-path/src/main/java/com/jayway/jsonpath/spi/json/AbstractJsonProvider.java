@@ -91,7 +91,7 @@ public abstract class AbstractJsonProvider implements JsonProvider {
     }
 
     @SuppressWarnings("unchecked")
-    public Iterable<? extends Object> toIterable(Object obj) {
+    public Iterable<?> toIterable(Object obj) {
         if (isArray(obj)) return ((Iterable) obj);
         else
             throw new JsonPathException(

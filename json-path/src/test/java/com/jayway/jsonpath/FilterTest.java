@@ -477,7 +477,8 @@ public class FilterTest extends BaseTest {
         Predicate.PredicateContext context = createPredicateContext(tree);
         Filter farr = parse("[?(@.foo == " + arr + ")]");
 
-        assertThat(farr.apply(context)).isEqualTo(true);
+        boolean apply = farr.apply(context);
+        assertThat(apply).isEqualTo(true);
     }
 
     @Test

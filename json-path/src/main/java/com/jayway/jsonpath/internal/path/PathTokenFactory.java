@@ -23,12 +23,12 @@ public class PathTokenFactory {
 
     public static PathToken createSliceArrayPathToken(
             final ArraySliceOperation arraySliceOperation) {
-        return new ArrayPathToken(arraySliceOperation);
+        return new ArraySliceToken(arraySliceOperation);
     }
 
     public static PathToken createIndexArrayPathToken(
             final ArrayIndexOperation arrayIndexOperation) {
-        return new ArrayPathToken(arrayIndexOperation);
+        return new ArrayIndexToken(arrayIndexOperation);
     }
 
     public static PathToken createWildCardPathToken() {
