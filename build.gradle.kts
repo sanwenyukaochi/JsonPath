@@ -116,7 +116,7 @@ subprojects {
             add("implementation", "org.apache.commons:commons-lang3:3.21.0")
             add("testImplementation", "commons-io:commons-io:2.22.0")
             add("implementation", "org.slf4j:slf4j-api:2.0.20")
-            add("testImplementation", "ch.qos.logback:logback-classic:1.6.6")
+            add("testImplementation", "org.slf4j:slf4j-simple:2.0.20")
         }
         add(
             "testImplementation",
@@ -124,7 +124,7 @@ subprojects {
         )
         add("testImplementation", "commons-io:commons-io")
         add("implementation", "org.slf4j:slf4j-api")
-        add("testImplementation", "ch.qos.logback:logback-classic")
+        add("testImplementation", "org.slf4j:slf4j-simple")
         add("testImplementation", "org.hamcrest:hamcrest-library")
         add("testImplementation", "org.junit.jupiter:junit-jupiter")
         add("testRuntimeOnly", "org.junit.platform:junit-platform-launcher")
@@ -136,6 +136,7 @@ subprojects {
 
     tasks.withType<Test>().configureEach {
         useJUnitPlatform()
+        systemProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug")
     }
 
     if (rootProject.hasProperty("release")) {
