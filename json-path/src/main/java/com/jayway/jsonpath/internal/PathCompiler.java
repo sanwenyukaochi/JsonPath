@@ -8,8 +8,8 @@ import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.Predicate;
 import com.jayway.jsonpath.internal.compiler.ArrayPathToken;
-import com.jayway.jsonpath.internal.compiler.FilterPathToken;
 import com.jayway.jsonpath.internal.compiler.PathToken;
+import com.jayway.jsonpath.internal.compiler.PredicatePathToken;
 import com.jayway.jsonpath.internal.compiler.PropertyPathToken;
 import com.jayway.jsonpath.internal.compiler.RootPathToken;
 import com.jayway.jsonpath.internal.compiler.ScanPathToken;
@@ -201,14 +201,14 @@ public class PathCompiler {
             else if ("..".equals(pathFragment)) return new ScanPathToken();
             else if ("[*]".equals(pathFragment)) return new WildcardPathToken();
             else if (".*".equals(pathFragment)) return new WildcardPathToken();
-            else if ("[?]".equals(pathFragment)) return new FilterPathToken(filterList.poll());
+            else if ("[?]".equals(pathFragment)) return new PredicatePathToken(filterList.poll());
             else if (FILTER_PATTERN.matcher(pathFragment).matches()) {
                 final int criteriaCount = Utils.countMatches(pathFragment, "?");
                 List<Predicate> filters = new ArrayList<Predicate>(criteriaCount);
                 for (int i = 0; i < criteriaCount; i++) {
                     filters.add(filterList.poll());
                 }
-                return new FilterPathToken(filters);
+                return new PredicatePathToken(filters);
             }
 
             this.chars = pathFragment.toCharArray();
@@ -323,7 +323,7 @@ public class PathCompiler {
 
             Filter filter2 = Filter.filter(criteria);
 
-            return new FilterPathToken(filter2);
+            return new PredicatePathToken(filter2);
         }
 
         private Criteria createCriteria(
