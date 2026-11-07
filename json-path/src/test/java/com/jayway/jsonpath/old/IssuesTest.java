@@ -861,10 +861,50 @@ public class IssuesTest extends BaseTest {
     @Test
     public void issue_131() {
 
-        String json = "[1, 2, {\"d\": { \"random\":null, \"date\": \"1234\"} , \"l\": \"filler\"}]";
+        String json =
+"""
+[
+    {
+        "foo": "1"
+    },
+    {
+        "foo": null
+    },
+    {
+        "xxx": null
+    }
+]\
+""";
 
-        Object read = JsonPath.read(json, "$[2]['d'][?(@.random)]['date']");
+        List<Map<String, String>> result = JsonPath.read(json, "$[?(@.foo)]");
 
-        System.out.println(read);
+        Assertions.assertThat(result).extracting("foo").containsExactly("1", null);
+    }
+
+    @Test
+    public void issue_131_2() {
+
+        String json =
+"""
+[
+    {
+        "foo": { "bar" : "0"}
+    },
+    {
+        "foo": null
+    },
+    {
+        "xxx": null
+    }
+]\
+""";
+
+        List<String> result = JsonPath.read(json, "$[?(@.foo != null)].foo.bar");
+
+        Assertions.assertThat(result).containsExactly("0");
+
+        result = JsonPath.read(json, "$[?(@.foo.bar)].foo.bar");
+
+        Assertions.assertThat(result).containsExactly("0");
     }
 }
