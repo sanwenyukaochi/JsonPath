@@ -2,8 +2,6 @@ package com.jayway.jsonpath.internal.filter;
 
 import com.jayway.jsonpath.spi.JsonProvider;
 
-import java.util.List;
-
 public class ScanFilter extends PathTokenFilter {
 
     public ScanFilter(String condition) {
@@ -12,7 +10,7 @@ public class ScanFilter extends PathTokenFilter {
 
     @Override
     public Object filter(Object obj, JsonProvider jsonProvider) {
-        List<Object> result = jsonProvider.createList();
+        Object result = jsonProvider.createArray();
         scan(obj, result, jsonProvider);
 
         return result;
@@ -28,22 +26,15 @@ public class ScanFilter extends PathTokenFilter {
         throw new UnsupportedOperationException();
     }
 
-    private void scan(Object container, List<Object> result, JsonProvider jsonProvider) {
+    private void scan(Object container, Object result, JsonProvider jsonProvider) {
 
         if (jsonProvider.isMap(container)) {
-            result.add(container);
+            jsonProvider.setProperty(result, jsonProvider.length(result), container);
+        }
 
-            for (Object value : jsonProvider.toMap(container).values()) {
-                if (jsonProvider.isContainer(value)) {
-                    scan(value, result, jsonProvider);
-                }
-            }
-        } else if (jsonProvider.isList(container)) {
-
-            for (Object value : jsonProvider.toList(container)) {
-                if (jsonProvider.isContainer(value)) {
-                    scan(value, result, jsonProvider);
-                }
+        for (Object value : jsonProvider.toIterable(container)) {
+            if (jsonProvider.isContainer(value)) {
+                scan(value, result, jsonProvider);
             }
         }
     }

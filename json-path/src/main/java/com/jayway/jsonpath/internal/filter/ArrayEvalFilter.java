@@ -1,43 +1,41 @@
 package com.jayway.jsonpath.internal.filter;
 
 import com.jayway.jsonpath.InvalidPathException;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.internal.filter.eval.ExpressionEvaluator;
 import com.jayway.jsonpath.spi.JsonProvider;
-
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ArrayEvalFilter extends PathTokenFilter {
 
-    private static final Pattern PATTERN = Pattern.compile("(.*?)\\s?([=<>]+)\\s?(.*)");
+    private static final Pattern PATTERN =
+            Pattern.compile("\\[\\s?\\?\\(\\s?(@.*?)\\s?([!=<>]+)\\s?(.*?)\\s?\\)\\s?\\]");
+
     private final ConditionStatement conditionStatement;
 
     public ArrayEvalFilter(String condition) {
         super(condition);
-
-        String trimmedCondition = condition;
-
-        if (condition.contains("['")) {
-            trimmedCondition = trimmedCondition.replace("['", ".");
-            trimmedCondition = trimmedCondition.replace("']", "");
-        }
-
-        trimmedCondition = trim(trimmedCondition, 5, 2);
-
-        this.conditionStatement = createConditionStatement(trimmedCondition);
+        this.conditionStatement = createConditionStatement(condition);
     }
 
     @Override
     public Object filter(Object obj, JsonProvider jsonProvider) {
-
-        List<Object> src = jsonProvider.toList(obj);
-        List<Object> result = jsonProvider.createList();
-
+        Iterable<Object> src = null;
+        try {
+            src = jsonProvider.toIterable(obj);
+        } catch (ClassCastException e) {
+            throw new InvalidPathException(
+                    "The path fragment '"
+                            + this.condition
+                            + "' can not be applied to a JSON object only a JSON array.",
+                    e);
+        }
+        Object result = jsonProvider.createArray();
         for (Object item : src) {
             if (isMatch(item, conditionStatement, jsonProvider)) {
-                result.add(item);
+                jsonProvider.setProperty(result, jsonProvider.length(result), item);
             }
         }
         return result;
@@ -55,30 +53,24 @@ public class ArrayEvalFilter extends PathTokenFilter {
 
     private boolean isMatch(
             Object check, ConditionStatement conditionStatement, JsonProvider jsonProvider) {
-        if (!jsonProvider.isMap(check)) {
+        try {
+            Object value = conditionStatement.path.read(check);
+            return ExpressionEvaluator.eval(
+                    value, conditionStatement.getOperator(), conditionStatement.getExpected());
+        } catch (PathNotFoundException e) {
             return false;
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        Map<String, Object> obj = jsonProvider.toMap(check);
-
-        if (!obj.containsKey(conditionStatement.getField())) {
-            return false;
-        }
-
-        Object propertyValue = obj.get(conditionStatement.getField());
-
-        if (jsonProvider.isContainer(propertyValue)) {
-            return false;
-        }
-        return ExpressionEvaluator.eval(
-                propertyValue, conditionStatement.getOperator(), conditionStatement.getExpected());
     }
 
-    private ConditionStatement createConditionStatement(String str) {
+    static ConditionStatement createConditionStatement(String str) {
         Matcher matcher = PATTERN.matcher(str);
         if (matcher.matches()) {
-            String property = matcher.group(1);
-            String operator = matcher.group(2);
-            String expected = matcher.group(3);
+            String property = matcher.group(1).trim();
+            String operator = matcher.group(2).trim();
+            String expected = matcher.group(3).trim();
 
             return new ConditionStatement(property, operator, expected);
         } else {
@@ -86,20 +78,31 @@ public class ArrayEvalFilter extends PathTokenFilter {
         }
     }
 
-    private static class ConditionStatement {
+    static class ConditionStatement {
         private final String field;
         private final String operator;
         private final String expected;
+        private final JsonPath path;
 
-        private ConditionStatement(String field, String operator, String expected) {
+        ConditionStatement(String field, String operator, String expected) {
             this.field = field;
-            this.operator = operator.trim();
+            this.operator = operator;
 
             if (expected.startsWith("'")) {
                 this.expected = trim(expected, 1, 1);
             } else {
                 this.expected = expected;
             }
+
+            if (field.startsWith("@.")) {
+                this.path = JsonPath.compile(this.field.replace("@.", "$."));
+            } else {
+                this.path = JsonPath.compile(this.field.replace("@", "$"));
+            }
+        }
+
+        public JsonPath getJsonPath() {
+            return path;
         }
 
         public String getField() {
@@ -112,6 +115,45 @@ public class ArrayEvalFilter extends PathTokenFilter {
 
         public String getExpected() {
             return expected;
+        }
+
+        @Override
+        public String toString() {
+            return "ConditionStatement{"
+                    + "field='"
+                    + field
+                    + '\''
+                    + ", operator='"
+                    + operator
+                    + '\''
+                    + ", expected='"
+                    + expected
+                    + '\''
+                    + '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            ConditionStatement that = (ConditionStatement) o;
+
+            if (expected != null ? !expected.equals(that.expected) : that.expected != null)
+                return false;
+            if (field != null ? !field.equals(that.field) : that.field != null) return false;
+            if (operator != null ? !operator.equals(that.operator) : that.operator != null)
+                return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = field != null ? field.hashCode() : 0;
+            result = 31 * result + (operator != null ? operator.hashCode() : 0);
+            result = 31 * result + (expected != null ? expected.hashCode() : 0);
+            return result;
         }
     }
 }

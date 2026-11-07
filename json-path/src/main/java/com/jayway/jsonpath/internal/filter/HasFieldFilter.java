@@ -1,9 +1,7 @@
 package com.jayway.jsonpath.internal.filter;
 
 import com.jayway.jsonpath.spi.JsonProvider;
-
-import java.util.List;
-import java.util.Map;
+import java.util.Collection;
 
 public class HasFieldFilter extends PathTokenFilter {
 
@@ -23,15 +21,14 @@ public class HasFieldFilter extends PathTokenFilter {
 
     @Override
     public Object filter(Object obj, JsonProvider jsonProvider) {
-
-        List<Object> src = jsonProvider.toList(obj);
-        List<Object> result = jsonProvider.createList();
+        Iterable<Object> src = jsonProvider.toIterable(obj);
+        Object result = jsonProvider.createArray();
 
         for (Object item : src) {
             if (jsonProvider.isMap(item)) {
-                Map<String, Object> map = jsonProvider.toMap(item);
-                if (map.containsKey(trimmedCondition)) {
-                    result.add(map);
+                Collection<String> keys = jsonProvider.getPropertyKeys(item);
+                if (keys.contains(trimmedCondition)) {
+                    jsonProvider.setProperty(result, jsonProvider.length(result), item);
                 }
             }
         }

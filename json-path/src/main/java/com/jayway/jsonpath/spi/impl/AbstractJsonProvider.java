@@ -2,6 +2,8 @@ package com.jayway.jsonpath.spi.impl;
 
 import com.jayway.jsonpath.spi.JsonProvider;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.SerializationUtils;
@@ -14,28 +16,60 @@ public abstract class AbstractJsonProvider implements JsonProvider {
     }
 
     public boolean isContainer(Object obj) {
-        return (isList(obj) || isMap(obj));
+        return isArray(obj) || isMap(obj);
     }
 
-    public boolean isList(Object obj) {
-        return (obj instanceof List);
+    public boolean isArray(Object obj) {
+        return obj instanceof List;
     }
 
-    @SuppressWarnings({"unchecked"})
-    public List<Object> toList(Object list) {
-        return (List<Object>) list;
+    public Object getProperty(Object obj, Object key) {
+        if (isMap(obj)) {
+            return ((Map) obj).get(key.toString());
+        } else {
+            int index = key instanceof Integer ? (Integer) key : Integer.parseInt(key.toString());
+            return ((List) obj).get(index);
+        }
     }
 
-    @SuppressWarnings({"unchecked"})
-    public Map<String, Object> toMap(Object map) {
-        return (Map<String, Object>) map;
-    }
-
-    public Object getMapValue(Object map, String key) {
-        return toMap(map).get(key);
+    public void setProperty(Object obj, Object key, Object value) {
+        if (isMap(obj)) {
+            ((Map) obj).put(key.toString(), value);
+        } else {
+            int index = key instanceof Integer ? (Integer) key : Integer.parseInt(key.toString());
+            ((List) obj).add(index, value);
+        }
     }
 
     public boolean isMap(Object obj) {
-        return (obj instanceof Map);
+        return obj instanceof Map;
+    }
+
+    public Collection<String> getPropertyKeys(Object obj) {
+        if (isArray(obj)) {
+            List l = (List) obj;
+            List<String> keys = new ArrayList<String>(l.size());
+            for (int i = 0; i < l.size(); i++) {
+                keys.add(String.valueOf(i));
+            }
+            return keys;
+        } else {
+            return ((Map) obj).keySet();
+        }
+    }
+
+    public int length(Object obj) {
+        if (isArray(obj)) {
+            return ((List) obj).size();
+        }
+        return getPropertyKeys(obj).size();
+    }
+
+    public Iterable<Object> toIterable(Object obj) {
+        if (isArray(obj)) {
+            return (Iterable) obj;
+        } else {
+            return ((Map) obj).values();
+        }
     }
 }
