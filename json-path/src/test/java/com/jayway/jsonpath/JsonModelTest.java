@@ -2,7 +2,9 @@ package com.jayway.jsonpath;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.jayway.jsonpath.spi.JsonProviderFactory;
 import java.io.ByteArrayInputStream;
@@ -60,6 +62,15 @@ public class JsonModelTest {
             """;
 
     @Test
+    public void has_path_validates() throws Exception {
+        assertFalse(JsonModel.model(DOCUMENT).hasPath("store.invalid"));
+        assertFalse(JsonModel.model(DOCUMENT).hasPath("store.book[0].foo"));
+
+        assertTrue(JsonModel.model(DOCUMENT).hasPath("store.book"));
+        assertTrue(JsonModel.model(DOCUMENT).hasPath("store.book[0].title"));
+    }
+
+    @Test
     public void a_json_document_can_be_fetched_with_a_URL(@TempDir Path directory)
             throws Exception {
         Path response = directory.resolve("response.json");
@@ -79,14 +90,6 @@ public class JsonModelTest {
     }
 
     @Test
-    public void test_a_sub_model_can_be_fetched_and_read() throws Exception {
-        JsonModel model = JsonModel.model(DOCUMENT);
-        assertEquals("Nigel Rees", model.getModel("$store.book[0]").get("author"));
-        assertEquals(
-                "Nigel Rees", model.getModel(JsonPath.compile("$store.book[0]")).get("author"));
-    }
-
-    @Test
     public void maps_and_list_can_queried() throws Exception {
         Map<String, Object> doc = new HashMap<String, Object>();
         doc.put("items", asList(0, 1, 2));
@@ -96,7 +99,7 @@ public class JsonModelTest {
 
         assertEquals("value", model.get("$child.key"));
         assertEquals(1, model.<Integer>get("$items[1]"));
-        assertEquals(doc, JsonProviderFactory.createProvider().parse(model.getJson()));
+        assertEquals(doc, JsonProviderFactory.createProvider().parse(model.toJson()));
     }
 
     @Test

@@ -23,6 +23,8 @@ public interface JsonProvider {
 
     List<Object> createList();
 
+    Object clone(Object model);
+
     boolean isContainer(Object obj);
 
     boolean isList(Object obj);

@@ -20,8 +20,8 @@ public class ComplianceTest {
         String json =
                 """
                 {
-                    a: "a",
-                    b: "b",
+                    "a": "a",
+                    "b": "b",
                     "c d": "e"
                 }\
                 """;
@@ -44,11 +44,11 @@ public class ComplianceTest {
         assertThat(
                 JsonPath.<List<Comparable>>read(json, "$[*]"),
                 hasItems(
-                        (Comparable) new Integer(1),
-                        (Comparable) new String("2"),
-                        (Comparable) new Double(3.14),
-                        (Comparable) new Boolean(true),
-                        null));
+                        new Integer(1),
+                        new String("2"),
+                        new Double(3.14),
+                        new Boolean(true),
+                        (Comparable) null));
         assertThat(JsonPath.<Boolean>read(json, "$[-1:]"), is(equalTo(null)));
     }
 
@@ -57,13 +57,13 @@ public class ComplianceTest {
         String json =
                 """
                 {
-                    points: [
-                        { id: "i1", x: 4, y: -5 },
-                        { id: "i2", x: -2, y: 2, z: 1 },
-                        { id: "i3", x: 8, y: 3 },
-                        { id: "i4", x: -6, y: -1 },
-                        { id: "i5", x: 0, y: 2, z: 1 },
-                        { id: "i6", x: 1, y: 4 }
+                    "points": [
+                        { "id": "i1", "x": 4, "y": -5 },
+                        { "id": "i2", "x": -2, "y": 2, "z": 1 },
+                        { "id": "i3", "x": 8, "y": 3 },
+                        { "id": "i4", "x": -6, "y": -1 },
+                        { "id": "i5", "x": 0, "y": 2, "z": 1 },
+                        { "id": "i6", "x": 1, "y": 4 }
                     ]
                 }\
                 """;
@@ -85,7 +85,7 @@ public class ComplianceTest {
 
         assertThat(JsonPath.<List<String>>read(json, "$.points[?(@.z)].id"), hasItems("i2", "i5"));
 
-        assertThat(JsonPath.<String>read(json, "$.points[(@.length-1)].id"), equalTo("i6"));
+        assertThat(JsonPath.<String>read(json, "$.points[(@.length - 1)].id"), equalTo("i6"));
     }
 
     @SuppressWarnings("UnusedAssignment")

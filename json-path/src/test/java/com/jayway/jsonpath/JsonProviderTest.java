@@ -1,7 +1,10 @@
 package com.jayway.jsonpath;
 
-import com.jayway.jsonpath.spi.impl.JacksonProvider;
+import static com.jayway.jsonpath.JsonModel.model;
 
+import com.jayway.jsonpath.spi.impl.JacksonProvider;
+import java.io.Serializable;
+import org.apache.commons.lang.SerializationUtils;
 import org.junit.jupiter.api.Test;
 
 public class JsonProviderTest {
@@ -65,6 +68,15 @@ public class JsonProviderTest {
                 }
             }\
             """;
+
+    @Test
+    public void clone_test() throws Exception {
+        Serializable jsonObject = (Serializable) model(DOCUMENT).getJsonObject();
+
+        Object clone = SerializationUtils.clone(jsonObject);
+
+        System.out.println(model(clone).toJson());
+    }
 
     @Test
     public void parse_document() throws Exception {

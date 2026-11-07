@@ -3,14 +3,17 @@ package com.jayway.jsonpath.spi.impl;
 import com.jayway.jsonpath.InvalidJsonException;
 import com.jayway.jsonpath.spi.MappingProvider;
 import com.jayway.jsonpath.spi.Mode;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.type.CollectionType;
 
@@ -52,7 +55,15 @@ public class JacksonProvider extends AbstractJsonProvider implements MappingProv
 
     @Override
     public String toJson(Object obj) {
-        throw new UnsupportedOperationException();
+        StringWriter writer = new StringWriter();
+        try {
+            JsonGenerator jsonGenerator = objectMapper.createGenerator(writer);
+            objectMapper.writeValue(jsonGenerator, obj);
+            writer.close();
+            return writer.getBuffer().toString();
+        } catch (IOException | JacksonException e) {
+            throw new InvalidJsonException();
+        }
     }
 
     @Override

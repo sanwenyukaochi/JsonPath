@@ -1,7 +1,10 @@
 package com.jayway.jsonpath;
 
+import static com.jayway.jsonpath.JsonModel.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,11 +49,28 @@ public class JsonModelOpsTest {
                         "color": "red",
                         "price": 19.95,
                         "foo:bar": "fooBar",
+                        "number": 12,
                         "dot.notation": "new"
                     }
                 }
             }\
             """;
+
+    @Test
+    public void convert_values() throws Exception {
+
+        JsonModel model = model(DOCUMENT).getSubModel("store.bicycle");
+
+        JsonModel.ObjectOps ops = model.opsForObject();
+
+        assertEquals(19.95D, ops.getDouble("price"));
+        assertEquals(new Long(12), ops.getLong("number"));
+        assertEquals(new Integer(12), ops.getInteger("number"));
+
+        int i = ops.getInteger("number");
+        long l = ops.getLong("number");
+        double d = ops.getDouble("price");
+    }
 
     @Test
     public void object_ops_can_update() throws Exception {
@@ -76,13 +96,87 @@ public class JsonModelOpsTest {
 
         model.opsForArray("store.book").add(newBook);
 
-        JsonModel subModel = model.getModel("store.book[4]");
+        JsonModel subModel = model.getSubModel("store.book[4]");
 
         assertEquals("reference", subModel.get("category"));
         assertEquals("Kalle", subModel.get("author"));
         assertEquals("JSONPath book", subModel.get("title"));
         assertEquals("0-553-21311-34", subModel.get("isbn"));
         assertEquals(12.10D, subModel.<Double>get("price"));
+    }
+
+    @Test
+    public void ops_can_transform_object_root() throws Exception {
+
+        Map<String, Object> rootDocument = new HashMap<String, Object>();
+        rootDocument.put("category", "reference");
+        rootDocument.put("author", "Kalle");
+        rootDocument.put("title", "JSONPath book");
+        rootDocument.put("isbn", "0-553-21311-34");
+        rootDocument.put("price", 12.10D);
+
+        JsonModel model = JsonModel.model(rootDocument);
+
+        model.opsForObject()
+                .transform(
+                        new Transformer<Map<String, Object>>() {
+                            @Override
+                            public Object transform(Map<String, Object> obj) {
+                                obj.put("name", "kalle");
+                                return obj;
+                            }
+                        });
+        assertEquals("kalle", model.get("name"));
+    }
+
+    @Test
+    public void ops_can_transform_array_root() throws Exception {
+
+        List<Object> rootDocument = new ArrayList<Object>();
+        rootDocument.add(Collections.singletonMap("name", "kalle"));
+        rootDocument.add(Collections.singletonMap("name", "bob"));
+        rootDocument.add(Collections.singletonMap("name", "zak"));
+
+        JsonModel model = JsonModel.model(rootDocument);
+
+        model.opsForArray()
+                .transform(
+                        new Transformer<List<Object>>() {
+                            @Override
+                            public Object transform(List<Object> obj) {
+                                return Collections.singletonMap("root", "new");
+                            }
+                        });
+        assertEquals("new", model.get("root"));
+    }
+
+    @Test
+    public void ops_can_transform_nested_document() throws Exception {
+
+        Map<String, Object> childDocument = new HashMap<String, Object>();
+        childDocument.put("level", 1);
+
+        Map<String, Object> rootDocument = new HashMap<String, Object>();
+        rootDocument.put("category", "reference");
+        rootDocument.put("author", "Kalle");
+        rootDocument.put("title", "JSONPath book");
+        rootDocument.put("isbn", "0-553-21311-34");
+        rootDocument.put("price", 12.10D);
+        rootDocument.put("child", childDocument);
+
+        JsonModel model = JsonModel.model(rootDocument);
+
+        model.opsForObject("child")
+                .transform(
+                        new Transformer<Map<String, Object>>() {
+                            @Override
+                            public Object transform(Map<String, Object> obj) {
+                                obj.put("name", "kalle");
+                                return obj;
+                            }
+                        });
+
+        assertEquals("kalle", model.get("child.name"));
     }
 
     @Test
@@ -112,11 +206,12 @@ public class JsonModelOpsTest {
 
     @Test
     public void object_can_be_transformed() throws Exception {
+
         Transformer transformer =
-                new Transformer<JsonModel>() {
+                new Transformer<Map<String, Object>>() {
                     @Override
-                    public JsonModel transform(int index, JsonModel model) {
-                        model.opsForObject().put("newProp", "newProp");
+                    public Map<String, Object> transform(Map<String, Object> model) {
+                        model.put("newProp", "newProp");
                         return model;
                     }
                 };
@@ -131,11 +226,15 @@ public class JsonModelOpsTest {
     @Test
     public void arrays_can_be_transformed() throws Exception {
         Transformer transformer =
-                new Transformer<Object>() {
+                new Transformer<List<Object>>() {
                     @Override
-                    public Object transform(int index, Object model) {
-                        Map<String, Object> map = (Map<String, Object>) model;
-                        map.put("newProp", "newProp");
+                    public Object transform(List<Object> model) {
+
+                        for (Object o : model) {
+                            Map<String, Object> map = (Map<String, Object>) o;
+                            map.put("newProp", "newProp");
+                        }
+
                         return model;
                     }
                 };
@@ -150,22 +249,31 @@ public class JsonModelOpsTest {
     @Test
     public void array_can_be_transformed_to_primitives() throws Exception {
         Transformer positionTransformer =
-                new Transformer<Object>() {
+                new Transformer<List<Object>>() {
                     private int i = 0;
 
                     @Override
-                    public Object transform(int index, Object model) {
-                        return i++;
+                    public Object transform(List<Object> model) {
+                        List<Object> newList = new ArrayList<Object>();
+
+                        for (Object o : model) {
+                            newList.add(new Integer(i++));
+                        }
+
+                        return newList;
                     }
                 };
 
         Transformer multiplyingTransformer =
-                new Transformer<Object>() {
+                new Transformer<List<Object>>() {
                     @Override
-                    public Object transform(int index, Object model) {
-                        int in = (Integer) model;
+                    public Object transform(List<Object> model) {
 
-                        return in * 2;
+                        for (int i = 0; i < model.size(); i++) {
+                            int curr = (Integer) model.get(i);
+                            model.set(i, curr * 2);
+                        }
+                        return model;
                     }
                 };
 
