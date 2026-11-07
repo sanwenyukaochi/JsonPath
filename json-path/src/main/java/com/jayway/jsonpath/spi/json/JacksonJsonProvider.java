@@ -68,7 +68,7 @@ public class JacksonJsonProvider extends AbstractJsonProvider {
             generator.close();
             return writer.getBuffer().toString();
         } catch (IOException | JacksonException e) {
-            throw new InvalidJsonException();
+            throw new InvalidJsonException(e);
         }
     }
 
