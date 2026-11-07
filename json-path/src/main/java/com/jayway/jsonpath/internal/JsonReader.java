@@ -32,7 +32,6 @@ public class JsonReader implements ParseContext, DocumentContext {
 
     private final Configuration configuration;
     private Object json;
-    private Object patch;
 
     public JsonReader() {
         this(Configuration.defaultConfiguration());

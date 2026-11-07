@@ -4,13 +4,13 @@ public interface EvaluationListener {
 
     EvaluationContinuation resultFound(FoundResult found);
 
-    public static enum EvaluationContinuation {
+    enum EvaluationContinuation {
         CONTINUE,
 
         ABORT
     }
 
-    public interface FoundResult {
+    interface FoundResult {
 
         int index();
 
