@@ -1,8 +1,10 @@
 package com.jayway.jsonpath.internal.function;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Configurations;
-
+import com.jayway.jsonpath.JsonPathException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedClass;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -49,5 +51,60 @@ public class NumericPathFunctionTest extends BaseFunctionTest {
     @Test
     public void testStdDevOfDouble() {
         verifyMathFunction(conf, "$.numbers.stddev()", 2.8722813232690143d);
+    }
+
+    @Test
+    public void testAverageOfEmptyListNegative() {
+        try {
+            verifyMathFunction(conf, "$.empty.avg()", null);
+        } catch (JsonPathException e) {
+            assertEquals(
+                    e.getMessage(),
+                    "Aggregation function attempted to calculate value using empty array");
+        }
+    }
+
+    @Test
+    public void testMaxOfEmptyListNegative() {
+        try {
+            verifyMathFunction(conf, "$.empty.max()", null);
+        } catch (JsonPathException e) {
+            assertEquals(
+                    e.getMessage(),
+                    "Aggregation function attempted to calculate value using empty array");
+        }
+    }
+
+    @Test
+    public void testMinOfEmptyListNegative() {
+        try {
+            verifyMathFunction(conf, "$.empty.min()", null);
+        } catch (JsonPathException e) {
+            assertEquals(
+                    e.getMessage(),
+                    "Aggregation function attempted to calculate value using empty array");
+        }
+    }
+
+    @Test
+    public void testStddevOfEmptyListNegative() {
+        try {
+            verifyMathFunction(conf, "$.empty.stddev()", null);
+        } catch (JsonPathException e) {
+            assertEquals(
+                    e.getMessage(),
+                    "Aggregation function attempted to calculate value using empty array");
+        }
+    }
+
+    @Test
+    public void testSumOfEmptyListNegative() {
+        try {
+            verifyMathFunction(conf, "$.empty.sum()", null);
+        } catch (JsonPathException e) {
+            assertEquals(
+                    e.getMessage(),
+                    "Aggregation function attempted to calculate value using empty array");
+        }
     }
 }

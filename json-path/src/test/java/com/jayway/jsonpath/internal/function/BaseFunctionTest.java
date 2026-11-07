@@ -9,18 +9,22 @@ import java.util.Scanner;
 
 public class BaseFunctionTest {
     protected static final String NUMBER_SERIES =
-            "{\"numbers\" : [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}";
+            "{\"empty\": [], \"numbers\" : [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}";
     protected static final String TEXT_SERIES =
-            "{\"text\" : [ \"a\", \"b\", \"c\", \"d\", \"e\", \"f\" ]}";
+            "{\"urls\": [\"http://api.worldbank.org/countries/all/?format=json\", \"http://api.worldbank.org/countries/all/?format=json\"], \"text\" : [ \"a\", \"b\", \"c\", \"d\", \"e\", \"f\" ]}";
 
     protected void verifyFunction(
             Configuration conf, String pathExpr, String json, Object expectedValue) {
         Object result = using(conf).parse(json).read(pathExpr);
-        assertThat(result).isEqualTo(expectedValue);
+        assertThat(conf.jsonProvider().unwrap(result)).isEqualTo(expectedValue);
     }
 
     protected void verifyMathFunction(Configuration conf, String pathExpr, Object expectedValue) {
         verifyFunction(conf, pathExpr, NUMBER_SERIES, expectedValue);
+    }
+
+    protected void verifyTextFunction(Configuration conf, String pathExpr, Object expectedValue) {
+        verifyFunction(conf, pathExpr, TEXT_SERIES, expectedValue);
     }
 
     protected String getResourceAsText(String resourceName) throws IOException {

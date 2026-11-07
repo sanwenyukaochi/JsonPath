@@ -9,6 +9,8 @@ import com.jayway.jsonpath.internal.CharacterIndex;
 import com.jayway.jsonpath.internal.Path;
 import com.jayway.jsonpath.internal.Utils;
 import com.jayway.jsonpath.internal.filter.FilterCompiler;
+import com.jayway.jsonpath.internal.function.ParamType;
+import com.jayway.jsonpath.internal.function.Parameter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -22,10 +24,16 @@ public class PathCompiler {
     private static final char OPEN_SQUARE_BRACKET = '[';
     private static final char CLOSE_SQUARE_BRACKET = ']';
     private static final char OPEN_PARENTHESIS = '(';
+    private static final char CLOSE_PARENTHESIS = ')';
+    private static final char OPEN_BRACE = '{';
+    private static final char CLOSE_BRACE = '}';
 
     private static final char WILDCARD = '*';
     private static final char PERIOD = '.';
     private static final char SPACE = ' ';
+    private static final char TAB = '\t';
+    private static final char CR = '\r';
+    private static final char LF = '\r';
     private static final char BEGIN_FILTER = '?';
     private static final char COMMA = ',';
     private static final char SPLIT = ':';
@@ -70,9 +78,25 @@ public class PathCompiler {
         }
     }
 
+    private void readWhitespace() {
+        while (path.inBounds()) {
+            char c = path.currentChar();
+            if (!isWhitespace(c)) {
+                break;
+            }
+            path.incrementPosition(1);
+        }
+    }
+
+    private Boolean isPathContext(char c) {
+        return (c == DOC_CONTEXT || c == EVAL_CONTEXT);
+    }
+
     private RootPathToken readContextToken() {
 
-        if (!path.currentCharIs(DOC_CONTEXT) && !path.currentCharIs(EVAL_CONTEXT)) {
+        readWhitespace();
+
+        if (!isPathContext(path.currentChar())) {
             throw new InvalidPathException("Path must start with '$' or '@'");
         }
 
@@ -148,15 +172,20 @@ public class PathCompiler {
         int readPosition = startPosition;
         int endPosition = 0;
 
+        boolean isFunction = false;
+
         while (path.inBounds(readPosition)) {
             char c = path.charAt(readPosition);
             if (c == SPACE) {
                 throw new InvalidPathException(
                         "Use bracket notion ['my prop'] if your property contains blank characters. position: "
                                 + path.position());
-            }
-            if (c == PERIOD || c == OPEN_SQUARE_BRACKET) {
+            } else if (c == PERIOD || c == OPEN_SQUARE_BRACKET) {
                 endPosition = readPosition;
+                break;
+            } else if (c == OPEN_PARENTHESIS) {
+                isFunction = true;
+                endPosition = readPosition++;
                 break;
             }
             readPosition++;
@@ -165,17 +194,153 @@ public class PathCompiler {
             endPosition = path.length();
         }
 
-        path.setPosition(endPosition);
+        List<Parameter> functionParameters = null;
+        if (isFunction) {
+            if (path.inBounds(readPosition + 1)) {
+
+                char c = path.charAt(readPosition + 1);
+                if (c != CLOSE_PARENTHESIS) {
+                    path.setPosition(endPosition + 1);
+
+                    String functionName = path.subSequence(startPosition, endPosition).toString();
+                    functionParameters = parseFunctionParameters(functionName);
+                } else {
+                    path.setPosition(readPosition + 1);
+                }
+            } else {
+                path.setPosition(readPosition);
+            }
+        } else {
+            path.setPosition(endPosition);
+        }
 
         String property = path.subSequence(startPosition, endPosition).toString();
-        if (property.endsWith("()")) {
-            appender.appendPathToken(PathTokenFactory.createFunctionPathToken(property));
+        if (isFunction) {
+            appender.appendPathToken(
+                    PathTokenFactory.createFunctionPathToken(property, functionParameters));
         } else {
             appender.appendPathToken(
                     PathTokenFactory.createSinglePropertyPathToken(property, SINGLE_QUOTE));
         }
 
         return path.currentIsTail() || readNextToken(appender);
+    }
+
+    private List<Parameter> parseFunctionParameters(String funcName) {
+        PathToken currentToken;
+        ParamType type = null;
+
+        Integer groupParen = 1, groupBracket = 0, groupBrace = 0, groupQuote = 0;
+        Boolean endOfStream = false;
+        char priorChar = 0;
+        List<Parameter> parameters = new ArrayList<Parameter>();
+        StringBuffer parameter = new StringBuffer();
+        while (path.inBounds() && !endOfStream) {
+            char c = path.currentChar();
+            path.incrementPosition(1);
+
+            if (type == null) {
+                if (isWhitespace(c)) {
+                    continue;
+                }
+
+                if (c == OPEN_BRACE || isDigit(c) || DOUBLE_QUOTE == c) {
+                    type = ParamType.JSON;
+                } else if (isPathContext(c)) {
+                    type = ParamType.PATH;
+                }
+            }
+
+            switch (c) {
+                case DOUBLE_QUOTE:
+                    if (priorChar != '\\' && groupQuote > 0) {
+                        if (groupQuote == 0) {
+                            throw new InvalidPathException(
+                                    "Unexpected quote '\"' at character position: "
+                                            + path.position());
+                        }
+                        groupQuote--;
+                    } else {
+                        groupQuote++;
+                    }
+                    break;
+                case OPEN_PARENTHESIS:
+                    groupParen++;
+                    break;
+                case OPEN_BRACE:
+                    groupBrace++;
+                    break;
+                case OPEN_SQUARE_BRACKET:
+                    groupBracket++;
+                    break;
+
+                case CLOSE_BRACE:
+                    if (0 == groupBrace) {
+                        throw new InvalidPathException(
+                                "Unexpected close brace '}' at character position: "
+                                        + path.position());
+                    }
+                    groupBrace--;
+                    break;
+                case CLOSE_SQUARE_BRACKET:
+                    if (0 == groupBracket) {
+                        throw new InvalidPathException(
+                                "Unexpected close bracket ']' at character position: "
+                                        + path.position());
+                    }
+                    groupBracket--;
+                    break;
+
+                case CLOSE_PARENTHESIS:
+                    groupParen--;
+                    if (0 != groupParen) {
+                        parameter.append(c);
+                    }
+                case COMMA:
+                    if ((0 == groupQuote
+                            && 0 == groupBrace
+                            && 0 == groupBracket
+                            && ((0 == groupParen && CLOSE_PARENTHESIS == c) || 1 == groupParen))) {
+                        endOfStream = (0 == groupParen);
+
+                        if (null != type) {
+                            Parameter param = null;
+                            switch (type) {
+                                case JSON:
+                                    param = new Parameter(parameter.toString());
+                                    break;
+                                case PATH:
+                                    LinkedList<Predicate> predicates = new LinkedList<Predicate>();
+                                    PathCompiler compiler =
+                                            new PathCompiler(parameter.toString(), predicates);
+                                    param = new Parameter(compiler.compile());
+                                    break;
+                            }
+                            if (null != param) {
+                                parameters.add(param);
+                            }
+                            parameter.delete(0, parameter.length());
+                            type = null;
+                        }
+                    }
+                    break;
+            }
+
+            if (type != null
+                    && !(c == COMMA && 0 == groupBrace && 0 == groupBracket && 1 == groupParen)) {
+                parameter.append(c);
+            }
+            priorChar = c;
+        }
+        if (0 != groupBrace || 0 != groupParen || 0 != groupBracket) {
+            throw new InvalidPathException(
+                    "Arguments to function: '" + funcName + "' are not closed properly.");
+        }
+        return parameters;
+    }
+
+    private boolean isWhitespace(char c) {
+        return (c == SPACE || c == TAB || c == LF || c == CR);
     }
 
     private boolean readPlaceholderToken(PathTokenAppender appender) {
