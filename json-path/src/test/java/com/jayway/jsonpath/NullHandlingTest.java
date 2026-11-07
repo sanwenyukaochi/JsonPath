@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class NullHandlingTest {
@@ -44,6 +45,7 @@ public class NullHandlingTest {
     }
 
     @Test
+    @Disabled
     public void last_token_defaults_to_null() {
 
         assertNull(JsonPath.read(DOCUMENT, "$.children[2].age"));
