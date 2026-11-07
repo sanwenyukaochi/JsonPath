@@ -485,4 +485,64 @@ public class IssuesTest {
 
         Assertions.assertThat(result).containsExactly("foo");
     }
+
+    @Test
+    public void issue_60() {
+
+        String json =
+"""
+[
+{
+  "mpTransactionId": "542986eae4b001fd500fdc5b-coreDisc_50-title",
+  "resultType": "FAIL",
+  "narratives": [
+    {
+      "ruleProcessingDate": "Nov 2, 2014 7:30:20 AM",
+      "area": "Discovery",
+      "phase": "Validation",
+      "message": "Chain does not have a discovery event. Possible it was cut by the date that was picked",
+      "ruleName": "Validate chain\\u0027s discovery event existence",
+      "lastRule": true
+    }
+  ]
+},
+{
+  "mpTransactionId": "54298649e4b001fd500fda3e-fixCoreDiscovery_3-title",
+  "resultType": "FAIL",
+  "narratives": [
+    {
+      "ruleProcessingDate": "Nov 2, 2014 7:30:20 AM",
+      "area": "Discovery",
+      "phase": "Validation",
+      "message": "There is one and only discovery event ContentDiscoveredEvent(230) found.",
+      "ruleName": "Marks existence of discovery event (230)",
+      "lastRule": false
+    },
+    {
+      "ruleProcessingDate": "Nov 2, 2014 7:30:20 AM",
+      "area": "Discovery/Processing",
+      "phase": "Validation",
+      "message": "Chain does not have SLA start event (204) in Discovery or Processing. ",
+      "ruleName": "Check if SLA start event is not present (204). ",
+      "lastRule": false
+    },
+    {
+      "ruleProcessingDate": "Nov 2, 2014 7:30:20 AM",
+      "area": "Processing",
+      "phase": "Transcode",
+      "message": "No start transcoding events found",
+      "ruleName": "Start transcoding events missing (240)",
+      "lastRule": true
+    }
+  ]
+}]\
+""";
+
+        List<String> problems = JsonPath.read(json, "$..narratives[?(@.lastRule==true)].message");
+
+        Assertions.assertThat(problems)
+                .containsExactly(
+                        "Chain does not have a discovery event. Possible it was cut by the date that was picked",
+                        "No start transcoding events found");
+    }
 }

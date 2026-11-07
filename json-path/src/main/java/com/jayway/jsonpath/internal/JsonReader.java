@@ -11,6 +11,7 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.Predicate;
 import com.jayway.jsonpath.ReadContext;
+import com.jayway.jsonpath.TypeRef;
 import com.jayway.jsonpath.spi.http.HttpProviderFactory;
 import java.io.File;
 import java.io.FileInputStream;
@@ -122,6 +123,16 @@ public class JsonReader implements ParseContext, DocumentContext {
         return convert(read(path), type, configuration);
     }
 
+    @Override
+    public <T> T read(JsonPath path, TypeRef<T> type) {
+        return convert(read(path), type, configuration);
+    }
+
+    @Override
+    public <T> T read(String path, TypeRef<T> type) {
+        return convert(read(path), type, configuration);
+    }
+
     public ReadContext limit(int maxResults) {
         return withListeners(new LimitingEvaluationListener(maxResults));
     }
@@ -131,6 +142,10 @@ public class JsonReader implements ParseContext, DocumentContext {
     }
 
     private <T> T convert(Object obj, Class<T> targetType, Configuration configuration) {
+        return configuration.mappingProvider().map(obj, targetType, configuration);
+    }
+
+    private <T> T convert(Object obj, TypeRef<T> targetType, Configuration configuration) {
         return configuration.mappingProvider().map(obj, targetType, configuration);
     }
 

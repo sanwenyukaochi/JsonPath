@@ -14,6 +14,10 @@ public interface ReadContext {
 
     <T> T read(JsonPath path, Class<T> type);
 
+    <T> T read(JsonPath path, TypeRef<T> typeRef);
+
+    <T> T read(String path, TypeRef<T> typeRef);
+
     ReadContext limit(int maxResults);
 
     ReadContext withListeners(EvaluationListener... listener);

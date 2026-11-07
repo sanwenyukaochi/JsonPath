@@ -2,13 +2,34 @@ package com.jayway.jsonpath;
 
 import static com.jayway.jsonpath.JsonPath.using;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.jayway.jsonpath.spi.mapper.MappingException;
+import java.io.IOException;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
 
 public class JacksonTreeJsonProviderTest extends BaseTest {
+
+    private static final String JSON =
+"""
+[{
+   "foo" : "foo0",
+   "bar" : 0,
+   "baz" : true,
+   "gen" : {"eric" : "yepp"}},{
+   "foo" : "foo1",
+   "bar" : 1,
+   "baz" : true,
+   "gen" : {"eric" : "yepp"}},{
+   "foo" : "foo2",
+   "bar" : 2,
+   "baz" : true,
+   "gen" : {"eric" : "yepp"}}]\
+""";
 
     @Test
     public void json_can_be_parsed() {
@@ -60,7 +81,39 @@ public class JacksonTreeJsonProviderTest extends BaseTest {
                 using(JACKSON_TREE_CONFIGURATION)
                         .parse(JSON_DOCUMENT)
                         .read("$.store.book[*].display-price");
-
         System.out.println(objs.toString());
+    }
+
+    @Test
+    public void test_type_ref() throws IOException {
+        TypeRef<List<FooBarBaz<Gen>>> typeRef = new TypeRef<List<FooBarBaz<Gen>>>() {};
+
+        List<FooBarBaz<Gen>> list =
+                using(JACKSON_TREE_CONFIGURATION).parse(JSON).read("$", typeRef);
+
+        assertThat(list.get(0).gen.eric).isEqualTo("yepp");
+    }
+
+    @Test
+    public void test_type_ref_fail() throws IOException {
+        assertThrows(
+                MappingException.class,
+                () -> {
+                    TypeRef<List<FooBarBaz<Integer>>> typeRef =
+                            new TypeRef<List<FooBarBaz<Integer>>>() {};
+
+                    using(JACKSON_TREE_CONFIGURATION).parse(JSON).read("$", typeRef);
+                });
+    }
+
+    public static class FooBarBaz<T> {
+        public T gen;
+        public String foo;
+        public Long bar;
+        public boolean baz;
+    }
+
+    public static class Gen {
+        public String eric;
     }
 }
