@@ -52,7 +52,6 @@ public class JSONEntityFunctionTest extends BaseFunctionTest {
     @Test
     public void testLengthOfTextArray() {
 
-        System.out.println(TEXT_SERIES);
         verifyFunction(conf, "$['text'].%length()", TEXT_SERIES, 6);
     }
 

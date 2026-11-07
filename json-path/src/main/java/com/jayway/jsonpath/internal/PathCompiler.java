@@ -1,12 +1,11 @@
 package com.jayway.jsonpath.internal;
 
 import static java.lang.Character.isDigit;
-import static java.lang.Math.min;
 import static java.util.Arrays.asList;
 
-import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.Predicate;
+import com.jayway.jsonpath.internal.filter.FilterCompiler;
 import com.jayway.jsonpath.internal.token.ArrayIndexOperation;
 import com.jayway.jsonpath.internal.token.ArraySliceOperation;
 import com.jayway.jsonpath.internal.token.PathTokenAppender;
@@ -32,11 +31,8 @@ public class PathCompiler {
     private static final char COMMA = ',';
     private static final char SPLIT = ':';
     private static final char MINUS = '-';
-    private static final char ESCAPE = '\\';
     private static final char TICK = '\'';
     private static final char FUNCTION = '%';
-
-    private static final Cache cache = new Cache(200);
 
     private final LinkedList<Predicate> filterStack;
     private final CharacterIndex path;
@@ -62,9 +58,7 @@ public class PathCompiler {
                 fail("Path must not end wid a scan operation '..'");
             }
             LinkedList filterStack = new LinkedList<Predicate>(asList(filters));
-
             Path p = new PathCompiler(path.trim(), filterStack).compile();
-
             return p;
         } catch (Exception e) {
             InvalidPathException ipe;
@@ -93,7 +87,7 @@ public class PathCompiler {
         path.incrementPosition(1);
 
         if (path.currentChar() != PERIOD && path.currentChar() != OPEN_SQUARE_BRACKET) {
-            fail("Illegal character at position " + path.position + " expected '.' or '[");
+            fail("Illegal character at position " + path.position() + " expected '.' or '[");
         }
 
         readNextToken(appender);
@@ -112,20 +106,20 @@ public class PathCompiler {
                         || readWildCardToken(appender)
                         || readFilterToken(appender)
                         || readPlaceholderToken(appender)
-                        || fail("Could not parse bracket statement at position " + path.position);
+                        || fail("Could not parse bracket statement at position " + path.position());
             case PERIOD:
                 return readDotSeparatorToken(appender)
                         || readScanToken(appender)
-                        || fail("Could not parse token at position " + path.position);
+                        || fail("Could not parse token at position " + path.position());
             case WILDCARD:
                 return readWildCardToken(appender)
-                        || fail("Could not parse token at position " + path.position);
+                        || fail("Could not parse token at position " + path.position());
             case FUNCTION:
                 return readFunctionToken(appender)
-                        || fail("Could not parse token at position " + path.position);
+                        || fail("Could not parse token at position " + path.position());
             default:
                 return readPropertyToken(appender)
-                        || fail("Could not parse token at position " + path.position);
+                        || fail("Could not parse token at position " + path.position());
         }
     }
 
@@ -136,7 +130,7 @@ public class PathCompiler {
                 || path.currentCharIs(SPACE)) {
             return false;
         }
-        int startPosition = path.position;
+        int startPosition = path.position();
         int readPosition = startPosition;
         int endPosition = 0;
         while (path.inBounds(readPosition)) {
@@ -176,7 +170,7 @@ public class PathCompiler {
                 || path.currentCharIs(SPACE)) {
             return false;
         }
-        int startPosition = path.position;
+        int startPosition = path.position();
         int readPosition = startPosition;
         int endPosition = 0;
 
@@ -185,7 +179,7 @@ public class PathCompiler {
             if (c == SPACE) {
                 throw new InvalidPathException(
                         "Use bracket notion ['my prop'] if your property contains blank characters. position: "
-                                + path.position);
+                                + path.position());
             }
             if (c == PERIOD || c == OPEN_SQUARE_BRACKET) {
                 endPosition = readPosition;
@@ -220,7 +214,7 @@ public class PathCompiler {
             return false;
         }
 
-        int expressionBeginIndex = path.position + 1;
+        int expressionBeginIndex = path.position() + 1;
         int expressionEndIndex = path.nextIndexOf(expressionBeginIndex, CLOSE_SQUARE_BRACKET);
 
         if (expressionEndIndex == -1) {
@@ -236,7 +230,7 @@ public class PathCompiler {
                     "Not enough predicates supplied for filter ["
                             + expression
                             + "] at position "
-                            + path.position);
+                            + path.position());
         }
 
         Collection<Predicate> predicates = new ArrayList<Predicate>();
@@ -260,7 +254,7 @@ public class PathCompiler {
             return false;
         }
 
-        int openStatementBracketIndex = path.position;
+        int openStatementBracketIndex = path.position();
         int questionMarkIndex = path.indexOfNextSignificantChar(QUESTIONMARK);
         if (questionMarkIndex == -1) {
             return false;
@@ -269,7 +263,7 @@ public class PathCompiler {
         if (openBracketIndex == -1) {
             return false;
         }
-        int closeBracketIndex = path.indexOfClosingBracket(openBracketIndex + 1, true);
+        int closeBracketIndex = path.indexOfClosingBracket(openBracketIndex, true, true);
         if (closeBracketIndex == -1) {
             return false;
         }
@@ -283,7 +277,9 @@ public class PathCompiler {
                 path.subSequence(openStatementBracketIndex, closeStatementBracketIndex + 1)
                         .toString();
 
-        appender.appendPathToken(PathTokenFactory.createPredicatePathToken(Filter.parse(criteria)));
+        Predicate predicate = FilterCompiler.compile(criteria);
+
+        appender.appendPathToken(PathTokenFactory.createPredicatePathToken(predicate));
 
         path.setPosition(closeStatementBracketIndex + 1);
 
@@ -297,7 +293,7 @@ public class PathCompiler {
         if (inBracket && !path.nextSignificantCharIs(WILDCARD)) {
             return false;
         }
-        if (!path.currentCharIs(WILDCARD) && path.isOutOfBounds(path.position + 1)) {
+        if (!path.currentCharIs(WILDCARD) && path.isOutOfBounds(path.position() + 1)) {
             return false;
         }
         if (inBracket) {
@@ -330,7 +326,7 @@ public class PathCompiler {
             return false;
         }
 
-        int expressionBeginIndex = path.position + 1;
+        int expressionBeginIndex = path.position() + 1;
         int expressionEndIndex = path.nextIndexOf(expressionBeginIndex, CLOSE_SQUARE_BRACKET);
 
         if (expressionEndIndex == -1) {
@@ -377,7 +373,7 @@ public class PathCompiler {
 
         List<String> properties = new ArrayList<String>();
 
-        int startPosition = path.position + 1;
+        int startPosition = path.position() + 1;
         int readPosition = startPosition;
         int endPosition = 0;
         boolean inProperty = false;
@@ -422,158 +418,5 @@ public class PathCompiler {
 
     public static boolean fail(String message) {
         throw new InvalidPathException(message);
-    }
-
-    private static class CharacterIndex {
-
-        private final CharSequence charSequence;
-        private int position;
-
-        private CharacterIndex(CharSequence charSequence) {
-            this.charSequence = charSequence;
-            this.position = 0;
-        }
-
-        private int length() {
-            return charSequence.length();
-        }
-
-        private char charAt(int idx) {
-            return charSequence.charAt(idx);
-        }
-
-        private char currentChar() {
-            return charSequence.charAt(position);
-        }
-
-        private boolean currentCharIs(char c) {
-            return (charSequence.charAt(position) == c);
-        }
-
-        private boolean nextCharIs(char c) {
-            return inBounds(position + 1) && (charSequence.charAt(position + 1) == c);
-        }
-
-        private int incrementPosition(int charCount) {
-            return setPosition(position + charCount);
-        }
-
-        private int setPosition(int newPosition) {
-            position = min(newPosition, charSequence.length() - 1);
-            return position;
-        }
-
-        private int indexOfClosingBracket(int startPosition, boolean skipStrings) {
-            int opened = 1;
-            int readPosition = startPosition;
-            while (inBounds(readPosition)) {
-                if (skipStrings) {
-                    if (charAt(readPosition) == TICK) {
-                        boolean escaped = false;
-                        while (inBounds(readPosition)) {
-                            readPosition++;
-                            if (escaped) {
-                                escaped = false;
-                                continue;
-                            }
-                            if (charAt(readPosition) == ESCAPE) {
-                                escaped = true;
-                                continue;
-                            }
-                            if (charAt(readPosition) == TICK) {
-                                readPosition++;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (charAt(readPosition) == OPEN_BRACKET) {
-                    opened++;
-                }
-                if (charAt(readPosition) == CLOSE_BRACKET) {
-                    opened--;
-                    if (opened == 0) {
-                        return readPosition;
-                    }
-                }
-                readPosition++;
-            }
-            return -1;
-        }
-
-        public int indexOfNextSignificantChar(char c) {
-            return indexOfNextSignificantChar(position, c);
-        }
-
-        public int indexOfNextSignificantChar(int startPosition, char c) {
-            int readPosition = startPosition + 1;
-            while (!isOutOfBounds(readPosition) && charAt(readPosition) == SPACE) {
-                readPosition++;
-            }
-            if (charAt(readPosition) == c) {
-                return readPosition;
-            } else {
-                return -1;
-            }
-        }
-
-        public int nextIndexOf(int startPosition, char c) {
-            int readPosition = startPosition;
-            while (!isOutOfBounds(readPosition)) {
-                if (charAt(readPosition) == c) {
-                    return readPosition;
-                }
-                readPosition++;
-            }
-            return -1;
-        }
-
-        public boolean nextSignificantCharIs(int startPosition, char c) {
-            int readPosition = startPosition + 1;
-            while (!isOutOfBounds(readPosition) && charAt(readPosition) == SPACE) {
-                readPosition++;
-            }
-            return !isOutOfBounds(readPosition) && charAt(readPosition) == c;
-        }
-
-        public boolean nextSignificantCharIs(char c) {
-            return nextSignificantCharIs(position, c);
-        }
-
-        public char nextSignificantChar() {
-            return nextSignificantChar(position);
-        }
-
-        public char nextSignificantChar(int startPosition) {
-            int readPosition = startPosition + 1;
-            while (!isOutOfBounds(readPosition) && charAt(readPosition) == SPACE) {
-                readPosition++;
-            }
-            if (!isOutOfBounds(readPosition)) {
-                return charAt(readPosition);
-            } else {
-                return ' ';
-            }
-        }
-
-        private boolean currentIsTail() {
-            return isOutOfBounds(position + 1);
-        }
-
-        private boolean hasMoreCharacters() {
-            return inBounds(position + 1);
-        }
-
-        private boolean inBounds(int idx) {
-            return (idx >= 0) && (idx < charSequence.length());
-        }
-
-        private boolean isOutOfBounds(int idx) {
-            return !inBounds(idx);
-        }
-
-        private CharSequence subSequence(int start, int end) {
-            return charSequence.subSequence(start, end);
-        }
     }
 }
