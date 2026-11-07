@@ -5,6 +5,7 @@ import com.jayway.jsonpath.JsonPathException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -144,9 +145,11 @@ public class JacksonJsonNodeJsonProvider extends AbstractJsonProvider {
 
     @Override
     public void setProperty(Object obj, Object key, Object value) {
-        if (isMap(obj)) toJsonObject(obj).set(key.toString(), createJsonElement(value));
-        else {
-            ArrayNode array = toJsonArray(obj);
+
+        if (isMap(obj)) {
+            setValueInObjectNode((ObjectNode) obj, key, value);
+        } else {
+            ArrayNode array = (ArrayNode) obj;
             int index;
             if (key != null) {
                 index = key instanceof Integer ? (Integer) key : Integer.parseInt(key.toString());
@@ -161,7 +164,6 @@ public class JacksonJsonNodeJsonProvider extends AbstractJsonProvider {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public void removeProperty(Object obj, Object key) {
         if (isMap(obj)) toJsonObject(obj).remove(key.toString());
         else {
@@ -216,7 +218,16 @@ public class JacksonJsonNodeJsonProvider extends AbstractJsonProvider {
     }
 
     private JsonNode createJsonElement(Object o) {
-        return objectMapper.valueToTree(o);
+        if (o != null) {
+
+            if (o instanceof JsonNode) {
+                return (JsonNode) o;
+            } else {
+                return objectMapper.valueToTree(o);
+            }
+        } else {
+            return null;
+        }
     }
 
     private ArrayNode toJsonArray(Object o) {
@@ -225,5 +236,35 @@ public class JacksonJsonNodeJsonProvider extends AbstractJsonProvider {
 
     private ObjectNode toJsonObject(Object o) {
         return (ObjectNode) o;
+    }
+
+    private void setValueInObjectNode(ObjectNode objectNode, Object key, Object value) {
+
+        if (value instanceof JsonNode) {
+            objectNode.set(key.toString(), (JsonNode) value);
+        } else if (value instanceof String) {
+            objectNode.put(key.toString(), (String) value);
+        } else if (value instanceof Integer) {
+            objectNode.put(key.toString(), (Integer) value);
+        } else if (value instanceof Long) {
+            objectNode.put(key.toString(), (Long) value);
+        } else if (value instanceof Short) {
+            objectNode.put(key.toString(), (Short) value);
+        } else if (value instanceof Double) {
+            objectNode.put(key.toString(), (Double) value);
+        } else if (value instanceof Float) {
+            objectNode.put(key.toString(), (Float) value);
+        } else if (value instanceof BigDecimal) {
+            objectNode.put(key.toString(), (BigDecimal) value);
+        } else if (value instanceof Boolean) {
+            objectNode.put(key.toString(), (Boolean) value);
+        } else if (value instanceof byte[]) {
+            objectNode.put(key.toString(), (byte[]) value);
+        } else if (value == null) {
+            objectNode.set(key.toString(), null);
+        } else {
+            throw new IllegalArgumentException(
+                    "Cannot handle object type: " + value.getClass().getName());
+        }
     }
 }
