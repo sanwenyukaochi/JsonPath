@@ -102,6 +102,19 @@ public class JsonPath {
         return resultByConfiguration(jsonObject, configuration, evaluationContext);
     }
 
+    public <T> T convert(
+            Object jsonObject, ValueConverter valueConverter, Configuration configuration) {
+        notNull(jsonObject, "json can not be null");
+        notNull(configuration, "configuration can not be null");
+        notNull(valueConverter, "valueConverter can not be null");
+        EvaluationContext evaluationContext =
+                path.evaluate(jsonObject, jsonObject, configuration, true);
+        for (PathRef updateOperation : evaluationContext.updateOperations()) {
+            updateOperation.convert(valueConverter, configuration);
+        }
+        return resultByConfiguration(jsonObject, configuration, evaluationContext);
+    }
+
     public <T> T delete(Object jsonObject, Configuration configuration) {
         notNull(jsonObject, "json can not be null");
         notNull(configuration, "configuration can not be null");
@@ -132,6 +145,19 @@ public class JsonPath {
                 path.evaluate(jsonObject, jsonObject, configuration, true);
         for (PathRef updateOperation : evaluationContext.updateOperations()) {
             updateOperation.put(key, value, configuration);
+        }
+        return resultByConfiguration(jsonObject, configuration, evaluationContext);
+    }
+
+    public <T> T renameKey(
+            Object jsonObject, String oldKeyName, String newKeyName, Configuration configuration) {
+        notNull(jsonObject, "json can not be null");
+        notEmpty(newKeyName, "newKeyName can not be null or empty");
+        notNull(configuration, "configuration can not be null");
+        EvaluationContext evaluationContext =
+                path.evaluate(jsonObject, jsonObject, configuration, true);
+        for (PathRef updateOperation : evaluationContext.updateOperations()) {
+            updateOperation.renameKey(oldKeyName, newKeyName, configuration);
         }
         return resultByConfiguration(jsonObject, configuration, evaluationContext);
     }

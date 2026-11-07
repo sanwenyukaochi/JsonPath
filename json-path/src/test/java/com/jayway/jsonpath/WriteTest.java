@@ -5,6 +5,7 @@ import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -244,5 +245,139 @@ public class WriteTest extends BaseTest {
 
                     parse(model).set("$[?(@.a == 'a-val')]", 1);
                 });
+    }
+
+    @Test
+    public void a_path_can_be_renamed() {
+        Object o = parse(JSON_DOCUMENT).renameKey("$.store", "book", "updated-book").json();
+        List<Object> result = parse(o).read("$.store.updated-book");
+
+        assertThat(result).isNotEmpty();
+    }
+
+    @Test
+    public void an_array_criteria_with_multiple_results_can_be_deleted() {
+        InputStream stream =
+                this.getClass().getResourceAsStream("/json_array_multiple_delete.json");
+        String deletePath = "$._embedded.mandates[?(@.count=~/0/)]";
+        DocumentContext documentContext = JsonPath.parse(stream);
+        documentContext.delete(deletePath);
+        List<Object> result = documentContext.read(deletePath);
+        assertThat(result.size()).isEqualTo(0);
+    }
+
+    @Test
+    public void keys_in_root_containing_map_can_be_renamed() {
+        Object o = parse(JSON_DOCUMENT).renameKey("$", "store", "new-store").json();
+        List<Object> result = parse(o).read("$.new-store[*]");
+        assertThat(result).isNotEmpty();
+    }
+
+    @Test
+    public void map_array_items_can_be_renamed() {
+        Object o =
+                parse(JSON_DOCUMENT)
+                        .renameKey("$.store.book[*]", "category", "renamed-category")
+                        .json();
+        List<Object> result = parse(o).read("$.store.book[*].renamed-category");
+        assertThat(result).isNotEmpty();
+    }
+
+    @Test
+    public void multi_match_path_can_be_converted() {
+        ValueConverter valueConverter = new ToStringValueConverterImpl();
+        List<Double> doubleResult = parse(JSON_DOCUMENT).read("$..display-price");
+        for (Double dRes : doubleResult) {
+            assertThat(dRes).isInstanceOf(Double.class);
+        }
+        List<String> stringResult =
+                parse(JSON_DOCUMENT)
+                        .convert("$..display-price", valueConverter)
+                        .read("$..display-price");
+        for (String sRes : stringResult) {
+            assertThat(sRes).isInstanceOf(String.class);
+            assertThat(sRes.endsWith("converted")).isTrue();
+        }
+    }
+
+    @Test
+    public void multiple_properties_cannot_be_renamed() {
+        assertThrows(
+                InvalidModificationException.class,
+                () -> {
+                    parse(JSON_DOCUMENT)
+                            .renameKey(
+                                    "$.store.book[*]['author', 'category']", "old-key", "new-key");
+                });
+    }
+
+    @Test
+    public void non_existent_key_rename_not_allowed() {
+        assertThrows(
+                PathNotFoundException.class,
+                () -> {
+                    Object o = parse(JSON_DOCUMENT).renameKey("$", "fake", "new-fake").json();
+                });
+    }
+
+    @Test
+    public void non_map_array_items_cannot_be_renamed() {
+        assertThrows(
+                InvalidModificationException.class,
+                () -> {
+                    List<Integer> model = new LinkedList<Integer>();
+                    model.add(1);
+                    model.add(2);
+                    parse(model).renameKey("$[*]", "oldKey", "newKey");
+                });
+    }
+
+    @Test
+    public void object_can_be_converted() {
+        TypeRef<List<String>> typeRef = new TypeRef<List<String>>() {};
+        ValueConverter valueConverter = new ToStringValueConverterImpl();
+        DocumentContext documentContext =
+                JsonPath.using(JACKSON_CONFIGURATION).parse(JSON_DOCUMENT);
+        Object list = documentContext.read("$..book");
+        assertThat(list).isInstanceOf(List.class);
+        String result =
+                documentContext.convert("$..book", valueConverter).read("$..book", typeRef).get(0);
+        assertThat(result).isInstanceOf(String.class);
+        assertThat(result).endsWith("converted");
+    }
+
+    @Test
+    public void rootCannotBeConverted() {
+        assertThrows(
+                InvalidModificationException.class,
+                () -> {
+                    ValueConverter valueConverter =
+                            new ValueConverter() {
+                                @Override
+                                public Object convert(
+                                        Object currentValue, Configuration configuration) {
+                                    return currentValue.toString() + "converted";
+                                }
+                            };
+                    Object o = parse(JSON_DOCUMENT).convert("$", valueConverter).json();
+                });
+    }
+
+    @Test
+    public void single_match_value_can_be_converted() {
+        ValueConverter valueConverter = new ToStringValueConverterImpl();
+        String stringResult =
+                parse(JSON_DOCUMENT)
+                        .convert("$.string-property", valueConverter)
+                        .read("$.string-property");
+        assertThat(stringResult.endsWith("converted")).isTrue();
+    }
+
+    private class ToStringValueConverterImpl implements ValueConverter {
+
+        @Override
+        public Object convert(Object currentValue, Configuration configuration) {
+            return currentValue.toString() + "converted";
+        }
     }
 }
