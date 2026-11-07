@@ -20,6 +20,8 @@ import java.util.Set;
 
 public class EvaluationContextImpl implements EvaluationContext {
 
+    private static final EvaluationAbortException ABORT_EVALUATION = new EvaluationAbortException();
+
     private final Configuration configuration;
     private final Object valueResult;
     private final Object pathResult;
@@ -67,7 +69,7 @@ public class EvaluationContextImpl implements EvaluationContext {
                 EvaluationListener.EvaluationContinuation continuation =
                         listener.resultFound(new FoundResultImpl(idx, path, model));
                 if (EvaluationListener.EvaluationContinuation.ABORT == continuation) {
-                    throw new EvaluationAbortException();
+                    throw ABORT_EVALUATION;
                 }
             }
         }
