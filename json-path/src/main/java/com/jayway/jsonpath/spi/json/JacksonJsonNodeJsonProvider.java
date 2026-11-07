@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -165,8 +166,9 @@ public class JacksonJsonNodeJsonProvider extends AbstractJsonProvider {
     }
 
     public void removeProperty(Object obj, Object key) {
-        if (isMap(obj)) toJsonObject(obj).remove(key.toString());
-        else {
+        if (isMap(obj)) {
+            toJsonObject(obj).remove(key.toString());
+        } else {
             ArrayNode array = toJsonArray(obj);
             int index = key instanceof Integer ? (Integer) key : Integer.parseInt(key.toString());
             array.remove(index);
@@ -249,6 +251,8 @@ public class JacksonJsonNodeJsonProvider extends AbstractJsonProvider {
             objectNode.put(key.toString(), (Long) value);
         } else if (value instanceof Short) {
             objectNode.put(key.toString(), (Short) value);
+        } else if (value instanceof BigInteger) {
+            objectNode.put(key.toString(), (BigInteger) value);
         } else if (value instanceof Double) {
             objectNode.put(key.toString(), (Double) value);
         } else if (value instanceof Float) {
