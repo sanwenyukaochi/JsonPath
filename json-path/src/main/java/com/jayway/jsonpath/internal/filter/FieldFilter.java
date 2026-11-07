@@ -47,6 +47,11 @@ public class FieldFilter extends Filter {
     }
 
     @Override
+    public Object getRef(Object obj, JsonProvider jsonProvider) {
+        return filter(obj, jsonProvider);
+    }
+
+    @Override
     public boolean isArrayFilter() {
         return false;
     }

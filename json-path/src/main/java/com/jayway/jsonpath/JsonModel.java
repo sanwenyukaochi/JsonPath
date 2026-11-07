@@ -4,11 +4,15 @@ import static java.util.Arrays.asList;
 import static org.apache.commons.lang.Validate.notEmpty;
 import static org.apache.commons.lang.Validate.notNull;
 
+import com.jayway.jsonpath.internal.PathToken;
+import com.jayway.jsonpath.spi.JsonProvider;
 import com.jayway.jsonpath.spi.JsonProviderFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,12 +58,13 @@ public class JsonModel {
         }
     }
 
+    public Object getJsonObject() {
+        return this.jsonObject;
+    }
+
     @SuppressWarnings({"unchecked"})
     public <T> T get(String jsonPath) {
-        notEmpty(jsonPath, "jsonPath can not be null or empty");
-
-        JsonPath path = JsonPath.compile(jsonPath);
-        return (T) get(path);
+        return (T) get(JsonPath.compile(jsonPath));
     }
 
     @SuppressWarnings({"unchecked"})
@@ -69,14 +74,36 @@ public class JsonModel {
         return (T) jsonPath.read(jsonObject);
     }
 
+    public ArrayOps opsForArray(String jsonPath) {
+        return opsForArray(JsonPath.compile(jsonPath));
+    }
+
+    public ArrayOps opsForArray(JsonPath jsonPath) {
+        notNull(jsonPath, "jsonPath can not be null");
+
+        List<Object> opsTarget = getTargetObject(jsonPath, List.class);
+
+        return new DefaultArrayOps(opsTarget);
+    }
+
+    public ObjectOps opsForObject(String jsonPath) {
+        return opsForObject(JsonPath.compile(jsonPath));
+    }
+
+    public ObjectOps opsForObject(JsonPath jsonPath) {
+        notNull(jsonPath, "jsonPath can not be null");
+
+        Map<String, Object> opsTarget = getTargetObject(jsonPath, Map.class);
+
+        return new DefaultObjectOps(opsTarget);
+    }
+
     public String toJson() {
         return JsonProviderFactory.getInstance().toJson(jsonObject);
     }
 
     public String toJson(String jsonPath) {
-        notEmpty(jsonPath, "jsonPath can not be null or empty");
-
-        return JsonProviderFactory.getInstance().toJson(get(jsonPath));
+        return toJson(JsonPath.compile(jsonPath));
     }
 
     public String toJson(JsonPath jsonPath) {
@@ -86,10 +113,7 @@ public class JsonModel {
     }
 
     public JsonModel getSubModel(String jsonPath) {
-        notEmpty(jsonPath, "jsonPath can not be null or empty");
-
-        JsonPath path = JsonPath.compile(jsonPath);
-        return getSubModel(path);
+        return getSubModel(JsonPath.compile(jsonPath));
     }
 
     public JsonModel getSubModel(JsonPath jsonPath) {
@@ -108,10 +132,8 @@ public class JsonModel {
         return new JsonModel(subModel);
     }
 
-    public MappingModelReader map(final String jsonPath) {
-        notEmpty(jsonPath, "jsonPath can not be null or empty");
-
-        return new DefaultMappingModelReader(JsonModel.this.get(jsonPath));
+    public MappingModelReader map(String jsonPath) {
+        return map(JsonPath.compile(jsonPath));
     }
 
     public MappingModelReader map(final JsonPath jsonPath) {
@@ -144,23 +166,187 @@ public class JsonModel {
         return new JsonModel(jsonInputStream);
     }
 
-    public interface MappingModelReader {
+    private static ObjectMapper getObjectMapper() {
+        if (JsonModel.objectMapper == null) {
+            synchronized (JsonModel.class) {
+                try {
+                    Class.forName("tools.jackson.databind.ObjectMapper");
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(
+                            "tools.jackson.databind.ObjectMapper not found on classpath. This is an optional dependency needed for POJO conversions.");
+                }
+                JsonModel.objectMapper = new ObjectMapper();
+            }
+        }
+        return JsonModel.objectMapper;
+    }
+
+    private <T> T getTargetObject(JsonPath jsonPath, Class<T> clazz) {
+        notNull(jsonPath, "jsonPath can not be null");
+
+        if (!jsonPath.isPathDefinite()) {
+            throw new IndefinitePathException(jsonPath.getPath());
+        }
+
+        JsonProvider jsonProvider = JsonProviderFactory.getInstance();
+
+        Object modelRef = jsonObject;
+
+        LinkedList<PathToken> tokens = jsonPath.getTokenizer().getPathTokens();
+
+        PathToken currentToken;
+        do {
+            currentToken = tokens.poll();
+            modelRef = currentToken.get(modelRef, jsonProvider);
+        } while (!tokens.isEmpty());
+
+        if (modelRef.getClass().isAssignableFrom(clazz)) {
+            throw new InvalidModelPathException(
+                    jsonPath
+                            + " does nor refer to a Map but "
+                            + (currentToken != null ? currentToken.getClass().getName() : "null"));
+        }
+        return clazz.cast(modelRef);
+    }
+
+    public interface MappingModelReader extends ListMappingModelReader, ObjectMappingModelReader {}
+
+    public interface ObjectMappingModelReader {
+        <T> T to(Class<T> targetClass);
+    }
+
+    public interface ListMappingModelReader {
+        <T> List<T> of(Class<T> targetClass);
 
         ListMappingModelReader toList();
 
         <T> List<T> toListOf(Class<T> targetClass);
 
         <T> Set<T> toSetOf(Class<T> targetClass);
+    }
+
+    public interface ObjectOps {
+
+        Map<String, Object> getTarget();
+
+        boolean containsKey(String key);
+
+        ObjectOps put(String key, Object value);
+
+        ObjectOps putAll(Map<String, Object> map);
+
+        ObjectOps remove(String key);
 
         <T> T to(Class<T> targetClass);
     }
 
-    public interface ListMappingModelReader {
-        <T> List<T> of(Class<T> targetClass);
+    public interface ArrayOps {
+        List<Object> getTarget();
+
+        ArrayOps add(Object o);
+
+        ArrayOps addAll(Collection<Object> collection);
+
+        ArrayOps remove(Object o);
+
+        ListMappingModelReader toList();
+
+        <T> List<T> toListOf(Class<T> targetClass);
+
+        <T> Set<T> toSetOf(Class<T> targetClass);
     }
 
-    private static class DefaultMappingModelReader
-            implements MappingModelReader, ListMappingModelReader {
+    private static class DefaultObjectOps implements ObjectOps {
+
+        private Map<String, Object> opsTarget;
+
+        private DefaultObjectOps(Map<String, Object> opsTarget) {
+
+            this.opsTarget = opsTarget;
+        }
+
+        @Override
+        public Map<String, Object> getTarget() {
+            return opsTarget;
+        }
+
+        @Override
+        public boolean containsKey(String key) {
+            return opsTarget.containsKey(key);
+        }
+
+        @Override
+        public ObjectOps put(String key, Object value) {
+            opsTarget.put(key, value);
+            return this;
+        }
+
+        @Override
+        public ObjectOps putAll(Map<String, Object> map) {
+            opsTarget.putAll(map);
+            return this;
+        }
+
+        @Override
+        public ObjectOps remove(String key) {
+            opsTarget.remove(key);
+            return this;
+        }
+
+        @Override
+        public <T> T to(Class<T> targetClass) {
+            return new DefaultMappingModelReader(opsTarget).to(targetClass);
+        }
+    }
+
+    private static class DefaultArrayOps implements ArrayOps {
+
+        private List<Object> opsTarget;
+
+        private DefaultArrayOps(List<Object> opsTarget) {
+            this.opsTarget = opsTarget;
+        }
+
+        @Override
+        public List<Object> getTarget() {
+            return opsTarget;
+        }
+
+        @Override
+        public ArrayOps add(Object o) {
+            opsTarget.add(o);
+            return this;
+        }
+
+        @Override
+        public ArrayOps addAll(Collection<Object> collection) {
+            opsTarget.addAll(collection);
+            return this;
+        }
+
+        @Override
+        public ArrayOps remove(Object o) {
+            opsTarget.remove(o);
+            return this;
+        }
+
+        @Override
+        public ListMappingModelReader toList() {
+            return new DefaultMappingModelReader(opsTarget);
+        }
+
+        @Override
+        public <T> List<T> toListOf(Class<T> targetClass) {
+            return new DefaultMappingModelReader(opsTarget).toListOf(targetClass);
+        }
+
+        @Override
+        public <T> Set<T> toSetOf(Class<T> targetClass) {
+            return new DefaultMappingModelReader(opsTarget).toSetOf(targetClass);
+        }
+    }
+
+    private static class DefaultMappingModelReader implements MappingModelReader {
         private ObjectMapper objectMapper;
         private Object model;
 
@@ -205,14 +391,5 @@ public class JsonModel {
         public <T> T to(Class<T> targetClass) {
             return objectMapper.convertValue(model, targetClass);
         }
-    }
-
-    private static ObjectMapper getObjectMapper() {
-        if (JsonModel.objectMapper == null) {
-            synchronized (JsonModel.class) {
-                JsonModel.objectMapper = new ObjectMapper();
-            }
-        }
-        return JsonModel.objectMapper;
     }
 }

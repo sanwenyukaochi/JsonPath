@@ -23,6 +23,11 @@ public class ScanFilter extends Filter {
         return true;
     }
 
+    @Override
+    public Object getRef(Object obj, JsonProvider jsonProvider) {
+        throw new UnsupportedOperationException();
+    }
+
     private void scan(Object container, List<Object> result, JsonProvider jsonProvider) {
 
         if (jsonProvider.isMap(container)) {

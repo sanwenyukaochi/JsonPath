@@ -3,8 +3,12 @@ package com.jayway.jsonpath.internal.filter;
 import com.jayway.jsonpath.spi.JsonProvider;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class ArrayIndexFilter extends Filter {
+
+    private static final Pattern SINGLE_ARRAY_INDEX_PATTERN = Pattern.compile("\\[\\d+\\]");
+
     public ArrayIndexFilter(String condition) {
         super(condition);
     }
@@ -49,6 +53,18 @@ public class ArrayIndexFilter extends Filter {
                 }
                 return result;
             }
+        }
+    }
+
+    @Override
+    public Object getRef(Object obj, JsonProvider jsonProvider) {
+        if (SINGLE_ARRAY_INDEX_PATTERN.matcher(condition).matches()) {
+            String trimmedCondition = trim(condition, 1, 1);
+            List<Object> src = jsonProvider.toList(obj);
+            return src.get(Integer.parseInt(trimmedCondition));
+
+        } else {
+            throw new UnsupportedOperationException();
         }
     }
 
