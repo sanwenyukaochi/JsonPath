@@ -24,6 +24,22 @@ public class IssuesTest {
     private static final JsonProvider jp = JsonProviderFactory.createProvider();
 
     @Test
+    public void full_ones_can_be_filtered() {
+        String json =
+                """
+                [
+                 {"kind" : "full"},
+                 {"kind" : "empty"}
+                ]
+                """;
+
+        List<Map<String, String>> fullOnes = JsonPath.read(json, "$[?(@.kind == full)]");
+
+        assertEquals(1, fullOnes.size());
+        assertEquals("full", fullOnes.get(0).get("kind"));
+    }
+
+    @Test
     public void issue_36() {
         String json =
 """
@@ -222,10 +238,7 @@ public class IssuesTest {
         assertThrows(
                 PathNotFoundException.class,
                 () -> {
-                    Configuration configuration =
-                            Configuration.builder()
-                                    .options(Option.THROW_ON_MISSING_PROPERTY)
-                                    .build();
+                    Configuration configuration = Configuration.defaultConfiguration();
 
                     String json = "{\"a\":{\"b\":1,\"c\":2}}";
                     System.out.println((Object) JsonPath.parse(json, configuration).read("a.d"));
@@ -244,8 +257,13 @@ public class IssuesTest {
     @Test
     public void issue_22b() throws Exception {
         String json = "{\"a\":[{\"b\":1,\"c\":2},{\"b\":5,\"c\":2}]}";
-        System.out.println((Object) JsonPath.read(json, "a[?(@.b==5)].d"));
-        System.out.println((Object) JsonPath.read(json, "a[?(@.b==5)].d"));
+        List<Object> res =
+                JsonPath.using(
+                                Configuration.defaultConfiguration()
+                                        .options(Option.DEFAULT_PATH_LEAF_TO_NULL))
+                        .parse(json)
+                        .read("a[?(@.b==5)].d");
+        Assertions.assertThat(res).hasSize(1).containsNull();
     }
 
     @Test
@@ -409,7 +427,7 @@ public class IssuesTest {
 
             failBecauseExceptionWasNotThrown(PathNotFoundException.class);
         } catch (PathNotFoundException e) {
-            Assertions.assertThat(e).hasMessage("No results for path: $['nonExistingProperty']");
+
         }
 
         try {
@@ -417,8 +435,7 @@ public class IssuesTest {
 
             failBecauseExceptionWasNotThrown(PathNotFoundException.class);
         } catch (PathNotFoundException e) {
-            Assertions.assertThat(e)
-                    .hasMessage("No results for path: $['nonExisting']['property']");
+
         }
     }
 

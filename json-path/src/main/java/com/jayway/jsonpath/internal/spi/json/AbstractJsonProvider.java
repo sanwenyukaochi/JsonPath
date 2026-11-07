@@ -49,6 +49,7 @@ public abstract class AbstractJsonProvider implements JsonProvider {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void setProperty(Object obj, Object key, Object value) {
         if (isMap(obj)) ((Map) obj).put(key.toString(), value);
         else {
@@ -67,6 +68,7 @@ public abstract class AbstractJsonProvider implements JsonProvider {
         return (obj instanceof Map);
     }
 
+    @SuppressWarnings("unchecked")
     public Collection<String> getPropertyKeys(Object obj) {
         if (isArray(obj)) {
             List l = (List) obj;
@@ -87,6 +89,7 @@ public abstract class AbstractJsonProvider implements JsonProvider {
         return getPropertyKeys(obj).size();
     }
 
+    @SuppressWarnings("unchecked")
     public Iterable<Object> toIterable(Object obj) {
         if (isArray(obj)) return ((Iterable) obj);
         else return ((Map) obj).values();

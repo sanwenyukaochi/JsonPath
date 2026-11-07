@@ -43,12 +43,11 @@ public class JsonPath {
         return read(jsonObject, Configuration.defaultConfiguration());
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T read(Object jsonObject, Configuration configuration) {
         boolean optAsPathList = configuration.containsOption(Option.AS_PATH_LIST);
         boolean optAlwaysReturnList = configuration.containsOption(Option.ALWAYS_RETURN_LIST);
         boolean optSuppressExceptions = configuration.containsOption(Option.SUPPRESS_EXCEPTIONS);
-        boolean optThrowOnMissingProperty =
-                configuration.containsOption(Option.THROW_ON_MISSING_PROPERTY);
 
         try {
             if (optAsPathList) {
@@ -64,7 +63,8 @@ public class JsonPath {
                 }
             }
         } catch (RuntimeException e) {
-            if (optThrowOnMissingProperty || !optSuppressExceptions) {
+
+            if (!optSuppressExceptions) {
                 throw e;
             }
         }
