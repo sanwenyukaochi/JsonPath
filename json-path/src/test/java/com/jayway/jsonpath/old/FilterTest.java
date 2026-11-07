@@ -346,7 +346,7 @@ public class FilterTest extends BaseTest {
                     public boolean apply(PredicateContext ctx) {
                         if (ctx.configuration()
                                 .jsonProvider()
-                                .getMapValue(ctx.contextDocument(), "name")
+                                .getMapValue(ctx.item(), "name")
                                 .equals("rootGrandChild_A")) {
                             return true;
                         }
@@ -376,7 +376,7 @@ public class FilterTest extends BaseTest {
                 new Predicate() {
                     @Override
                     public boolean apply(PredicateContext ctx) {
-                        return 1 == (Integer) ctx.contextDocument();
+                        return 1 == (Integer) ctx.item();
                     }
                 };
 
