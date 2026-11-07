@@ -11,11 +11,6 @@ public abstract class AbstractJsonProvider implements JsonProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractJsonProvider.class);
 
-    @Override
-    public Object createNull() {
-        return null;
-    }
-
     public boolean isArray(Object obj) {
         return (obj instanceof List);
     }
