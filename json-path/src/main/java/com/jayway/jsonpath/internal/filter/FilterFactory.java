@@ -48,7 +48,7 @@ public class FilterFactory {
                         && !pathFragment.contains("<")
                         && !pathFragment.contains(">")) {
 
-                    return new HasFieldFilter(pathFragment);
+                    return new HasPathFilter(pathFragment);
                 } else {
 
                     throw new InvalidPathException(

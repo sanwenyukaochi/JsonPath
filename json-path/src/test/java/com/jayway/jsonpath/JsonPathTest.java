@@ -3,6 +3,7 @@ package com.jayway.jsonpath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -355,5 +356,14 @@ public class JsonPathTest {
                 () -> {
                     Object res = JsonPath.read(DOCUMENT, "$.store.book[100].author");
                 });
+    }
+
+    @Test
+    public void exists_filter_with_nested_path() throws Exception {
+
+        assertThat(JsonPath.<List<String>>read(DOCUMENT, "$..[?(@.bicycle.color)]"), hasSize(1));
+        assertThat(
+                JsonPath.<List<String>>read(DOCUMENT, "$..[?(@.bicycle.numberOfGears)]"),
+                hasSize(0));
     }
 }
