@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Date;
 import org.junit.jupiter.api.Test;
 
-public class ConverterTest extends BaseTest {
+public class MapperTest extends BaseTest {
 
     @Test
     public void an_Integer_can_be_converted_to_a_Long() {
