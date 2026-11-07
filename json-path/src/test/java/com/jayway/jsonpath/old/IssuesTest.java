@@ -17,6 +17,7 @@ import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Criteria;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.Filter;
+import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.PathNotFoundException;
@@ -979,5 +980,79 @@ public class IssuesTest extends BaseTest {
                     JsonPath path = JsonPath.compile("$.foo");
                     String object = path.read(json);
                 });
+    }
+
+    @Test
+    public void issue_114_a() {
+        String json =
+"""
+{ "p":{
+"s": { "u": "su" },\s
+"t": { "u": "tu" }
+}}\
+""";
+
+        List<String> result = read(json, "$.p.['s', 't'].u");
+        Assertions.assertThat(result).containsExactly("su", "tu");
+    }
+
+    @Test
+    public void issue_114_b() {
+        String json = "{ \"p\": [\"valp\", \"valq\", \"valr\"] }";
+
+        List<String> result = read(json, "$.p[?(@ == 'valp')]");
+        Assertions.assertThat(result).containsExactly("valp");
+    }
+
+    @Test
+    public void issue_114_c() {
+        String json = "{ \"p\": [\"valp\", \"valq\", \"valr\"] }";
+
+        List<String> result = read(json, "$.p[?(@[0] == 'valp')]");
+        Assertions.assertThat(result).isEmpty();
+    }
+
+    @Test
+    public void issue_114_d() {
+        assertThrows(
+                InvalidPathException.class,
+                () -> {
+                    read(JSON_BOOK_DOCUMENT, "$..book[(@.length-1)] ");
+                });
+    }
+
+    @Test
+    public void issue_151() {
+        String json =
+"""
+{
+"datas": {
+    "selling": {
+        "3": [
+            26452067,
+            31625950
+        ],
+        "206": [
+            32381852,
+            32489262
+        ],
+        "208": [
+            458
+        ],
+        "217": [
+            27364892
+        ],
+        "226": [
+            30474109
+        ]
+    }
+},
+"status": 0
+}\
+""";
+
+        List<Integer> result = read(json, "$.datas.selling['3','206'].*");
+
+        Assertions.assertThat(result).containsExactly(26452067, 31625950, 32381852, 32489262);
     }
 }
