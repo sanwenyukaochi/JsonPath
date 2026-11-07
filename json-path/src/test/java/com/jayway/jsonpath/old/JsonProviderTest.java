@@ -52,8 +52,6 @@ public class JsonProviderTest {
         JacksonJsonProvider provider = new JacksonJsonProvider();
 
         Object o = provider.parse(DOCUMENT);
-
-        System.out.println(o);
     }
 
     @Test
@@ -61,7 +59,5 @@ public class JsonProviderTest {
         JacksonJsonProvider provider = new JacksonJsonProvider();
 
         Object o = provider.parse(ARRAY);
-
-        System.out.println(o);
     }
 }

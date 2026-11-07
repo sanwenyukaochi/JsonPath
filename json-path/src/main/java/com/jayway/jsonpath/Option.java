@@ -7,5 +7,7 @@ public enum Option {
 
     AS_PATH_LIST,
 
-    SUPPRESS_EXCEPTIONS
+    SUPPRESS_EXCEPTIONS,
+
+    REQUIRE_PATH_PROPERTIES
 }
