@@ -22,8 +22,15 @@ class PropertyPathToken extends PathToken {
     public void evaluate(
             String currentPath, PathRef parent, Object model, EvaluationContextImpl ctx) {
         if (!ctx.jsonProvider().isMap(model)) {
+
             throw new PathNotFoundException(
-                    "Property " + getPathFragment() + " not found in path " + currentPath);
+                    "Expected to find an object with property "
+                            + getPathFragment()
+                            + " but found '"
+                            + model.getClass().getName()
+                            + "'. This is not a json object according to the JsonProvider: '"
+                            + ctx.configuration().jsonProvider().getClass().getName()
+                            + "'.");
         }
 
         handleObjectProperty(currentPath, model, ctx, properties);
