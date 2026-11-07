@@ -39,6 +39,7 @@ import net.minidev.json.parser.JSONParser;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.node.ObjectNode;
 
 public class IssuesTest extends BaseTest {
 
@@ -1090,5 +1091,26 @@ public class IssuesTest extends BaseTest {
         List<Integer> list = context.read("$.array", List.class);
 
         Assertions.assertThat(list).containsExactly(null, 1, null);
+    }
+
+    @Test
+    public void issue_171() {
+
+        String json =
+"""
+{
+  "can delete": "this",
+  "can't delete": "this"
+}\
+""";
+
+        DocumentContext context = using(JACKSON_JSON_NODE_CONFIGURATION).parse(json);
+        context.set("$.['can delete']", null);
+        context.set("$.['can\\'t delete']", null);
+
+        ObjectNode objectNode = context.read("$");
+
+        Assertions.assertThat(objectNode.get("can delete").isNull());
+        Assertions.assertThat(objectNode.get("can't delete").isNull());
     }
 }
