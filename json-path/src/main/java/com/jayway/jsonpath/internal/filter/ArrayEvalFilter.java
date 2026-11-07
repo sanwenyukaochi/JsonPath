@@ -12,16 +12,10 @@ import java.util.regex.Pattern;
 public class ArrayEvalFilter extends PathTokenFilter {
 
     private static final Pattern PATTERN = Pattern.compile("(.*?)\\s?([=<>]+)\\s?(.*)");
+    private final ConditionStatement conditionStatement;
 
     public ArrayEvalFilter(String condition) {
         super(condition);
-    }
-
-    @Override
-    public Object filter(Object obj, JsonProvider jsonProvider) {
-
-        List<Object> src = jsonProvider.toList(obj);
-        List<Object> result = jsonProvider.createList();
 
         String trimmedCondition = condition;
 
@@ -32,7 +26,14 @@ public class ArrayEvalFilter extends PathTokenFilter {
 
         trimmedCondition = trim(trimmedCondition, 5, 2);
 
-        ConditionStatement conditionStatement = createConditionStatement(trimmedCondition);
+        this.conditionStatement = createConditionStatement(trimmedCondition);
+    }
+
+    @Override
+    public Object filter(Object obj, JsonProvider jsonProvider) {
+
+        List<Object> src = jsonProvider.toList(obj);
+        List<Object> result = jsonProvider.createList();
 
         for (Object item : src) {
             if (isMatch(item, conditionStatement, jsonProvider)) {
@@ -85,18 +86,19 @@ public class ArrayEvalFilter extends PathTokenFilter {
         }
     }
 
-    private class ConditionStatement {
+    private static class ConditionStatement {
         private final String field;
         private final String operator;
-        private String expected;
+        private final String expected;
 
         private ConditionStatement(String field, String operator, String expected) {
             this.field = field;
             this.operator = operator.trim();
-            this.expected = expected;
 
-            if (this.expected.startsWith("'")) {
-                this.expected = trim(this.expected, 1, 1);
+            if (expected.startsWith("'")) {
+                this.expected = trim(expected, 1, 1);
+            } else {
+                this.expected = expected;
             }
         }
 

@@ -17,7 +17,7 @@ public abstract class PathTokenFilter {
         return condition;
     }
 
-    String trim(String str, int front, int end) {
+    static String trim(String str, int front, int end) {
         String res = str;
 
         if (front > 0) {
