@@ -18,7 +18,6 @@ dependencies {
     implementation("org.eclipse.jetty.ee11:jetty-ee11-servlet:12.1.14")
     implementation(platform("org.glassfish.jersey:jersey-bom:4.0.3"))
     implementation("org.glassfish.jersey.containers:jersey-container-servlet")
-    implementation("org.glassfish.jersey.ext:jersey-mvc-mustache")
     implementation("org.glassfish.jersey.media:jersey-media-json-jackson")
     runtimeOnly("org.glassfish.jersey.inject:jersey-hk2")
     implementation("commons-io:commons-io:2.22.0")
