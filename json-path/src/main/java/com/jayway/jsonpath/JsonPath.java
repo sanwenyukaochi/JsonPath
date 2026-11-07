@@ -5,9 +5,9 @@ import static com.jayway.jsonpath.internal.Utils.notEmpty;
 import static com.jayway.jsonpath.internal.Utils.notNull;
 
 import com.jayway.jsonpath.internal.JsonReader;
+import com.jayway.jsonpath.internal.Path;
+import com.jayway.jsonpath.internal.PathCompiler;
 import com.jayway.jsonpath.internal.Utils;
-import com.jayway.jsonpath.internal.spi.compiler.PathCompiler;
-import com.jayway.jsonpath.spi.compiler.Path;
 import com.jayway.jsonpath.spi.http.HttpProviderFactory;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.json.JsonProviderFactory;
@@ -23,7 +23,7 @@ public class JsonPath {
 
     private JsonPath(String jsonPath, Filter[] filters) {
         notNull(jsonPath, "path can not be null");
-        this.path = PathCompiler.tokenize(jsonPath, filters);
+        this.path = PathCompiler.compile(jsonPath, filters);
     }
 
     public String getPath() {
@@ -169,6 +169,12 @@ public class JsonPath {
     @SuppressWarnings({"unchecked"})
     public static <T> T read(String json, String jsonPath, Filter... filters) {
         return new JsonReader().parse(json).read(jsonPath, filters);
+    }
+
+    public static <T> T read(String json, String jsonPath, Class<T> clazz, Filter... filters) {
+        Object res = new JsonReader().parse(json).read(jsonPath, filters);
+
+        return clazz.cast(res);
     }
 
     @SuppressWarnings({"unchecked"})
