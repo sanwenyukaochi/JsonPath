@@ -1,4 +1,4 @@
-package com.jayway.jsonpath.internal.token;
+package com.jayway.jsonpath.internal.path;
 
 import static java.util.Collections.singletonList;
 

@@ -4,7 +4,7 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.internal.PathCompiler;
+import com.jayway.jsonpath.internal.path.PathCompiler;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

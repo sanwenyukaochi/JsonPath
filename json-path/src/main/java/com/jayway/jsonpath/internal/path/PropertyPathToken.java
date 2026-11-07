@@ -1,4 +1,4 @@
-package com.jayway.jsonpath.internal.token;
+package com.jayway.jsonpath.internal.path;
 
 import static com.jayway.jsonpath.internal.Utils.onlyOneIsTrueNonThrow;
 
