@@ -26,7 +26,10 @@ public class JsonAsserterImpl implements JsonAsserter {
         try {
             obj = JsonPath.<T>read(jsonObject, path);
         } catch (Exception e) {
-            throw new AssertionError(String.format("Error reading JSON path [%s]", path), e);
+            final AssertionError assertionError =
+                    new AssertionError(String.format("Error reading JSON path [%s]", path));
+            assertionError.initCause(e);
+            throw assertionError;
         }
 
         if (!matcher.matches(obj)) {

@@ -1,7 +1,6 @@
 package com.jayway.jsonpath.internal.token;
 
 import com.jayway.jsonpath.Function;
-import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.internal.PathRef;
@@ -31,6 +30,9 @@ public abstract class PathToken {
             String evalPath = Utils.concat(currentPath, "['", property, "']");
             Object propertyVal = readObjectProperty(property, model, ctx);
             if (propertyVal == JsonProvider.UNDEFINED) {
+
+                assert this instanceof PropertyPathToken : "only PropertyPathToken is supported";
+
                 if (isLeaf()) {
                     if (ctx.options().contains(Option.DEFAULT_PATH_LEAF_TO_NULL)) {
                         propertyVal = null;
@@ -43,9 +45,10 @@ public abstract class PathToken {
                         }
                     }
                 } else {
-                    if (!isUpstreamDefinite()
-                            && !ctx.options().contains(Option.REQUIRE_PROPERTIES)
-                            && !ctx.options().contains(Option.SUPPRESS_EXCEPTIONS)) {
+                    if (!(isUpstreamDefinite() && isTokenDefinite())
+                                    && !ctx.options().contains(Option.REQUIRE_PROPERTIES)
+                            || ctx.options().contains(Option.SUPPRESS_EXCEPTIONS)) {
+
                         return;
                     } else {
                         throw new PathNotFoundException("Missing property in path " + evalPath);
@@ -61,10 +64,7 @@ public abstract class PathToken {
         } else {
             String evalPath = currentPath + "[" + Utils.join(", ", "'", properties) + "]";
 
-            if (!isLeaf()) {
-                throw new InvalidPathException(
-                        "Multi properties can only be used as path leafs: " + evalPath);
-            }
+            assert isLeaf() : "non-leaf multi props handled elsewhere";
 
             Object merged = ctx.jsonProvider().createMap();
             for (String property : properties) {
@@ -138,15 +138,10 @@ public abstract class PathToken {
     }
 
     boolean isUpstreamDefinite() {
-        if (upstreamDefinite != null) {
-            return upstreamDefinite.booleanValue();
+        if (upstreamDefinite == null) {
+            upstreamDefinite = isRoot() || prev.isTokenDefinite() && prev.isUpstreamDefinite();
         }
-        boolean isUpstreamDefinite = isTokenDefinite();
-        if (isUpstreamDefinite && !isRoot()) {
-            isUpstreamDefinite = prev.isPathDefinite();
-        }
-        upstreamDefinite = isUpstreamDefinite;
-        return isUpstreamDefinite;
+        return upstreamDefinite;
     }
 
     public int getTokenCount() {

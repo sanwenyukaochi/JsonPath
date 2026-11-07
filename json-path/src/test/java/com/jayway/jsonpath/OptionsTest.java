@@ -4,12 +4,14 @@ import static com.jayway.jsonpath.JsonPath.using;
 import static com.jayway.jsonpath.Option.ALWAYS_RETURN_LIST;
 import static com.jayway.jsonpath.Option.AS_PATH_LIST;
 import static com.jayway.jsonpath.Option.DEFAULT_PATH_LEAF_TO_NULL;
+import static com.jayway.jsonpath.Option.SUPPRESS_EXCEPTIONS;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +56,13 @@ public class OptionsTest extends BaseTest {
 
         assertThat(using(conf).parse("{\"foo\" : \"bar\"}").<Object>read("$.foo"))
                 .isInstanceOf(List.class);
+
+        assertThat(using(conf).parse("{\"foo\": null}").<Object>read("$.foo"))
+                .isInstanceOf(List.class);
+
+        assertThat(using(conf).parse("{\"foo\": [1, 4, 8]}").<Object>read("$.foo"))
+                .asList()
+                .containsExactly(Arrays.asList(1, 4, 8));
     }
 
     @Test
@@ -122,5 +131,50 @@ public class OptionsTest extends BaseTest {
             fail("Should throw PathNotFoundException");
         } catch (PathNotFoundException pnf) {
         }
+    }
+
+    @Test
+    public void an_indefinite_path_can_be_returned_as_list() {
+        Configuration conf = Configuration.builder().options(ALWAYS_RETURN_LIST).build();
+
+        List<Object> result = using(conf).parse("{\"bar\": {\"foo\": null}}").read("$..foo");
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0)).isNull();
+
+        assertThat(using(conf).parse("{\"bar\": {\"foo\": [1, 4, 8]}}").<Object>read("$..foo"))
+                .asList()
+                .containsExactly(Arrays.asList(1, 4, 8));
+    }
+
+    @Test
+    public void issue_suppress_exceptions_does_not_break_indefinite_evaluation() {
+        Configuration conf = Configuration.builder().options(SUPPRESS_EXCEPTIONS).build();
+
+        assertThat(using(conf).parse("{\"foo2\": [5]}").<Object>read("$..foo2[0]"))
+                .asList()
+                .containsOnly(5);
+        assertThat(using(conf).parse("{\"foo\" : {\"foo2\": [5]}}").<Object>read("$..foo2[0]"))
+                .asList()
+                .containsOnly(5);
+        assertThat(
+                        using(conf)
+                                .parse("[null, [{\"foo\" : {\"foo2\": [5]}}]]")
+                                .<Object>read("$..foo2[0]"))
+                .asList()
+                .containsOnly(5);
+
+        assertThat(
+                        using(conf)
+                                .parse("[null, [{\"foo\" : {\"foo2\": [5]}}]]")
+                                .<Object>read("$..foo.foo2[0]"))
+                .asList()
+                .containsOnly(5);
+
+        assertThat(
+                        using(conf)
+                                .parse("{\"aoo\" : {}, \"foo\" : {\"foo2\": [5]}, \"zoo\" : {}}")
+                                .<Object>read("$[*].foo2[0]"))
+                .asList()
+                .containsOnly(5);
     }
 }
