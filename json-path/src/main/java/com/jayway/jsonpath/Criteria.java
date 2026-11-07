@@ -1,12 +1,15 @@
 package com.jayway.jsonpath;
 
 import static com.jayway.jsonpath.internal.Utils.notNull;
+import static com.jayway.jsonpath.internal.filter.ValueNodes.PredicateNode;
+import static com.jayway.jsonpath.internal.filter.ValueNodes.ValueListNode;
 
 import com.jayway.jsonpath.internal.Path;
 import com.jayway.jsonpath.internal.Utils;
 import com.jayway.jsonpath.internal.filter.RelationalExpressionNode;
 import com.jayway.jsonpath.internal.filter.RelationalOperator;
 import com.jayway.jsonpath.internal.filter.ValueNode;
+import com.jayway.jsonpath.internal.filter.ValueNodes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -126,7 +129,7 @@ public class Criteria implements Predicate {
     public Criteria in(Collection<?> c) {
         notNull(c, "collection can not be null");
         this.criteriaType = RelationalOperator.IN;
-        this.right = new ValueNode.ValueListNode(c);
+        this.right = new ValueListNode(c);
         return this;
     }
 
@@ -143,7 +146,7 @@ public class Criteria implements Predicate {
     public Criteria nin(Collection<?> c) {
         notNull(c, "collection can not be null");
         this.criteriaType = RelationalOperator.NIN;
-        this.right = new ValueNode.ValueListNode(c);
+        this.right = new ValueListNode(c);
         return this;
     }
 
@@ -154,7 +157,7 @@ public class Criteria implements Predicate {
     public Criteria subsetof(Collection<?> c) {
         notNull(c, "collection can not be null");
         this.criteriaType = RelationalOperator.SUBSETOF;
-        this.right = new ValueNode.ValueListNode(c);
+        this.right = new ValueListNode(c);
         return this;
     }
 
@@ -165,7 +168,7 @@ public class Criteria implements Predicate {
     public Criteria all(Collection<?> c) {
         notNull(c, "collection can not be null");
         this.criteriaType = RelationalOperator.ALL;
-        this.right = new ValueNode.ValueListNode(c);
+        this.right = new ValueListNode(c);
         return this;
     }
 
@@ -195,13 +198,13 @@ public class Criteria implements Predicate {
 
     public Criteria empty(boolean empty) {
         this.criteriaType = RelationalOperator.EMPTY;
-        this.right = empty ? ValueNode.TRUE : ValueNode.FALSE;
+        this.right = empty ? ValueNodes.TRUE : ValueNodes.FALSE;
         return this;
     }
 
     public Criteria matches(Predicate p) {
         this.criteriaType = RelationalOperator.MATCHES;
-        this.right = new ValueNode.PredicateNode(p);
+        this.right = new PredicateNode(p);
         return this;
     }
 
