@@ -1,7 +1,7 @@
-package com.jayway.jsonpath.reader.filter;
+package com.jayway.jsonpath.internal.filter;
 
 import com.jayway.jsonpath.InvalidPathException;
-import com.jayway.jsonpath.reader.filter.eval.ExpressionEvaluator;
+import com.jayway.jsonpath.internal.filter.eval.ExpressionEvaluator;
 import com.jayway.jsonpath.spi.JsonProvider;
 
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class ArrayEvalFilter extends Filter {
 
-    public static final Pattern PATTERN = Pattern.compile("(.*?)\\s?([=<>]+)\\s?(.*)");
+    private static final Pattern PATTERN = Pattern.compile("(.*?)\\s?([=<>]+)\\s?(.*)");
 
     public ArrayEvalFilter(String condition) {
         super(condition);

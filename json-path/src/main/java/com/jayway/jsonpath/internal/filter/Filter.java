@@ -1,16 +1,16 @@
-package com.jayway.jsonpath.reader.filter;
+package com.jayway.jsonpath.internal.filter;
 
 import com.jayway.jsonpath.spi.JsonProvider;
 
 public abstract class Filter {
 
-    protected final String condition;
+    final String condition;
 
-    public Filter(String condition) {
+    Filter(String condition) {
         this.condition = condition;
     }
 
-    protected String trim(String str, int front, int end) {
+    String trim(String str, int front, int end) {
         String res = str;
 
         if (front > 0) {

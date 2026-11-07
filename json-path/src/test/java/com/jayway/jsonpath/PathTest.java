@@ -2,14 +2,14 @@ package com.jayway.jsonpath;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.jayway.jsonpath.reader.PathTokenizer;
-import com.jayway.jsonpath.spi.JsonProvider;
+import com.jayway.jsonpath.internal.PathTokenizer;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 
-public class SplitPathFragmentsTest {
+public class PathTest {
 
     /*
     1.  "$..book[-1:].foo.bar"
@@ -26,17 +26,16 @@ public class SplitPathFragmentsTest {
     12. "$..*"
     */
 
-    private JsonProvider jsonProvider = JsonProvider.getInstance();
+    @Test
+    public void path_is_not_definite() throws Exception {
+        assertFalse(JsonPath.compile("$..book[0]").isPathDefinite());
+        assertFalse(JsonPath.compile("$.books[*]").isPathDefinite());
+    }
 
     @Test
-    public void array_filter_bracket_test() throws Exception {
-
-        PathTokenizer tokenizer =
-                new PathTokenizer("$.store.book[?(@['isbn'])].isbn", jsonProvider);
-
-        for (String fragment : tokenizer.getFragments()) {
-            System.out.println(fragment);
-        }
+    public void path_is_definite() throws Exception {
+        assertTrue(JsonPath.compile("$.definite.this.is").isPathDefinite());
+        assertTrue(JsonPath.compile("rows[0].id").isPathDefinite());
     }
 
     @Test
@@ -110,7 +109,7 @@ public class SplitPathFragmentsTest {
 
     private void assertPathInvalid(String path) {
         try {
-            PathTokenizer tokenizer = new PathTokenizer(path, jsonProvider);
+            PathTokenizer tokenizer = new PathTokenizer(path);
             assertTrue(false, "Expected exception!");
         } catch (InvalidPathException expected) {
         }
@@ -118,7 +117,7 @@ public class SplitPathFragmentsTest {
 
     private void assertPath(String path, Matcher<Iterable<String>> matcher) {
         System.out.println("PATH: " + path);
-        PathTokenizer tokenizer = new PathTokenizer(path, jsonProvider);
+        PathTokenizer tokenizer = new PathTokenizer(path);
         for (String fragment : tokenizer.getFragments()) {
             System.out.println(fragment);
         }

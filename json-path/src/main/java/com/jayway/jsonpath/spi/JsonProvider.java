@@ -1,48 +1,37 @@
 package com.jayway.jsonpath.spi;
 
 import com.jayway.jsonpath.InvalidJsonException;
-import com.jayway.jsonpath.spi.impl.JsonSmartProvider;
 
+import java.io.InputStream;
+import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 
-public abstract class JsonProvider {
+public interface JsonProvider {
 
-    public abstract Mode getMode();
+    Mode getMode();
 
-    public abstract Object parse(String json) throws InvalidJsonException;
+    Object parse(String json) throws InvalidJsonException;
 
-    public abstract String toJson(Object obj);
+    Object parse(Reader jsonReader) throws InvalidJsonException;
 
-    public abstract Map<String, Object> createMap();
+    Object parse(InputStream jsonStream) throws InvalidJsonException;
 
-    public abstract List<Object> createList();
+    String toJson(Object obj);
 
-    public static JsonProvider getInstance() {
-        return new JsonSmartProvider();
-    }
+    Map<String, Object> createMap();
 
-    public boolean isContainer(Object obj) {
-        return (isList(obj) || isMap(obj));
-    }
+    List<Object> createList();
 
-    public boolean isList(Object obj) {
-        return (obj instanceof List);
-    }
+    boolean isContainer(Object obj);
 
-    public List<Object> toList(Object list) {
-        return (List<Object>) list;
-    }
+    boolean isList(Object obj);
 
-    public Map<String, Object> toMap(Object map) {
-        return (Map<String, Object>) map;
-    }
+    List<Object> toList(Object list);
 
-    public Object getMapValue(Object map, String key) {
-        return toMap(map).get(key);
-    }
+    Map<String, Object> toMap(Object map);
 
-    public boolean isMap(Object obj) {
-        return (obj instanceof Map);
-    }
+    Object getMapValue(Object map, String key);
+
+    boolean isMap(Object obj);
 }

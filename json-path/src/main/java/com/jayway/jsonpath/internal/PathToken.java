@@ -1,7 +1,7 @@
-package com.jayway.jsonpath.reader;
+package com.jayway.jsonpath.internal;
 
-import com.jayway.jsonpath.reader.filter.Filter;
-import com.jayway.jsonpath.reader.filter.FilterFactory;
+import com.jayway.jsonpath.internal.filter.Filter;
+import com.jayway.jsonpath.internal.filter.FilterFactory;
 import com.jayway.jsonpath.spi.JsonProvider;
 
 public class PathToken {
