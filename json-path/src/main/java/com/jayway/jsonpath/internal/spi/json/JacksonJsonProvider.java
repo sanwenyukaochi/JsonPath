@@ -13,9 +13,9 @@ import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ObjectReader;
 
-public class JacksonProvider extends AbstractJsonProvider {
+public class JacksonJsonProvider extends AbstractJsonProvider {
 
-    private static final Logger logger = LoggerFactory.getLogger(JacksonProvider.class);
+    private static final Logger logger = LoggerFactory.getLogger(JacksonJsonProvider.class);
 
     private static final ObjectMapper defaultObjectMapper = new ObjectMapper();
     private static final ObjectReader defaultObjectReader =
@@ -24,15 +24,15 @@ public class JacksonProvider extends AbstractJsonProvider {
     protected ObjectMapper objectMapper;
     protected ObjectReader objectReader;
 
-    public JacksonProvider() {
+    public JacksonJsonProvider() {
         this(defaultObjectMapper, defaultObjectReader);
     }
 
-    public JacksonProvider(ObjectMapper objectMapper) {
+    public JacksonJsonProvider(ObjectMapper objectMapper) {
         this(objectMapper, objectMapper.reader().forType(Object.class));
     }
 
-    public JacksonProvider(ObjectMapper objectMapper, ObjectReader objectReader) {
+    public JacksonJsonProvider(ObjectMapper objectMapper, ObjectReader objectReader) {
         this.objectMapper = objectMapper;
         this.objectReader = objectReader;
     }

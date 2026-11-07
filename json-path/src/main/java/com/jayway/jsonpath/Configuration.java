@@ -15,7 +15,10 @@ public class Configuration {
 
     private static Defaults DEFAULTS =
             new Defaults() {
-                @Override
+
+                private final ConversionProvider conversionProvider =
+                        new DefaultConversionProvider();
+
                 public JsonProvider jsonProvider() {
                     return new JsonSmartJsonProvider();
                 }
@@ -27,7 +30,7 @@ public class Configuration {
 
                 @Override
                 public ConversionProvider conversionProvider() {
-                    return new DefaultConversionProvider();
+                    return conversionProvider;
                 }
             };
 

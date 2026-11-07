@@ -1,6 +1,6 @@
 package com.jayway.jsonpath.old;
 
-import com.jayway.jsonpath.internal.spi.json.JacksonProvider;
+import com.jayway.jsonpath.internal.spi.json.JacksonJsonProvider;
 
 import org.junit.jupiter.api.Test;
 
@@ -49,7 +49,7 @@ public class JsonProviderTest {
     @Test
     public void parse_document() throws Exception {
 
-        JacksonProvider provider = new JacksonProvider();
+        JacksonJsonProvider provider = new JacksonJsonProvider();
 
         Object o = provider.parse(DOCUMENT);
 
@@ -58,7 +58,7 @@ public class JsonProviderTest {
 
     @Test
     public void parse_array() throws Exception {
-        JacksonProvider provider = new JacksonProvider();
+        JacksonJsonProvider provider = new JacksonJsonProvider();
 
         Object o = provider.parse(ARRAY);
 

@@ -6,7 +6,7 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.internal.spi.json.GsonProvider;
+import com.jayway.jsonpath.internal.spi.json.GsonJsonProvider;
 import com.jayway.jsonpath.spi.converter.ConversionException;
 
 import java.math.BigDecimal;
@@ -89,7 +89,7 @@ public class GsonConverter extends ConverterBase {
                     Object val = null;
                     JsonElement element = entry.getValue();
                     if (element.isJsonPrimitive()) {
-                        val = GsonProvider.unwrap(element);
+                        val = GsonJsonProvider.unwrap(element);
                     } else if (element.isJsonArray()) {
                         val = convert(element, element.getClass(), List.class, conf);
                     } else if (element.isJsonObject()) {
@@ -108,7 +108,7 @@ public class GsonConverter extends ConverterBase {
                 List<Object> targetList = new ArrayList<Object>();
                 for (JsonElement element : srcArray) {
                     if (element.isJsonPrimitive()) {
-                        targetList.add(GsonProvider.unwrap(element));
+                        targetList.add(GsonJsonProvider.unwrap(element));
                     } else if (element.isJsonArray()) {
                         targetList.add(convert(element, element.getClass(), List.class, conf));
                     } else if (element.isJsonObject()) {
