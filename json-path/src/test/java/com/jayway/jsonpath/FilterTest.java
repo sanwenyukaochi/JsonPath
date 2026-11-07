@@ -5,6 +5,7 @@ import static com.jayway.jsonpath.Filter.filter;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
@@ -369,5 +370,28 @@ public class FilterTest {
         List<Integer> res = JsonPath.read(doc, "$.items[?]", customFilter);
 
         assertEquals(1, res.get(0).intValue());
+    }
+
+    @Test
+    public void filters_can_contain_json_path_expressions() throws Exception {
+        Object doc = JsonModel.model(DOCUMENT).getJsonObject();
+
+        assertTrue(filter(where("$.store..price").gt(10)).accept(doc));
+        assertFalse(filter(where("$.store..price").gte(100)).accept(doc));
+        assertTrue(filter(where("$.store..category").ne("fiction")).accept(doc));
+        assertFalse(filter(where("$.store.bicycle.color").ne("red")).accept(doc));
+        assertTrue(filter(where("$.store.bicycle.color").ne("blue")).accept(doc));
+        assertTrue(filter(where("$.store..color").exists(true)).accept(doc));
+        assertFalse(filter(where("$.store..flavor").exists(true)).accept(doc));
+        assertTrue(filter(where("$.store..color").regex(Pattern.compile("^r.d$"))).accept(doc));
+        assertTrue(filter(where("$.store..color").type(String.class)).accept(doc));
+        assertTrue(filter(where("$.store..price").is(12.99)).accept(doc));
+        assertFalse(filter(where("$.store..price").is(13.99)).accept(doc));
+    }
+
+    @Test
+    public void collection_based_filters_cannot_be_applied_to_multi_level_expressions() {
+        assertThrows(IllegalArgumentException.class, () -> where("$.store.*").size(4));
+        assertThrows(IllegalArgumentException.class, () -> where("$.store.*").in("foo"));
     }
 }
