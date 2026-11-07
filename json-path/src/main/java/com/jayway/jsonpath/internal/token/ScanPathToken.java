@@ -3,8 +3,6 @@ package com.jayway.jsonpath.internal.token;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class ScanPathToken extends PathToken {
 
@@ -15,77 +13,68 @@ public class ScanPathToken extends PathToken {
             ctx.addResult(currentPath, model);
         }
 
-        Predicate predicate = createScanPredicate(next(), ctx);
-        Map<String, Object> predicateMatches = new LinkedHashMap<String, Object>();
+        PathToken pt = next();
 
-        walk(currentPath, model, ctx, predicate, predicateMatches);
-
-        PathToken next = next();
-        if (next instanceof PredicatePathToken) {
-            if (next.isLeaf()) {
-                for (Map.Entry<String, Object> match : predicateMatches.entrySet()) {
-                    ctx.addResult(match.getKey(), match.getValue());
-                }
-                return;
-            } else {
-                next = next.next();
-            }
-        }
-
-        for (Map.Entry<String, Object> match : predicateMatches.entrySet()) {
-            next.evaluate(match.getKey(), match.getValue(), ctx);
-        }
+        walk(pt, currentPath, model, ctx, createScanPredicate(pt, ctx));
     }
 
     public static void walk(
+            PathToken pt,
             String currentPath,
             Object model,
             EvaluationContextImpl ctx,
-            Predicate predicate,
-            Map<String, Object> predicateMatches) {
+            Predicate predicate) {
         if (ctx.jsonProvider().isMap(model)) {
-            walkObject(currentPath, model, ctx, predicate, predicateMatches);
+            walkObject(pt, currentPath, model, ctx, predicate);
         } else if (ctx.jsonProvider().isArray(model)) {
-            walkArray(currentPath, model, ctx, predicate, predicateMatches);
+            walkArray(pt, currentPath, model, ctx, predicate);
         }
     }
 
     public static void walkArray(
+            PathToken pt,
             String currentPath,
             Object model,
             EvaluationContextImpl ctx,
-            Predicate predicate,
-            Map<String, Object> predicateMatches) {
+            Predicate predicate) {
 
         if (predicate.matches(model)) {
-            predicateMatches.put(currentPath, model);
+            if (pt.isLeaf()) {
+                pt.evaluate(currentPath, model, ctx);
+            } else {
+                PathToken next = pt.next();
+                Iterable<?> models = ctx.jsonProvider().toIterable(model);
+                int idx = 0;
+                for (Object evalModel : models) {
+                    String evalPath = currentPath + "[" + idx + "]";
+                    next.evaluate(evalPath, evalModel, ctx);
+                    idx++;
+                }
+            }
         }
 
         Iterable<?> models = ctx.jsonProvider().toIterable(model);
         int idx = 0;
         for (Object evalModel : models) {
             String evalPath = currentPath + "[" + idx + "]";
-
-            if (predicate.clazz().equals(PredicatePathToken.class)) {
-                if (predicate.matches(evalModel)) {
-                    predicateMatches.put(evalPath, evalModel);
-                }
-            }
-
-            walk(evalPath, evalModel, ctx, predicate, predicateMatches);
+            walk(pt, evalPath, evalModel, ctx, predicate);
             idx++;
         }
     }
 
     public static void walkObject(
+            PathToken pt,
             String currentPath,
             Object model,
             EvaluationContextImpl ctx,
-            Predicate predicate,
-            Map<String, Object> predicateMatches) {
+            Predicate predicate) {
 
         if (predicate.matches(model)) {
-            predicateMatches.put(currentPath, model);
+            if (pt.isLeaf()) {
+                pt.evaluate(currentPath, model, ctx);
+            } else {
+                pt.evaluate(currentPath, model, ctx);
+            }
         }
         Collection<String> properties = ctx.jsonProvider().getPropertyKeys(model);
 
@@ -93,7 +82,7 @@ public class ScanPathToken extends PathToken {
             String evalPath = currentPath + "['" + property + "']";
             Object propertyModel = ctx.jsonProvider().getMapValue(model, property);
             if (propertyModel != JsonProvider.UNDEFINED) {
-                walk(evalPath, propertyModel, ctx, predicate, predicateMatches);
+                walk(pt, evalPath, propertyModel, ctx, predicate);
             }
         }
     }
@@ -124,17 +113,11 @@ public class ScanPathToken extends PathToken {
     }
 
     private static interface Predicate {
-        Class<?> clazz();
-
         boolean matches(Object model);
     }
 
     private static final Predicate FALSE_PREDICATE =
             new Predicate() {
-                @Override
-                public Class<?> clazz() {
-                    return null;
-                }
 
                 @Override
                 public boolean matches(Object model) {
@@ -152,21 +135,12 @@ public class ScanPathToken extends PathToken {
         }
 
         @Override
-        public Class<?> clazz() {
-            return PredicatePathToken.class;
-        }
-
-        @Override
         public boolean matches(Object model) {
             return predicatePathToken.accept(model, ctx.rootDocument(), ctx.configuration(), ctx);
         }
     }
 
     private static final class WildcardPathTokenPredicate implements Predicate {
-        @Override
-        public Class<?> clazz() {
-            return WildcardPathToken.class;
-        }
 
         @Override
         public boolean matches(Object model) {
@@ -182,11 +156,6 @@ public class ScanPathToken extends PathToken {
         }
 
         @Override
-        public Class<?> clazz() {
-            return ArrayPathToken.class;
-        }
-
-        @Override
         public boolean matches(Object model) {
             return ctx.jsonProvider().isArray(model);
         }
@@ -199,11 +168,6 @@ public class ScanPathToken extends PathToken {
         private PropertyPathTokenPredicate(PathToken target, EvaluationContextImpl ctx) {
             this.ctx = ctx;
             propertyPathToken = (PropertyPathToken) target;
-        }
-
-        @Override
-        public Class<?> clazz() {
-            return PropertyPathToken.class;
         }
 
         @Override
