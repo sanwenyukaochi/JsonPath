@@ -344,4 +344,27 @@ public class IssuesTest {
 
         assertEquals(1, JsonPath.<Integer>read(json, "$[0].a"));
     }
+
+    @Test
+    public void a_test() {
+        assertThrows(
+                PathNotFoundException.class,
+                () -> {
+                    String json =
+                            """
+                            {
+                              "success": true,
+                              "data": {
+                                "user": 3,
+                                "own": null,
+                                "passes": null,
+                                "completed": null
+                              },
+                              "version": 1371160528774
+                            }\
+                            """;
+
+                    Object read = JsonPath.read(json, "$.data.passes[0].id");
+                });
+    }
 }
