@@ -2,6 +2,7 @@ package com.jayway.jsonpath;
 
 import static com.jayway.jsonpath.JsonPath.parse;
 import static com.jayway.jsonpath.JsonPath.using;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -420,5 +421,15 @@ public class JakartaJsonProviderTest extends BaseTest {
         public Object map(Object currentValue, Configuration configuration) {
             return currentValue.toString() + "converted";
         }
+    }
+
+    @Test
+    public void an_object_can_be_read_from_bytes() {
+        JsonObject book =
+                using(JAKARTA_JSON_CONFIGURATION)
+                        .parseUtf8(JSON_DOCUMENT.getBytes(UTF_8))
+                        .read("$.store.book[0]");
+
+        assertThat(((JsonString) book.get("author")).getChars()).hasToString("Nigel Rees");
     }
 }

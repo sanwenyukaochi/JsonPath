@@ -12,6 +12,7 @@ import com.jayway.jsonpath.spi.mapper.MappingException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -328,5 +329,14 @@ public class JacksonJsonNodeJsonProviderTest extends BaseTest {
         assertThat(node.isBigInteger()).isTrue();
         assertThat(val).isEqualTo(bi);
         assertThat(val).isEqualTo(node.bigIntegerValue());
+    }
+
+    @Test
+    public void bytes_json_can_be_parsed() {
+        ObjectNode node =
+                using(JACKSON_JSON_NODE_CONFIGURATION)
+                        .parseUtf8(JSON_DOCUMENT.getBytes(StandardCharsets.UTF_8))
+                        .read("$");
+        assertThat(node.get("string-property").asText()).isEqualTo("string-value");
     }
 }
