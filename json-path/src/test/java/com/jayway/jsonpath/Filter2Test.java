@@ -1,7 +1,7 @@
 package com.jayway.jsonpath;
 
-import static com.jayway.jsonpath.Criteria2.where;
-import static com.jayway.jsonpath.Filter2.filter;
+import static com.jayway.jsonpath.Criteria.where;
+import static com.jayway.jsonpath.Filter.filter;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;

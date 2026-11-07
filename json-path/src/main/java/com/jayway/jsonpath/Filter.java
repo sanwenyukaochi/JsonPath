@@ -1,101 +1,48 @@
 package com.jayway.jsonpath;
 
-import com.jayway.jsonpath.spi.json.JsonProvider;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+public class Filter implements Predicate {
 
-public abstract class Filter<T> {
+    private List<Criteria> criteriaList = new ArrayList<Criteria>();
+
+    private Filter(Criteria criteria) {
+        this.criteriaList.add(criteria);
+    }
+
+    private Filter(List<Criteria> criteriaList) {
+        this.criteriaList = criteriaList;
+    }
 
     public static Filter filter(Criteria criteria) {
-        return new MapFilter(criteria);
+        return new Filter(criteria);
     }
 
-    public Object doFilter(Iterable<T> filterItems, Configuration configuration) {
-        JsonProvider provider = configuration.getProvider();
-        Object result = provider.createArray();
-        for (T filterItem : filterItems) {
-            if (accept(filterItem, configuration)) {
-                provider.setProperty(result, provider.length(result), filterItem);
-            }
-        }
-        return result;
+    public static Filter filter(List<Criteria> criteriaList) {
+        return new Filter(criteriaList);
     }
 
-    public abstract boolean accept(T obj);
-
-    public abstract boolean accept(T obj, Configuration configuration);
-
-    public abstract Filter addCriteria(Criteria criteria);
-
-    public abstract static class FilterAdapter<T> extends Filter<T> {
-
-        @Override
-        public boolean accept(T obj) {
-            return false;
+    @Override
+    public boolean apply(Object target, Configuration configuration) {
+        for (Criteria criteria : criteriaList) {
+            if (!criteria.apply(target, configuration)) {
+                return false;
+            }
         }
-
-        @Override
-        public boolean accept(T obj, Configuration configuration) {
-            return accept(obj);
-        }
-
-        @Override
-        public Filter addCriteria(Criteria criteria) {
-            throw new UnsupportedOperationException("can not add criteria to a FilterAdapter.");
-        }
+        return true;
     }
 
-    private static class MapFilter extends FilterAdapter<Object> {
+    public void addCriteria(Criteria criteria) {
+        criteriaList.add(criteria);
+    }
 
-        private HashMap<String, Criteria> criteria = new LinkedHashMap<String, Criteria>();
-
-        public MapFilter(Criteria criteria) {
-            addCriteria(criteria);
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Criteria crit : criteriaList) {
+            sb.append(crit.toString());
         }
-
-        public MapFilter addCriteria(Criteria criteria) {
-            String key = criteria.getKey().toString();
-            Criteria existing = this.criteria.get(key);
-            if (existing == null) {
-                this.criteria.put(key, criteria);
-            } else {
-                existing.andOperator(criteria);
-            }
-            return this;
-        }
-
-        @Override
-        public boolean accept(Object map) {
-            return accept(map, Configuration.defaultConfiguration());
-        }
-
-        @Override
-        public boolean accept(Object map, Configuration configuration) {
-            for (Criteria criterion : this.criteria.values()) {
-                if (!criterion.matches(map, configuration)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("[?(");
-
-            Iterator<Criteria> criteriaIterator = criteria.values().iterator();
-            Criteria criterion = criteriaIterator.next();
-            sb.append(criterion.toString());
-
-            while (criteriaIterator.hasNext()) {
-                sb.append(" && ").append(criteriaIterator.next().toString());
-            }
-            sb.append(")]");
-
-            return sb.toString();
-        }
+        return sb.toString();
     }
 }

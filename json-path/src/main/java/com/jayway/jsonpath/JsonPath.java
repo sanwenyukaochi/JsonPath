@@ -26,7 +26,7 @@ public class JsonPath {
 
     private final Path path;
 
-    private JsonPath(String jsonPath, Filter2[] filters) {
+    private JsonPath(String jsonPath, Filter[] filters) {
         notNull(jsonPath, "path can not be null");
         this.path = PathCompiler.tokenize(jsonPath, filters);
     }
@@ -137,36 +137,35 @@ public class JsonPath {
         }
     }
 
-    public static JsonPath compile(String jsonPath, Filter2... filters) {
+    public static JsonPath compile(String jsonPath, Filter... filters) {
         notEmpty(jsonPath, "json can not be null or empty");
 
         return new JsonPath(jsonPath, filters);
     }
 
     @SuppressWarnings({"unchecked"})
-    public static <T> T read(Object json, String jsonPath, Filter2... filters) {
+    public static <T> T read(Object json, String jsonPath, Filter... filters) {
 
         return new JsonReader().parse(json).read(jsonPath, filters);
     }
 
     @SuppressWarnings({"unchecked"})
-    public static <T> T read(String json, String jsonPath, Filter2... filters) {
+    public static <T> T read(String json, String jsonPath, Filter... filters) {
         return new JsonReader().parse(json).read(jsonPath, filters);
     }
 
     @SuppressWarnings({"unchecked"})
-    public static <T> T read(URL jsonURL, String jsonPath, Filter2... filters) throws IOException {
+    public static <T> T read(URL jsonURL, String jsonPath, Filter... filters) throws IOException {
         return new JsonReader().parse(jsonURL).read(jsonPath, filters);
     }
 
     @SuppressWarnings({"unchecked"})
-    public static <T> T read(File jsonFile, String jsonPath, Filter2... filters)
-            throws IOException {
+    public static <T> T read(File jsonFile, String jsonPath, Filter... filters) throws IOException {
         return new JsonReader().parse(jsonFile).read(jsonPath, filters);
     }
 
     @SuppressWarnings({"unchecked"})
-    public static <T> T read(InputStream jsonInputStream, String jsonPath, Filter2... filters)
+    public static <T> T read(InputStream jsonInputStream, String jsonPath, Filter... filters)
             throws IOException {
         return new JsonReader().parse(jsonInputStream).read(jsonPath, filters);
     }
