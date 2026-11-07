@@ -504,4 +504,36 @@ public class FilterTest extends BaseTest {
                                 .apply(createPredicateContext(json)))
                 .isTrue();
     }
+
+    @Test
+    public void empty_evals() {
+        assertThat(filter(where("string-key").empty(false)).apply(createPredicateContext(json)))
+                .isEqualTo(true);
+        assertThat(filter(where("string-key").empty(true)).apply(createPredicateContext(json)))
+                .isEqualTo(false);
+
+        assertThat(
+                        filter(where("string-key-empty").empty(true))
+                                .apply(createPredicateContext(json)))
+                .isEqualTo(true);
+        assertThat(
+                        filter(where("string-key-empty").empty(false))
+                                .apply(createPredicateContext(json)))
+                .isEqualTo(false);
+
+        assertThat(filter(where("int-arr").empty(false)).apply(createPredicateContext(json)))
+                .isEqualTo(true);
+        assertThat(filter(where("int-arr").empty(true)).apply(createPredicateContext(json)))
+                .isEqualTo(false);
+
+        assertThat(filter(where("arr-empty").empty(true)).apply(createPredicateContext(json)))
+                .isEqualTo(true);
+        assertThat(filter(where("arr-empty").empty(false)).apply(createPredicateContext(json)))
+                .isEqualTo(false);
+
+        assertThat(filter(where("null-key").empty(true)).apply(createPredicateContext(json)))
+                .isEqualTo(false);
+        assertThat(filter(where("null-key").empty(false)).apply(createPredicateContext(json)))
+                .isEqualTo(false);
+    }
 }
