@@ -84,7 +84,6 @@ public class JacksonJsonNodeJsonProvider extends AbstractJsonProvider {
     }
 
     public Object unwrap(Object o) {
-
         if (o == null) {
             return null;
         }
@@ -221,11 +220,23 @@ public class JacksonJsonNodeJsonProvider extends AbstractJsonProvider {
     @Override
     public Iterable<?> toIterable(Object obj) {
         ArrayNode arr = toJsonArray(obj);
-        List<Object> values = new ArrayList<Object>(arr.size());
-        for (Object o : arr) {
-            values.add(unwrap(o));
-        }
-        return values;
+        Iterator<?> iterator = arr.iterator();
+        return new Iterable<Object>() {
+            @Override
+            public Iterator<Object> iterator() {
+                return new Iterator<Object>() {
+                    @Override
+                    public boolean hasNext() {
+                        return iterator.hasNext();
+                    }
+
+                    @Override
+                    public Object next() {
+                        return unwrap(iterator.next());
+                    }
+                };
+            }
+        };
     }
 
     private JsonNode createJsonElement(Object o) {
