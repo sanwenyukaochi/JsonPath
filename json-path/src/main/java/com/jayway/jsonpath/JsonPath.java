@@ -52,24 +52,33 @@ public class JsonPath {
         boolean optThrowOnMissingProperty =
                 configuration.getOptions().contains(Option.THROW_ON_MISSING_PROPERTY);
 
-        Object result = null;
         try {
-            result = path.evaluate(jsonObject, configuration).getWithOptions();
-        } catch (RuntimeException e) {
-            if (optThrowOnMissingProperty
-                    || (!optThrowOnMissingProperty && !optSuppressExceptions)) {
-                throw e;
+            if (optAsPathList) {
+                return (T) path.evaluate(jsonObject, configuration).getPath();
             } else {
-                if (optSuppressExceptions) {
-                    if (path.isDefinite() && !optAlwaysReturnList && !optAsPathList) {
-                        result = null;
-                    } else {
-                        result = configuration.getProvider().createArray();
-                    }
+                Object res = path.evaluate(jsonObject, configuration).getValue();
+                if (optAlwaysReturnList && path.isDefinite()) {
+                    Object array = configuration.getProvider().createArray();
+                    configuration.getProvider().setProperty(array, 0, res);
+                    return (T) array;
+                } else {
+                    return (T) res;
                 }
             }
+        } catch (RuntimeException e) {
+            if (optThrowOnMissingProperty || !optSuppressExceptions) {
+                throw e;
+            }
         }
-        return (T) result;
+        if (optAsPathList) {
+            return (T) configuration.getProvider().createArray();
+        } else {
+            if (optAlwaysReturnList) {
+                return (T) configuration.getProvider().createArray();
+            } else {
+                return (T) (path.isDefinite() ? null : configuration.getProvider().createArray());
+            }
+        }
     }
 
     @SuppressWarnings({"unchecked"})

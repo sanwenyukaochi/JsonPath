@@ -5,11 +5,12 @@ import com.jayway.jsonpath.Configuration;
 import java.util.List;
 
 public interface EvaluationContext {
+
     Configuration configuration();
 
-    <T> T get();
+    <T> T getValue();
 
-    Object getWithOptions();
+    <T> T getPath();
 
     List<String> getPathList();
 }
