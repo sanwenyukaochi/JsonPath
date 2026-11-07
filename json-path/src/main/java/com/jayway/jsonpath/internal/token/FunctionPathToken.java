@@ -4,9 +4,6 @@ import com.jayway.jsonpath.internal.PathRef;
 import com.jayway.jsonpath.internal.function.Function;
 import com.jayway.jsonpath.internal.function.FunctionFactory;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public class FunctionPathToken extends PathToken {
 
     private final String functionName;
@@ -14,11 +11,9 @@ public class FunctionPathToken extends PathToken {
 
     public FunctionPathToken(String pathFragment) {
         this.pathFragment = pathFragment;
-        Matcher matcher = Pattern.compile(".*?\\%(\\w+)\\(.*?").matcher(pathFragment);
-        if (matcher.matches()) {
-            functionName = matcher.group(1);
+        if (pathFragment.endsWith("()")) {
+            functionName = pathFragment.substring(0, pathFragment.length() - 2);
         } else {
-
             functionName = null;
         }
     }

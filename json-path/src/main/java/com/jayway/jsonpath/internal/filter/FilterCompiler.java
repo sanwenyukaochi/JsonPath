@@ -19,7 +19,7 @@ public class FilterCompiler {
     private static final char SPACE = ' ';
     private static final char MINUS = '-';
     private static final char TICK = '\'';
-    private static final char FUNCTION = '%';
+    private static final char PERIOD = '.';
     private static final char LT = '<';
     private static final char GT = '>';
     private static final char EQ = '=';
@@ -374,7 +374,7 @@ public class FilterCompiler {
         }
         idx--;
         while (filter.inBounds(idx) && idx > lowerBound) {
-            if (filter.charAt(idx) == FUNCTION) {
+            if (filter.charAt(idx) == PERIOD) {
                 return true;
             }
             idx--;
