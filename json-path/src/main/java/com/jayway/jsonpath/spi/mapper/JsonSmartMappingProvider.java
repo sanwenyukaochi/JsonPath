@@ -3,6 +3,7 @@ package com.jayway.jsonpath.spi.mapper;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.TypeRef;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
@@ -27,6 +28,7 @@ public class JsonSmartMappingProvider implements MappingProvider {
         DEFAULT.registerReader(BigDecimal.class, new BigDecimalReader());
         DEFAULT.registerReader(String.class, new StringReader());
         DEFAULT.registerReader(Date.class, new DateReader());
+        DEFAULT.registerReader(BigInteger.class, new BigIntegerReader());
     }
 
     private final Callable<JsonReader> factory;
@@ -206,6 +208,19 @@ public class JsonSmartMappingProvider implements MappingProvider {
                 return null;
             }
             return new BigDecimal(src.toString());
+        }
+    }
+
+    private static class BigIntegerReader extends JsonReaderI<BigInteger> {
+        public BigIntegerReader() {
+            super(null);
+        }
+
+        public BigInteger convert(Object src) {
+            if (src == null) {
+                return null;
+            }
+            return new BigInteger(src.toString());
         }
     }
 
