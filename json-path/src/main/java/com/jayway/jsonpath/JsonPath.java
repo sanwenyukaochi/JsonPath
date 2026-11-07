@@ -18,8 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 
@@ -71,11 +69,12 @@ public class JsonPath {
     public <T> T read(Object jsonObject) {
         notNull(jsonObject, "json can not be null");
 
-        if (!(jsonObject instanceof Map) && !(jsonObject instanceof List)) {
+        JsonProvider jsonProvider = JsonProviderFactory.createProvider();
+
+        if (!jsonProvider.isMap(jsonObject) && !jsonProvider.isList(jsonObject)) {
             throw new IllegalArgumentException("Invalid container object");
         }
         LinkedList<Filter> contextFilters = new LinkedList<Filter>(filters);
-        JsonProvider jsonProvider = JsonProviderFactory.createProvider();
 
         Object result = jsonObject;
 
