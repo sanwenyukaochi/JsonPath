@@ -13,7 +13,9 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +24,22 @@ import org.slf4j.LoggerFactory;
 public class ApiResource {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiResource.class);
+
+    @GET
+    @Path("/info")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response info() {
+        Map<String, String> result = new HashMap<String, String>();
+        try {
+            ResourceBundle resource = ResourceBundle.getBundle("build-info");
+            result.put("version", resource.getString("version"));
+            result.put("timestamp", resource.getString("timestamp"));
+        } catch (Exception e) {
+            result.put("version", "LOCAL");
+            result.put("timestamp", "NOW");
+        }
+        return Response.ok(result).build();
+    }
 
     @GET
     @Path("/validate")
