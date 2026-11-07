@@ -1,6 +1,7 @@
 package com.jayway.jsonpath.matchers;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.isJson;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.withJsonPath;
 import static com.jayway.jsonpath.matchers.helpers.ResourceHelpers.resource;
@@ -17,6 +18,8 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.ReadContext;
 import com.jayway.jsonpath.matchers.helpers.StrictParsingConfiguration;
 import java.io.File;
 import java.util.List;
@@ -214,5 +217,14 @@ public class JsonPathMatchersTest {
     public void shouldMatchJsonPathOnParsedJsonObject() {
         Object json = Configuration.defaultConfiguration().jsonProvider().parse(BOOKS_JSON);
         assertThat(json, hasJsonPath("$.store.name", equalTo("Little Shop")));
+    }
+
+    @Test
+    public void shouldMatchJsonPathOnReadContext() {
+        String test = "{\"foo\":\"bar\"}";
+        ReadContext context = JsonPath.parse(test);
+        assertThat(context, hasJsonPath("$.foo"));
+        assertThat(context, hasJsonPath("$.foo", equalTo("bar")));
+        assertThat(context, hasNoJsonPath("$.zoo"));
     }
 }
