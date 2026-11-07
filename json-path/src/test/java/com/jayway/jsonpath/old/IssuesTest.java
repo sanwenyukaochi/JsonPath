@@ -929,4 +929,14 @@ public class IssuesTest extends BaseTest {
 
         Assertions.assertThat(result).containsExactly(1234);
     }
+
+    @Test
+    public void using_square_bracket_literal_path() {
+
+        String json = "{ \"valid key[@num = 2]\" : \"value\" }";
+
+        String result = JsonPath.read(json, "$['valid key[@num = 2]']");
+
+        Assertions.assertThat(result).isEqualTo("value");
+    }
 }
