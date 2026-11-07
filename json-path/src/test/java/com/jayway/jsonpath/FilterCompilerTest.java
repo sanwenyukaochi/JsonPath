@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 public class FilterCompilerTest {
 
     @Test
-    public void filter_compiler_test() {
+    public void valid_filters_compile() {
         assertThat(compile("[?(@)]").toString()).isEqualTo("[?(@)]");
         assertThat(compile("[?(@)]").toString()).isEqualTo("[?(@)]");
         assertThat(compile("[?(@.firstname)]").toString()).isEqualTo("[?(@['firstname'])]");
@@ -61,5 +61,26 @@ public class FilterCompilerTest {
         assertThat(compile("[?(10 == @.message.%min())]").toString())
                 .isEqualTo("[?(10 == @['message'].%min())]");
         assertThat(compile("[?(((@)))]").toString()).isEqualTo("[?(@)]");
+        assertThat(compile("[?(@.name =~ /.*?/i)]").toString())
+                .isEqualTo("[?(@['name'] =~ /.*?/i)]");
+        assertThat(compile("[?(@.name =~ /.*?/)]").toString()).isEqualTo("[?(@['name'] =~ /.*?/)]");
+    }
+
+    @Test
+    public void invalid_filters_does_not_compile() {
+        assertInvalidPathException("[?(@))]");
+        assertInvalidPathException("[?(@ FOO 1)]");
+        assertInvalidPathException("[?(@ || )]");
+        assertInvalidPathException("[?(@ == 'foo )]");
+        assertInvalidPathException("[?(@ == 1' )]");
+    }
+
+    private void assertInvalidPathException(String filter) {
+        try {
+            compile(filter);
+            throw new AssertionError("Expected " + filter + " to throw InvalidPathException");
+        } catch (InvalidPathException e) {
+            e.printStackTrace();
+        }
     }
 }
