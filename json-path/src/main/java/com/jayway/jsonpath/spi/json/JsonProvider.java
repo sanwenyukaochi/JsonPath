@@ -36,6 +36,12 @@ public interface JsonProvider {
 
     Object getProperty(Object obj, Object key);
 
+    Object getArrayIndex(Object obj, int idx);
+
+    Object getMapValue(Object obj, String key);
+
+    Object getMapValue(Object obj, String key, boolean throwOnMissing);
+
     void setProperty(Object obj, Object key, Object value);
 
     boolean isMap(Object obj);
