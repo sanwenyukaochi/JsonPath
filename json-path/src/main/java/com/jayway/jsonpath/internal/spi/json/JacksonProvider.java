@@ -3,12 +3,9 @@ package com.jayway.jsonpath.internal.spi.json;
 import com.jayway.jsonpath.InvalidJsonException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.io.StringWriter;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.jackson.core.JacksonException;
@@ -51,15 +48,6 @@ public class JacksonProvider extends AbstractJsonProvider {
     }
 
     @Override
-    public Object parse(Reader jsonReader) throws InvalidJsonException {
-        try {
-            return objectReader.readValue(jsonReader);
-        } catch (JacksonException e) {
-            throw new InvalidJsonException(e);
-        }
-    }
-
-    @Override
     public Object parse(InputStream jsonStream) throws InvalidJsonException {
         try {
             return objectReader.readValue(jsonStream);
@@ -81,11 +69,6 @@ public class JacksonProvider extends AbstractJsonProvider {
         } catch (IOException | JacksonException e) {
             throw new InvalidJsonException();
         }
-    }
-
-    @Override
-    public Map<String, Object> createMap() {
-        return new LinkedHashMap<String, Object>();
     }
 
     @Override
