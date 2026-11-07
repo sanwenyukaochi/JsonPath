@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class FilterTest extends BaseTest {
@@ -462,5 +463,41 @@ public class FilterTest extends BaseTest {
 
         assertThat(isFoo.or(isBar).apply(createPredicateContext(model))).isTrue();
         assertThat(isFoo.and(isBar).apply(createPredicateContext(model))).isFalse();
+    }
+
+    @Test
+    public void a_filter_can_be_parsed() {
+
+        Filter.parse("[?(@.foo)]");
+        Filter.parse("[?(@.foo == 1)]");
+        Filter.parse("[?(@.foo == 1 || @['bar'])]");
+        Filter.parse("[?(@.foo == 1 && @['bar'])]");
+    }
+
+    @Test
+    public void an_invalid_filter_can_not_be_parsed() {
+        try {
+            Filter.parse("[?(@.foo == 1)");
+            Assertions.fail("expected " + InvalidPathException.class.getName());
+        } catch (InvalidPathException ipe) {
+        }
+
+        try {
+            Filter.parse("[?(@.foo == 1) ||]");
+            Assertions.fail("expected " + InvalidPathException.class.getName());
+        } catch (InvalidPathException ipe) {
+        }
+
+        try {
+            Filter.parse("[(@.foo == 1)]");
+            Assertions.fail("expected " + InvalidPathException.class.getName());
+        } catch (InvalidPathException ipe) {
+        }
+
+        try {
+            Filter.parse("[?@.foo == 1)]");
+            Assertions.fail("expected " + InvalidPathException.class.getName());
+        } catch (InvalidPathException ipe) {
+        }
     }
 }

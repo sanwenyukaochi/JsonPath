@@ -131,7 +131,7 @@ public class IssuesTest {
 
             is.close();
         } catch (Exception e) {
-            e.printStackTrace();
+
             Utils.closeQuietly(is);
         }
     }
