@@ -52,24 +52,24 @@ public class JSONEntityFunctionTest extends BaseFunctionTest {
     @Test
     public void testLengthOfTextArray() {
 
-        verifyFunction(conf, "$['text'].%length()", TEXT_SERIES, 6);
+        verifyFunction(conf, "$['text'].length()", TEXT_SERIES, 6);
     }
 
     @Test
     public void testLengthOfNumberArray() {
 
-        verifyFunction(conf, "$.numbers.%length()", NUMBER_SERIES, 10);
+        verifyFunction(conf, "$.numbers.length()", NUMBER_SERIES, 10);
     }
 
     @Test
     public void testLengthOfStructure() {
-        verifyFunction(conf, "$.batches.%length()", BATCH_JSON, 2);
+        verifyFunction(conf, "$.batches.length()", BATCH_JSON, 2);
     }
 
     @Test
     public void testPredicateWithFunctionCallSingleMatch() {
         String path =
-                "$.batches.results[?(@.values.%length() >= $.batches.minBatchSize)].values.%avg()";
+                "$.batches.results[?(@.values.length() >= $.batches.minBatchSize)].values.avg()";
 
         JSONArray values = new JSONArray();
         values.add(12.2d);
@@ -78,7 +78,7 @@ public class JSONEntityFunctionTest extends BaseFunctionTest {
 
     @Test
     public void testPredicateWithFunctionCallTwoMatches() {
-        String path = "$.batches.results[?(@.values.%length() >= 3)].values.%avg()";
+        String path = "$.batches.results[?(@.values.length() >= 3)].values.avg()";
 
         JSONArray values = new JSONArray();
         values.add(12.2d);

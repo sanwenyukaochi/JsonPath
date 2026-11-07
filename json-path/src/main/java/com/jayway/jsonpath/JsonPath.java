@@ -62,9 +62,10 @@ public class JsonPath {
                                     + " are not allowed when using path functions!");
                 }
                 return path.evaluate(jsonObject, jsonObject, configuration).getValue(true);
-            }
-            if (optAsPathList) {
+
+            } else if (optAsPathList) {
                 return (T) path.evaluate(jsonObject, jsonObject, configuration).getPath();
+
             } else {
                 Object res = path.evaluate(jsonObject, jsonObject, configuration).getValue(false);
                 if (optAlwaysReturnList && path.isDefinite()) {
