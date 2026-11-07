@@ -1168,4 +1168,81 @@ public class IssuesTest extends BaseTest {
 
         ctx.read(jsonPath);
     }
+
+    @Test
+    public void issue_620_1() {
+        String json =
+"""
+{
+  "complexText": {
+    "nestedFields": [
+      {
+        "index": "0",
+        "name": "A"
+      },
+      {
+        "index": "1",
+        "name": "B"
+      },
+      {
+        "index": "2",
+        "name": "C"
+      }
+    ]
+  }
+}\
+""";
+
+        String path1 =
+                "$.concat($.complexText.nestedFields[?(@.index == '2')].name,"
+                        + "$.complexText.nestedFields[?(@.index == '1')].name,"
+                        + "$.complexText.nestedFields[?(@.index == '0')].name)";
+        String path2 =
+                "$.concat($.complexText.nestedFields[2].name,"
+                        + "$.complexText.nestedFields[1].name,"
+                        + "$.complexText.nestedFields[0].name)";
+
+        Assertions.assertThat((String) JsonPath.read(json, path1)).isEqualTo("CBA");
+        Assertions.assertThat((String) JsonPath.read(json, path2)).isEqualTo("CBA");
+    }
+
+    @Test
+    public void issue_620_2() {
+        String json =
+"""
+{
+  "complexText": {
+    "nestedFields": [
+      {
+        "index": "0",
+        "name": "A"
+      },
+      {
+        "index": "1",
+        "name": "B"
+      },
+      {
+        "index": "2",
+        "name": "C"
+      }
+    ]
+  }
+}\
+""";
+
+        String path1 =
+                "$.concat($.complexText.nestedFields[?(@.index == '2')].name,"
+                        + "$.complexText.nestedFields[?((@.index == '1')].name,"
+                        + "$.complexText.nestedFields[?(@.index == '0')].name)";
+
+        boolean thrown = false;
+
+        try {
+            Object result = (Object) JsonPath.read(json, path1);
+        } catch (Exception e) {
+            thrown = true;
+        }
+
+        assertTrue(thrown);
+    }
 }
