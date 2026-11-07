@@ -8,16 +8,12 @@ import java.io.StringWriter;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ObjectReader;
 
 public class JacksonJsonProvider extends AbstractJsonProvider {
-
-    private static final Logger logger = LoggerFactory.getLogger(JacksonJsonProvider.class);
 
     private static final ObjectMapper defaultObjectMapper = new ObjectMapper();
     private static final ObjectReader defaultObjectReader =
@@ -48,8 +44,7 @@ public class JacksonJsonProvider extends AbstractJsonProvider {
         try {
             return objectReader.readValue(json);
         } catch (JacksonException e) {
-            logger.debug("Invalid JSON: \n" + json);
-            throw new InvalidJsonException(e);
+            throw new InvalidJsonException(e, json);
         }
     }
 
