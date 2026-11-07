@@ -10,8 +10,6 @@ public interface JsonProvider {
 
     static final Object UNDEFINED = new Object();
 
-    Mode getMode();
-
     Object parse(String json) throws InvalidJsonException;
 
     Object parse(Reader jsonReader) throws InvalidJsonException;
@@ -24,10 +22,6 @@ public interface JsonProvider {
 
     Object createArray();
 
-    Object clone(Object model);
-
-    boolean isContainer(Object obj);
-
     boolean isArray(Object obj);
 
     int length(Object obj);
@@ -35,8 +29,6 @@ public interface JsonProvider {
     Iterable<Object> toIterable(Object obj);
 
     Collection<String> getPropertyKeys(Object obj);
-
-    Object getProperty(Object obj, Object key);
 
     Object getArrayIndex(Object obj, int idx);
 

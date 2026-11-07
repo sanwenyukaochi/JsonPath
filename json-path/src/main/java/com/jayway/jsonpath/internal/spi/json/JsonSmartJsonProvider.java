@@ -75,10 +75,6 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
         }
     }
 
-    public Mode getMode() {
-        return mode;
-    }
-
     private JSONParser createParser() {
         return new JSONParser(mode.intValue());
     }
