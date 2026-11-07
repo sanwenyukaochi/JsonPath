@@ -7,7 +7,7 @@ import static com.jayway.jsonpath.internal.Utils.notEmpty;
 import static com.jayway.jsonpath.internal.Utils.notNull;
 
 import com.jayway.jsonpath.internal.EvaluationContext;
-import com.jayway.jsonpath.internal.JsonContext;
+import com.jayway.jsonpath.internal.ParseContextImpl;
 import com.jayway.jsonpath.internal.Path;
 import com.jayway.jsonpath.internal.PathRef;
 import com.jayway.jsonpath.internal.Utils;
@@ -245,75 +245,75 @@ public class JsonPath {
 
     @SuppressWarnings({"unchecked"})
     public static <T> T read(String json, String jsonPath, Predicate... filters) {
-        return new JsonContext().parse(json).read(jsonPath, filters);
+        return new ParseContextImpl().parse(json).read(jsonPath, filters);
     }
 
     @SuppressWarnings({"unchecked"})
     @Deprecated
     public static <T> T read(URL jsonURL, String jsonPath, Predicate... filters)
             throws IOException {
-        return new JsonContext().parse(jsonURL).read(jsonPath, filters);
+        return new ParseContextImpl().parse(jsonURL).read(jsonPath, filters);
     }
 
     @SuppressWarnings({"unchecked"})
     public static <T> T read(File jsonFile, String jsonPath, Predicate... filters)
             throws IOException {
-        return new JsonContext().parse(jsonFile).read(jsonPath, filters);
+        return new ParseContextImpl().parse(jsonFile).read(jsonPath, filters);
     }
 
     @SuppressWarnings({"unchecked"})
     public static <T> T read(InputStream jsonInputStream, String jsonPath, Predicate... filters)
             throws IOException {
-        return new JsonContext().parse(jsonInputStream).read(jsonPath, filters);
+        return new ParseContextImpl().parse(jsonInputStream).read(jsonPath, filters);
     }
 
     public static ParseContext using(Configuration configuration) {
-        return new JsonContext(configuration);
+        return new ParseContextImpl(configuration);
     }
 
     @Deprecated
     public static ParseContext using(JsonProvider provider) {
-        return new JsonContext(Configuration.builder().jsonProvider(provider).build());
+        return new ParseContextImpl(Configuration.builder().jsonProvider(provider).build());
     }
 
     public static DocumentContext parse(Object json) {
-        return new JsonContext().parse(json);
+        return new ParseContextImpl().parse(json);
     }
 
     public static DocumentContext parse(String json) {
-        return new JsonContext().parse(json);
+        return new ParseContextImpl().parse(json);
     }
 
     public static DocumentContext parse(InputStream json) {
-        return new JsonContext().parse(json);
+        return new ParseContextImpl().parse(json);
     }
 
     public static DocumentContext parse(File json) throws IOException {
-        return new JsonContext().parse(json);
+        return new ParseContextImpl().parse(json);
     }
 
     public static DocumentContext parse(URL json) throws IOException {
-        return new JsonContext().parse(json);
+        return new ParseContextImpl().parse(json);
     }
 
     public static DocumentContext parse(Object json, Configuration configuration) {
-        return new JsonContext(configuration).parse(json);
+        return new ParseContextImpl(configuration).parse(json);
     }
 
     public static DocumentContext parse(String json, Configuration configuration) {
-        return new JsonContext(configuration).parse(json);
+        return new ParseContextImpl(configuration).parse(json);
     }
 
     public static DocumentContext parse(InputStream json, Configuration configuration) {
-        return new JsonContext(configuration).parse(json);
+        return new ParseContextImpl(configuration).parse(json);
     }
 
     public static DocumentContext parse(File json, Configuration configuration) throws IOException {
-        return new JsonContext(configuration).parse(json);
+        return new ParseContextImpl(configuration).parse(json);
     }
 
     public static DocumentContext parse(URL json, Configuration configuration) throws IOException {
-        return new JsonContext(configuration).parse(json);
+        return new ParseContextImpl(configuration).parse(json);
     }
 
     private <T> T resultByConfiguration(
