@@ -34,7 +34,7 @@ public class JsonProviderTest extends BaseTest {
                                 .read("$.string-property", String.class))
                 .isEqualTo("string-value");
         assertThat(
-                        using(JACKSON_TREE_CONFIGURATION)
+                        using(JACKSON_JSON_NODE_CONFIGURATION)
                                 .parse(JSON_DOCUMENT)
                                 .read("$.string-property", String.class))
                 .isEqualTo("string-value");
@@ -58,7 +58,7 @@ public class JsonProviderTest extends BaseTest {
                                 .read("$.int-max-property", Integer.class))
                 .isEqualTo(Integer.MAX_VALUE);
         assertThat(
-                        using(JACKSON_TREE_CONFIGURATION)
+                        using(JACKSON_JSON_NODE_CONFIGURATION)
                                 .parse(JSON_DOCUMENT)
                                 .read("$.int-max-property", Integer.class))
                 .isEqualTo(Integer.MAX_VALUE);
@@ -82,7 +82,7 @@ public class JsonProviderTest extends BaseTest {
                                 .read("$.int-max-property", int.class))
                 .isEqualTo(Integer.MAX_VALUE);
         assertThat(
-                        using(JACKSON_TREE_CONFIGURATION)
+                        using(JACKSON_JSON_NODE_CONFIGURATION)
                                 .parse(JSON_DOCUMENT)
                                 .read("$.int-max-property", int.class))
                 .isEqualTo(Integer.MAX_VALUE);
@@ -104,7 +104,7 @@ public class JsonProviderTest extends BaseTest {
         TypeRef<List<Double>> typeRef = new TypeRef<List<Double>>() {};
 
         assertThat(
-                        using(JACKSON_TREE_CONFIGURATION)
+                        using(JACKSON_JSON_NODE_CONFIGURATION)
                                 .parse(JSON_DOCUMENT)
                                 .read("$.store.book[*].display-price", typeRef))
                 .containsExactly(8.95D, 12.99D, 8.99D, 22.99D);
@@ -127,7 +127,7 @@ public class JsonProviderTest extends BaseTest {
         assertThat(using(JACKSON_CONFIGURATION).parse(JSON).read("$", typeRef))
                 .extracting("foo")
                 .containsExactly("foo0", "foo1", "foo2");
-        assertThat(using(JACKSON_TREE_CONFIGURATION).parse(JSON).read("$", typeRef))
+        assertThat(using(JACKSON_JSON_NODE_CONFIGURATION).parse(JSON).read("$", typeRef))
                 .extracting("foo")
                 .containsExactly("foo0", "foo1", "foo2");
         assertThat(using(GSON_CONFIGURATION).parse(JSON).read("$", typeRef))

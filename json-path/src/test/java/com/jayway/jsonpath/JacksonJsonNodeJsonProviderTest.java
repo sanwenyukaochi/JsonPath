@@ -12,7 +12,7 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
 
-public class JacksonTreeJsonProviderTest extends BaseTest {
+public class JacksonJsonNodeJsonProviderTest extends BaseTest {
 
     private static final String JSON =
 """
@@ -33,16 +33,18 @@ public class JacksonTreeJsonProviderTest extends BaseTest {
 
     @Test
     public void json_can_be_parsed() {
-        ObjectNode node = using(JACKSON_TREE_CONFIGURATION).parse(JSON_DOCUMENT).read("$");
+        ObjectNode node = using(JACKSON_JSON_NODE_CONFIGURATION).parse(JSON_DOCUMENT).read("$");
         assertThat(node.get("string-property").asText()).isEqualTo("string-value");
     }
 
     @Test
     public void strings_are_unwrapped() {
         JsonNode node =
-                using(JACKSON_TREE_CONFIGURATION).parse(JSON_DOCUMENT).read("$.string-property");
+                using(JACKSON_JSON_NODE_CONFIGURATION)
+                        .parse(JSON_DOCUMENT)
+                        .read("$.string-property");
         String unwrapped =
-                using(JACKSON_TREE_CONFIGURATION)
+                using(JACKSON_JSON_NODE_CONFIGURATION)
                         .parse(JSON_DOCUMENT)
                         .read("$.string-property", String.class);
 
@@ -53,9 +55,11 @@ public class JacksonTreeJsonProviderTest extends BaseTest {
     @Test
     public void ints_are_unwrapped() {
         JsonNode node =
-                using(JACKSON_TREE_CONFIGURATION).parse(JSON_DOCUMENT).read("$.int-max-property");
+                using(JACKSON_JSON_NODE_CONFIGURATION)
+                        .parse(JSON_DOCUMENT)
+                        .read("$.int-max-property");
         int unwrapped =
-                using(JACKSON_TREE_CONFIGURATION)
+                using(JACKSON_JSON_NODE_CONFIGURATION)
                         .parse(JSON_DOCUMENT)
                         .read("$.int-max-property", int.class);
         assertThat(unwrapped).isEqualTo(Integer.MAX_VALUE);
@@ -65,9 +69,11 @@ public class JacksonTreeJsonProviderTest extends BaseTest {
     @Test
     public void longs_are_unwrapped() {
         JsonNode node =
-                using(JACKSON_TREE_CONFIGURATION).parse(JSON_DOCUMENT).read("$.long-max-property");
+                using(JACKSON_JSON_NODE_CONFIGURATION)
+                        .parse(JSON_DOCUMENT)
+                        .read("$.long-max-property");
         long unwrapped =
-                using(JACKSON_TREE_CONFIGURATION)
+                using(JACKSON_JSON_NODE_CONFIGURATION)
                         .parse(JSON_DOCUMENT)
                         .read("$.long-max-property", long.class);
 
@@ -78,7 +84,7 @@ public class JacksonTreeJsonProviderTest extends BaseTest {
     @Test
     public void list_of_numbers() {
         ArrayNode objs =
-                using(JACKSON_TREE_CONFIGURATION)
+                using(JACKSON_JSON_NODE_CONFIGURATION)
                         .parse(JSON_DOCUMENT)
                         .read("$.store.book[*].display-price");
         System.out.println(objs.toString());
@@ -89,7 +95,7 @@ public class JacksonTreeJsonProviderTest extends BaseTest {
         TypeRef<List<FooBarBaz<Gen>>> typeRef = new TypeRef<List<FooBarBaz<Gen>>>() {};
 
         List<FooBarBaz<Gen>> list =
-                using(JACKSON_TREE_CONFIGURATION).parse(JSON).read("$", typeRef);
+                using(JACKSON_JSON_NODE_CONFIGURATION).parse(JSON).read("$", typeRef);
 
         assertThat(list.get(0).gen.eric).isEqualTo("yepp");
     }
@@ -102,7 +108,7 @@ public class JacksonTreeJsonProviderTest extends BaseTest {
                     TypeRef<List<FooBarBaz<Integer>>> typeRef =
                             new TypeRef<List<FooBarBaz<Integer>>>() {};
 
-                    using(JACKSON_TREE_CONFIGURATION).parse(JSON).read("$", typeRef);
+                    using(JACKSON_JSON_NODE_CONFIGURATION).parse(JSON).read("$", typeRef);
                 });
     }
 
