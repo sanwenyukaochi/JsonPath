@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.concurrent.Callable;
 import net.minidev.json.JSONValue;
 import net.minidev.json.writer.JsonReader;
 import net.minidev.json.writer.JsonReaderI;
@@ -32,19 +33,19 @@ public class JsonSmartMappingProvider implements MappingProvider {
         DEFAULT.registerReader(Date.class, new DateReader());
     }
 
-    private final Factory<JsonReader> factory;
+    private final Callable<JsonReader> factory;
 
     public JsonSmartMappingProvider(final JsonReader jsonReader) {
         this(
-                new Factory<JsonReader>() {
+                new Callable<JsonReader>() {
                     @Override
-                    public JsonReader createInstance() {
+                    public JsonReader call() {
                         return jsonReader;
                     }
                 });
     }
 
-    public JsonSmartMappingProvider(Factory<JsonReader> factory) {
+    public JsonSmartMappingProvider(Callable<JsonReader> factory) {
         this.factory = factory;
     }
 
@@ -63,7 +64,7 @@ public class JsonSmartMappingProvider implements MappingProvider {
         try {
             if (!configuration.jsonProvider().isMap(source)
                     && !configuration.jsonProvider().isArray(source)) {
-                return factory.createInstance().getMapper(targetType).convert(source);
+                return factory.call().getMapper(targetType).convert(source);
             }
             String s = configuration.jsonProvider().toJson(source);
             return (T) JSONValue.parse(s, targetType);
