@@ -8,8 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.jayway.jsonpath.BaseTest;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Criteria;
+import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
@@ -24,7 +26,7 @@ import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
-public class IssuesTest {
+public class IssuesTest extends BaseTest {
 
     private static final JsonProvider jp = Configuration.defaultConfiguration().jsonProvider();
 
@@ -609,5 +611,20 @@ public class IssuesTest {
         Object read = JsonPath.parse(json).read("$.store.book[?]", filter);
 
         System.out.println(read);
+    }
+
+    @Test
+    public void issue_76() throws Exception {
+
+        DocumentContext doc = JsonPath.parse(this.getClass().getResourceAsStream("/issue_76.json"));
+
+        Object o;
+        o = doc.read("$.frameworks");
+
+        try {
+            System.out.println(JSON_SMART_CONFIGURATION.jsonProvider().toJson(o));
+            assertTrue(false);
+        } catch (RuntimeException e) {
+        }
     }
 }
