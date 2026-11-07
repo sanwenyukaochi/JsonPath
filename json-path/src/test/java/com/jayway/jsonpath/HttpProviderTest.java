@@ -11,17 +11,15 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled
 public class HttpProviderTest {
 
     private static final String EXPECTED =
             """
             {
                "results" : [],
-               "status" : "REQUEST_DENIED"
+               "status" : "ZERO_RESULTS"
             }\
             """;
 
@@ -45,7 +43,7 @@ public class HttpProviderTest {
                     new URL(
                             "http://127.0.0.1:"
                                     + server.getAddress().getPort()
-                                    + "/maps/api/geocode/json");
+                                    + "/maps/api/geocode/json?sensor=false");
             inputStream = HttpProviderFactory.getProvider().get(url);
 
             byte[] bytes = inputStream.readAllBytes();
