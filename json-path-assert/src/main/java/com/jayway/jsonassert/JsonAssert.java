@@ -6,7 +6,6 @@ import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import com.jayway.jsonassert.impl.matcher.IsEmptyCollection;
 import com.jayway.jsonassert.impl.matcher.IsMapContainingKey;
 import com.jayway.jsonassert.impl.matcher.IsMapContainingValue;
-import com.jayway.jsonpath.spi.JsonProvider;
 import com.jayway.jsonpath.spi.JsonProviderFactory;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,18 +19,13 @@ import org.hamcrest.Matcher;
 
 public class JsonAssert {
 
-    private static JsonProvider jsonProvider = JsonProviderFactory.createProvider();
-
-    public static void setJsonProvider(JsonProvider jsonProvider) {
-        JsonAssert.jsonProvider = jsonProvider;
-    }
-
     public static JsonAsserter with(String json) {
-        return new JsonAsserterImpl(jsonProvider.parse(json));
+        return new JsonAsserterImpl(JsonProviderFactory.createProvider().parse(json));
     }
 
     public static JsonAsserter with(Reader reader) throws IOException {
-        return new JsonAsserterImpl(jsonProvider.parse(convertReaderToString(reader)));
+        return new JsonAsserterImpl(
+                JsonProviderFactory.createProvider().parse(convertReaderToString(reader)));
     }
 
     public static JsonAsserter with(InputStream is) throws IOException {
