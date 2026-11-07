@@ -7,6 +7,7 @@ import static org.apache.commons.lang.Validate.notNull;
 import com.jayway.jsonpath.internal.PathToken;
 import com.jayway.jsonpath.spi.JsonProvider;
 import com.jayway.jsonpath.spi.JsonProviderFactory;
+import com.jayway.jsonpath.spi.MappingProviderFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -17,12 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.type.CollectionType;
 
 public class JsonModel {
-
-    private static ObjectMapper objectMapper;
 
     private Object jsonObject;
 
@@ -166,21 +163,6 @@ public class JsonModel {
         return new JsonModel(jsonInputStream);
     }
 
-    private static ObjectMapper getObjectMapper() {
-        if (JsonModel.objectMapper == null) {
-            synchronized (JsonModel.class) {
-                try {
-                    Class.forName("tools.jackson.databind.ObjectMapper");
-                } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(
-                            "tools.jackson.databind.ObjectMapper not found on classpath. This is an optional dependency needed for POJO conversions.");
-                }
-                JsonModel.objectMapper = new ObjectMapper();
-            }
-        }
-        return JsonModel.objectMapper;
-    }
-
     private <T> T getTargetObject(JsonPath jsonPath, Class<T> clazz) {
         notNull(jsonPath, "jsonPath can not be null");
 
@@ -209,8 +191,6 @@ public class JsonModel {
         return clazz.cast(modelRef);
     }
 
-    public interface MappingModelReader extends ListMappingModelReader, ObjectMappingModelReader {}
-
     public interface ObjectMappingModelReader {
         <T> T to(Class<T> targetClass);
     }
@@ -224,6 +204,8 @@ public class JsonModel {
 
         <T> Set<T> toSetOf(Class<T> targetClass);
     }
+
+    public interface MappingModelReader extends ListMappingModelReader, ObjectMappingModelReader {}
 
     public interface ObjectOps {
 
@@ -347,12 +329,10 @@ public class JsonModel {
     }
 
     private static class DefaultMappingModelReader implements MappingModelReader {
-        private ObjectMapper objectMapper;
         private Object model;
 
         private DefaultMappingModelReader(Object model) {
             this.model = model;
-            this.objectMapper = JsonModel.getObjectMapper();
         }
 
         @Override
@@ -370,9 +350,8 @@ public class JsonModel {
             if (!(model instanceof List)) {
                 model = asList(model);
             }
-            CollectionType colType =
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, targetClass);
-            return objectMapper.convertValue(model, colType);
+            return MappingProviderFactory.getInstance()
+                    .convertValue(model, List.class, targetClass);
         }
 
         @Override
@@ -382,14 +361,12 @@ public class JsonModel {
                 setModel.add(model);
                 model = setModel;
             }
-            CollectionType colType =
-                    objectMapper.getTypeFactory().constructCollectionType(Set.class, targetClass);
-            return objectMapper.convertValue(model, colType);
+            return MappingProviderFactory.getInstance().convertValue(model, Set.class, targetClass);
         }
 
         @Override
         public <T> T to(Class<T> targetClass) {
-            return objectMapper.convertValue(model, targetClass);
+            return MappingProviderFactory.getInstance().convertValue(model, targetClass);
         }
     }
 }
