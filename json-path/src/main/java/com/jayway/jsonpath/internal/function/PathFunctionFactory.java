@@ -8,6 +8,9 @@ import com.jayway.jsonpath.internal.function.numeric.Max;
 import com.jayway.jsonpath.internal.function.numeric.Min;
 import com.jayway.jsonpath.internal.function.numeric.StandardDeviation;
 import com.jayway.jsonpath.internal.function.numeric.Sum;
+import com.jayway.jsonpath.internal.function.sequence.First;
+import com.jayway.jsonpath.internal.function.sequence.Index;
+import com.jayway.jsonpath.internal.function.sequence.Last;
 import com.jayway.jsonpath.internal.function.text.Concatenate;
 import com.jayway.jsonpath.internal.function.text.Length;
 
@@ -34,6 +37,10 @@ public class PathFunctionFactory {
         map.put("size", Length.class);
         map.put("append", Append.class);
         map.put("keys", KeySetFunction.class);
+
+        map.put("first", First.class);
+        map.put("last", Last.class);
+        map.put("index", Index.class);
 
         FUNCTIONS = Collections.unmodifiableMap(map);
     }
