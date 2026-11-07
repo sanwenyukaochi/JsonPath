@@ -54,5 +54,12 @@ public class FilterCompilerTest {
         assertThat(compile("[?(@.value<'7')]").toString()).isEqualTo("[?(@['value'] < '7')]");
         assertThat(compile("[?(@.message == 'it\\\\')]").toString())
                 .isEqualTo("[?(@['message'] == 'it\\\\')]");
+        assertThat(compile("[?(@.message.%min() > 10)]").toString())
+                .isEqualTo("[?(@['message'].%min() > 10)]");
+        assertThat(compile("[?(@.message.%min()==10)]").toString())
+                .isEqualTo("[?(@['message'].%min() == 10)]");
+        assertThat(compile("[?(10 == @.message.%min())]").toString())
+                .isEqualTo("[?(10 == @['message'].%min())]");
+        assertThat(compile("[?(((@)))]").toString()).isEqualTo("[?(@)]");
     }
 }
