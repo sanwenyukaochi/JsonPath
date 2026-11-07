@@ -6,6 +6,8 @@ public interface ReadContext {
 
     <T> T json();
 
+    String jsonString();
+
     <T> T read(String path, Predicate... filters);
 
     <T> T read(String path, Class<T> type, Predicate... filters);

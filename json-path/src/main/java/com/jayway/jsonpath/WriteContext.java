@@ -6,6 +6,8 @@ public interface WriteContext {
 
     <T> T json();
 
+    String jsonString();
+
     DocumentContext set(String path, Object newValue, Predicate... filters);
 
     DocumentContext set(JsonPath path, Object newValue);

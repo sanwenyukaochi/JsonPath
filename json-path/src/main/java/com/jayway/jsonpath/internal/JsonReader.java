@@ -13,12 +13,10 @@ import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.Predicate;
 import com.jayway.jsonpath.ReadContext;
 import com.jayway.jsonpath.TypeRef;
-import com.jayway.jsonpath.spi.http.HttpProviderFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,13 +90,6 @@ public class JsonReader implements ParseContext, DocumentContext {
     }
 
     @Override
-    public DocumentContext parse(URL json) throws IOException {
-        notNull(json, "json url can not be null");
-        InputStream is = HttpProviderFactory.getProvider().get(json);
-        return parse(is);
-    }
-
-    @Override
     public Configuration configuration() {
         return configuration;
     }
@@ -106,6 +97,11 @@ public class JsonReader implements ParseContext, DocumentContext {
     @Override
     public Object json() {
         return json;
+    }
+
+    @Override
+    public String jsonString() {
+        return configuration.jsonProvider().toJson(json);
     }
 
     @Override

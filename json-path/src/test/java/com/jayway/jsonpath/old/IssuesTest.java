@@ -564,4 +564,50 @@ public class IssuesTest {
 
         Assertions.assertThat(result).containsExactly("it's here");
     }
+
+    @Test
+    public void stack_overflow_question_1() {
+
+        String json =
+"""
+{
+"store": {
+    "book": [
+        {
+            "category": "reference",
+            "authors" : [
+                 {
+                     "firstName" : "Nigel",
+                     "lastName" :  "Rees"
+                  }
+            ],
+            "title": "Sayings of the Century",
+            "price": 8.95
+        },
+        {
+            "category": "fiction",
+            "authors": [
+                 {
+                     "firstName" : "Evelyn",
+                     "lastName" :  "Waugh"
+                  },
+                 {
+                     "firstName" : "Another",
+                     "lastName" :  "Author"
+                  }
+            ],
+            "title": "Sword of Honour",
+            "price": 12.99
+        }
+    ]
+  }
+}\
+""";
+
+        Filter filter = Filter.filter(Criteria.where("authors[*].lastName").contains("Waugh"));
+
+        Object read = JsonPath.parse(json).read("$.store.book[?]", filter);
+
+        System.out.println(read);
+    }
 }
