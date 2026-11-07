@@ -31,7 +31,8 @@ public class Criteria implements Predicate {
             @Override
             boolean eval(Object expected, Object actual, PredicateContext ctx) {
                 boolean res = (0 == safeCompare(expected, actual));
-                logger.debug("[{}] {} [{}] => {}", actual, name(), expected, res);
+                if (logger.isDebugEnabled())
+                    logger.debug("[{}] {} [{}] => {}", actual, name(), expected, res);
                 return res;
             }
         },
@@ -39,7 +40,8 @@ public class Criteria implements Predicate {
             @Override
             boolean eval(Object expected, Object actual, PredicateContext ctx) {
                 boolean res = (0 != safeCompare(expected, actual));
-                logger.debug("[{}] {} [{}] => {}", actual, name(), expected, res);
+                if (logger.isDebugEnabled())
+                    logger.debug("[{}] {} [{}] => {}", actual, name(), expected, res);
                 return res;
             }
         },
@@ -50,7 +52,8 @@ public class Criteria implements Predicate {
                     return false;
                 }
                 boolean res = (0 > safeCompare(expected, actual));
-                logger.debug("[{}] {} [{}] => {}", actual, name(), expected, res);
+                if (logger.isDebugEnabled())
+                    logger.debug("[{}] {} [{}] => {}", actual, name(), expected, res);
                 return res;
             }
         },
@@ -61,7 +64,8 @@ public class Criteria implements Predicate {
                     return false;
                 }
                 boolean res = (0 >= safeCompare(expected, actual));
-                logger.debug("[{}] {} [{}] => {}", actual, name(), expected, res);
+                if (logger.isDebugEnabled())
+                    logger.debug("[{}] {} [{}] => {}", actual, name(), expected, res);
                 return res;
             }
         },
@@ -72,7 +76,8 @@ public class Criteria implements Predicate {
                     return false;
                 }
                 boolean res = (0 < safeCompare(expected, actual));
-                logger.debug("[{}] {} [{}] => {}", actual, name(), expected, res);
+                if (logger.isDebugEnabled())
+                    logger.debug("[{}] {} [{}] => {}", actual, name(), expected, res);
                 return res;
             }
         },
@@ -83,7 +88,8 @@ public class Criteria implements Predicate {
                     return false;
                 }
                 boolean res = (0 <= safeCompare(expected, actual));
-                logger.debug("[{}] {} [{}] => {}", actual, name(), expected, res);
+                if (logger.isDebugEnabled())
+                    logger.debug("[{}] {} [{}] => {}", actual, name(), expected, res);
                 return res;
             }
         },
@@ -98,7 +104,8 @@ public class Criteria implements Predicate {
                         break;
                     }
                 }
-                logger.debug("[{}] {} [{}] => {}", actual, name(), join(", ", exps), res);
+                if (logger.isDebugEnabled())
+                    logger.debug("[{}] {} [{}] => {}", actual, name(), join(", ", exps), res);
                 return res;
             }
         },
@@ -107,7 +114,8 @@ public class Criteria implements Predicate {
             boolean eval(Object expected, Object actual, PredicateContext ctx) {
                 Collection nexps = (Collection) expected;
                 boolean res = !nexps.contains(actual);
-                logger.debug("[{}] {} [{}] => {}", actual, name(), join(", ", nexps), res);
+                if (logger.isDebugEnabled())
+                    logger.debug("[{}] {} [{}] => {}", actual, name(), join(", ", nexps), res);
                 return res;
             }
         },
@@ -130,16 +138,22 @@ public class Criteria implements Predicate {
                             break;
                         }
                     }
-                    logger.debug(
-                            "[{}] {} [{}] => {}",
-                            join(", ", ctx.configuration().jsonProvider().toIterable(actual)),
-                            name(),
-                            join(", ", exps),
-                            res);
+                    if (logger.isDebugEnabled())
+                        logger.debug(
+                                "[{}] {} [{}] => {}",
+                                join(", ", ctx.configuration().jsonProvider().toIterable(actual)),
+                                name(),
+                                join(", ", exps),
+                                res);
                 } else {
                     res = false;
-                    logger.debug(
-                            "[{}] {} [{}] => {}", "<NOT AN ARRAY>", name(), join(", ", exps), res);
+                    if (logger.isDebugEnabled())
+                        logger.debug(
+                                "[{}] {} [{}] => {}",
+                                "<NOT AN ARRAY>",
+                                name(),
+                                join(", ", exps),
+                                res);
                 }
                 return res;
             }
@@ -152,19 +166,23 @@ public class Criteria implements Predicate {
                 if (ctx.configuration().jsonProvider().isArray(actual)) {
                     int length = ctx.configuration().jsonProvider().length(actual);
                     res = (length == size);
-                    logger.debug("Array with size {} {} {} => {}", length, name(), size, res);
+                    if (logger.isDebugEnabled())
+                        logger.debug("Array with size {} {} {} => {}", length, name(), size, res);
                 } else if (actual instanceof String) {
                     int length = ((String) actual).length();
                     res = length == size;
-                    logger.debug("String with length {} {} {} => {}", length, name(), size, res);
+                    if (logger.isDebugEnabled())
+                        logger.debug(
+                                "String with length {} {} {} => {}", length, name(), size, res);
                 } else {
                     res = false;
-                    logger.debug(
-                            "{} {} {} => {}",
-                            actual == null ? "null" : actual.getClass().getName(),
-                            name(),
-                            size,
-                            res);
+                    if (logger.isDebugEnabled())
+                        logger.debug(
+                                "{} {} {} => {}",
+                                actual == null ? "null" : actual.getClass().getName(),
+                                name(),
+                                size,
+                                res);
                 }
                 return res;
             }
@@ -193,7 +211,8 @@ public class Criteria implements Predicate {
                 if (actual != null && actual instanceof String) {
                     res = pattern.matcher(actual.toString()).matches();
                 }
-                logger.debug("[{}] {} [{}] => {}", actual, name(), expected.toString(), res);
+                if (logger.isDebugEnabled())
+                    logger.debug("[{}] {} [{}] => {}", actual, name(), expected.toString(), res);
                 return res;
             }
         },
@@ -215,11 +234,13 @@ public class Criteria implements Predicate {
                     if (ctx.configuration().jsonProvider().isArray(actual)) {
                         int len = ctx.configuration().jsonProvider().length(actual);
                         res = (0 != len);
-                        logger.debug("array length = {} {} => {}", len, name(), res);
+                        if (logger.isDebugEnabled())
+                            logger.debug("array length = {} {} => {}", len, name(), res);
                     } else if (actual instanceof String) {
                         int len = ((String) actual).length();
                         res = (0 != len);
-                        logger.debug("string length = {} {} => {}", len, name(), res);
+                        if (logger.isDebugEnabled())
+                            logger.debug("string length = {} {} => {}", len, name(), res);
                     }
                 }
                 return res;

@@ -42,7 +42,5 @@ public class InlineFilterTest extends BaseTest {
     public void document_queries_are_cached() {
 
         Object read = reader.read("$.store.book[?(@.display-price <= $.max-price)]");
-
-        System.out.println(read);
     }
 }
