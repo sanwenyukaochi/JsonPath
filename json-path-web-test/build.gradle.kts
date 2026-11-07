@@ -16,6 +16,7 @@ dependencies {
     implementation(platform("org.eclipse.jetty:jetty-bom:12.1.14"))
     implementation("org.eclipse.jetty:jetty-server")
     implementation("org.eclipse.jetty.ee11:jetty-ee11-servlet:12.1.14")
+    implementation("org.eclipse.jetty.ee11:jetty-ee11-webapp:12.1.14")
     implementation(platform("org.glassfish.jersey:jersey-bom:4.0.3"))
     implementation("org.glassfish.jersey.containers:jersey-container-servlet")
     implementation("org.glassfish.jersey.media:jersey-media-json-jackson")

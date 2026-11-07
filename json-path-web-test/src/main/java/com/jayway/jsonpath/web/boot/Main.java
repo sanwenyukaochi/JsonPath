@@ -1,13 +1,12 @@
 package com.jayway.jsonpath.web.boot;
 
-import static org.eclipse.jetty.ee11.servlet.ServletContextHandler.NO_SESSIONS;
-
 import com.jayway.jsonpath.web.resource.ApiResource;
-import com.jayway.jsonpath.web.resource.StaticResource;
 import java.io.IOException;
 import org.eclipse.jetty.ee11.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee11.servlet.ServletHolder;
+import org.eclipse.jetty.ee11.webapp.WebAppContext;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.glassfish.jersey.jackson.JacksonFeature;
@@ -34,12 +33,21 @@ public class Main {
 
         server.setConnectors(new Connector[] {createConnector(server, port)});
 
-        ServletContextHandler context = new ServletContextHandler(NO_SESSIONS);
-        context.setContextPath("/");
+        ServletContextHandler context =
+                new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
+        context.setContextPath("/api");
         ServletHolder servletHolder = new ServletHolder(createJerseyServlet());
         servletHolder.setInitOrder(1);
         context.addServlet(servletHolder, "/*");
-        server.setHandler(context);
+
+        WebAppContext webAppContext = new WebAppContext();
+        webAppContext.setServer(server);
+        webAppContext.setContextPath("/");
+        webAppContext.setBaseResourceAsString(Main.class.getResource("/webapp").toExternalForm());
+
+        Handler.Sequence handlers = new Handler.Sequence();
+        handlers.setHandlers(new Handler[] {context, webAppContext});
+        server.setHandler(handlers);
 
         server.start();
         server.join();
@@ -47,7 +55,7 @@ public class Main {
 
     private static ServerConnector createConnector(Server s, int port) {
         ServerConnector connector = new ServerConnector(s);
-        connector.setHost("localhost");
+        connector.setHost("0.0.0.0");
         connector.setPort(port);
         return connector;
     }
@@ -57,7 +65,6 @@ public class Main {
         resourceConfig.register(JacksonFeature.class);
 
         resourceConfig.register(new ApiResource());
-        resourceConfig.register(new StaticResource());
 
         return new ServletContainer(resourceConfig);
     }
