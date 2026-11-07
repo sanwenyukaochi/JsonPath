@@ -61,7 +61,7 @@ public abstract class Filter<T> {
         @Override
         public boolean accept(Map<String, Object> map) {
             for (Criteria criterion : this.criteria.values()) {
-                if (!criterion.apply(map)) {
+                if (!criterion.matches(map)) {
                     return false;
                 }
             }
