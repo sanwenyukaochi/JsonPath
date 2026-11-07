@@ -17,12 +17,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class EvaluationContextImpl implements EvaluationContext {
-
-    private static final Logger logger = LoggerFactory.getLogger(EvaluationContextImpl.class);
 
     private final Configuration configuration;
     private final Object valueResult;
