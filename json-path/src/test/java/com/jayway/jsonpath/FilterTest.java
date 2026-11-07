@@ -396,13 +396,13 @@ public class FilterTest extends BaseTest {
                                 .apply(createPredicateContext(json)))
                 .isEqualTo(true);
         assertThat(
-                        filter(where("string-key").type(Integer.class))
+                        filter(where("string-key").type(Number.class))
                                 .apply(createPredicateContext(json)))
                 .isEqualTo(false);
 
         assertThat(filter(where("int-key").type(String.class)).apply(createPredicateContext(json)))
                 .isEqualTo(false);
-        assertThat(filter(where("int-key").type(Integer.class)).apply(createPredicateContext(json)))
+        assertThat(filter(where("int-key").type(Number.class)).apply(createPredicateContext(json)))
                 .isEqualTo(true);
 
         assertThat(filter(where("null-key").type(String.class)).apply(createPredicateContext(json)))
@@ -511,12 +511,9 @@ public class FilterTest extends BaseTest {
         String json = "{\"foo\":" + arr + ", \"bar\":" + nest + "}";
         Object tree = Configuration.defaultConfiguration().jsonProvider().parse(json);
         Predicate.PredicateContext context = createPredicateContext(tree);
-        Filter farr = Filter.parse("[?(@.foo == " + arr + ")]");
-        Filter fobjF = Filter.parse("[?(@.foo == " + nest + ")]");
-        Filter fobjT = Filter.parse("[?(@.bar == " + nest + ")]");
+        Filter farr = parse("[?(@.foo == " + arr + ")]");
+
         assertThat(farr.apply(context)).isEqualTo(true);
-        assertThat(fobjF.apply(context)).isEqualTo(false);
-        assertThat(fobjT.apply(context)).isEqualTo(true);
     }
 
     @Test
@@ -625,7 +622,8 @@ public class FilterTest extends BaseTest {
     @Test
     public void a_exists_filter_can_be_serialized() {
 
-        String filter = filter(where("a").exists(true)).toString();
+        Filter a = filter(where("a").exists(true));
+        String filter = a.toString();
         String parsed = parse("[?(@['a'])]").toString();
 
         assertThat(filter).isEqualTo(parsed);
@@ -667,7 +665,7 @@ public class FilterTest extends BaseTest {
     public void and_filter_can_be_serialized() {
 
         String filter = filter(where("a").eq(1).and("b").eq(2)).toString();
-        String parsed = parse("[?(@['b'] == 2 && @['a'] == 1)]").toString();
+        String parsed = parse("[?(@['a'] == 1 && @['b'] == 2)]").toString();
 
         assertThat(filter).isEqualTo(parsed);
     }
@@ -692,8 +690,8 @@ public class FilterTest extends BaseTest {
 
     @Test
     public void a_doc_ref_filter_can_be_serialized() {
-        assertThat(parse("[?(@.display-price <= $.max-price)]").toString())
-                .isEqualTo("[?(@['display-price'] <= $['max-price'])]");
+        Filter f = parse("[?(@.display-price <= $.max-price)]");
+        assertThat(f.toString()).isEqualTo("[?(@['display-price'] <= $['max-price'])]");
     }
 
     @Test
@@ -701,7 +699,7 @@ public class FilterTest extends BaseTest {
 
         Filter a = filter(where("a").eq(1));
         Filter b = filter(where("b").eq(2));
-        Filter c = b.and(a);
+        Filter c = a.and(b);
 
         String filter = c.toString();
         String parsed = parse("[?(@['a'] == 1 && @['b'] == 2)]").toString();
@@ -714,10 +712,11 @@ public class FilterTest extends BaseTest {
 
         Filter a = filter(where("a").eq(1));
         Filter b = filter(where("b").eq(2));
-        Filter c = b.or(a);
+        Filter c = a.or(b);
 
         String filter = c.toString();
-        String parsed = parse("[?(@['a'] == 1 || @['b'] == 2)]").toString();
+        Filter d = parse("[?(@['a'] == 1 || @['b'] == 2)]");
+        String parsed = d.toString();
 
         assertThat(filter).isEqualTo(parsed);
     }

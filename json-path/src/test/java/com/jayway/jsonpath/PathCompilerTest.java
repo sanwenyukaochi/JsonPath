@@ -154,7 +154,6 @@ public class PathCompilerTest {
         assertThat(compile("$..['prop']..[*]").toString()).isEqualTo("$..['prop']..[*]");
     }
 
-    @Disabled("not ready yet (requires compiler reimplementation)")
     @Test
     public void issue_predicate_brackets_must_change_priorities() {
         String json =
@@ -176,7 +175,6 @@ public class PathCompilerTest {
         assertThat(result).isEmpty();
     }
 
-    @Disabled("not ready yet (requires compiler reimplementation)")
     @Test
     public void issue_predicate_can_have_and_in_prop() {
         String json =
@@ -196,7 +194,6 @@ public class PathCompilerTest {
         assertThat(result).containsExactly("&& it");
     }
 
-    @Disabled("not ready yet (requires compiler reimplementation)")
     @Test
     public void issue_predicate_can_have_and_in_regex() {
         String json =
@@ -216,7 +213,6 @@ public class PathCompilerTest {
         assertThat(result).containsExactly("it");
     }
 
-    @Disabled("not ready yet (requires compiler reimplementation)")
     @Test
     public void issue_predicate_can_have_bracket_in_regex() {
         String json =
@@ -249,6 +245,8 @@ public class PathCompilerTest {
     ]
 }\
 """;
+
+        System.out.println(JsonPath.parse(json).json().toString());
 
         List<String> result = JsonPath.read(json, "$.logs[?(@.message == 'it\\\\')].message");
 

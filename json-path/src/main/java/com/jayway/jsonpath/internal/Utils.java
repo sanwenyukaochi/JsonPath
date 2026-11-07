@@ -1,6 +1,7 @@
 package com.jayway.jsonpath.internal;
 
 import com.jayway.jsonpath.JsonPathException;
+import com.jayway.jsonpath.ValueCompareException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -16,10 +17,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 public final class Utils {
 
     public static final String CR = System.getProperty("line.separator");
+    private static final char BACKSLASH = '\\';
 
     public static List<Integer> createRange(int start, int end) {
         if (end <= start) {
@@ -38,6 +41,10 @@ public final class Utils {
             range.add(i);
         }
         return range;
+    }
+
+    public static <T> Iterable<T> reverse(final List<T> list) {
+        return new ListReverser<T>(list);
     }
 
     public static String join(String delimiter, String wrap, Iterable<? extends Object> objs) {
@@ -125,6 +132,52 @@ public final class Utils {
             }
         }
         return true;
+    }
+
+    public static String unescape(String s) {
+        if (s.indexOf(BACKSLASH) == -1) {
+            return s;
+        }
+        StringBuilder sb = new StringBuilder(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == BACKSLASH) {
+                char c2 = s.charAt(++i);
+                switch (c2) {
+                    case '\\':
+                        c2 = '\\';
+                        break;
+                    case 'b':
+                        c2 = '\b';
+                        break;
+                    case 'f':
+                        c2 = '\f';
+                        break;
+                    case 'n':
+                        c2 = '\n';
+                        break;
+                    case 'r':
+                        c2 = '\r';
+                        break;
+                    case 't':
+                        c2 = '\t';
+                        break;
+                    case 'u':
+                        try {
+                            String hex = s.substring(i + 1, i + 5);
+                            c2 = (char) Integer.parseInt(hex, 16);
+                            i += 4;
+                        } catch (Exception e) {
+                            throw new ValueCompareException("\\u parse failed", e);
+                        }
+                        break;
+                }
+                sb.append(c2);
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 
     public static boolean isEmpty(CharSequence cs) {
@@ -275,6 +328,30 @@ public final class Utils {
             } catch (ClassNotFoundException ex) {
                 return Class.forName(name, false, Thread.currentThread().getContextClassLoader());
             }
+        }
+    }
+
+    private static class ListReverser<T> implements Iterable<T> {
+        private ListIterator<T> listIterator;
+
+        public ListReverser(List<T> wrappedList) {
+            this.listIterator = wrappedList.listIterator(wrappedList.size());
+        }
+
+        public Iterator<T> iterator() {
+            return new Iterator<T>() {
+                public boolean hasNext() {
+                    return listIterator.hasPrevious();
+                }
+
+                public T next() {
+                    return listIterator.previous();
+                }
+
+                public void remove() {
+                    listIterator.remove();
+                }
+            };
         }
     }
 

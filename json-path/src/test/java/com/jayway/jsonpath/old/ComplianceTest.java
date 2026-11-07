@@ -124,6 +124,9 @@ public class ComplianceTest {
                 JsonPath.<List<String>>read(json, "$.menu.items[?(@)]"),
                 Matchers.is(notNullValue()));
         assertThat(
+                JsonPath.<List<String>>read(json, "$.menu.items[?(@.id == 'ViewSVG')].id"),
+                hasItems("ViewSVG"));
+        assertThat(
                 JsonPath.<List<String>>read(json, "$.menu.items[?(@ && @.id == 'ViewSVG')].id"),
                 hasItems("ViewSVG"));
 

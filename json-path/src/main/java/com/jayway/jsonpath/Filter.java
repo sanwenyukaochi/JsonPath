@@ -2,20 +2,12 @@ package com.jayway.jsonpath;
 
 import static java.util.Arrays.asList;
 
+import com.jayway.jsonpath.internal.filter.FilterCompiler;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Stack;
-import java.util.regex.Pattern;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class Filter implements Predicate {
-
-    private static final Logger logger = LoggerFactory.getLogger(Filter.class);
-    private static final Pattern OPERATOR_SPLIT = Pattern.compile("((?<=&&|\\|\\|)|(?=&&|\\|\\|))");
-    private static final String AND = "&&";
-    private static final String OR = "||";
 
     public static Filter filter(Predicate predicate) {
         return new SingleFilter(predicate);
@@ -51,7 +43,12 @@ public abstract class Filter implements Predicate {
 
         @Override
         public String toString() {
-            return "[?(" + predicate.toString() + ")]";
+            String predicateString = predicate.toString();
+            if (predicateString.startsWith("(")) {
+                return "[?" + predicateString + "]";
+            } else {
+                return "[?(" + predicateString + ")]";
+            }
         }
     }
 
@@ -148,69 +145,7 @@ public abstract class Filter implements Predicate {
     }
 
     public static Filter parse(String filter) {
-        filter = filter.trim();
-        if (!filter.startsWith("[") || !filter.endsWith("]")) {
-            throw new InvalidPathException(
-                    "Filter must start with '[' and end with ']'. " + filter);
-        }
-        filter = filter.substring(1, filter.length() - 1).trim();
-        if (!filter.startsWith("?")) {
-            throw new InvalidPathException(
-                    "Filter must start with '[?' and end with ']'. " + filter);
-        }
-        filter = filter.substring(1).trim();
-        if (!filter.startsWith("(") || !filter.endsWith(")")) {
-            throw new InvalidPathException(
-                    "Filter must start with '[?(' and end with ')]'. " + filter);
-        }
-        filter = filter.substring(1, filter.length() - 1).trim();
-
-        String[] split = OPERATOR_SPLIT.split(filter);
-        Stack<String> operators = new Stack<String>();
-        Stack<Criteria> criteria = new Stack<Criteria>();
-
-        for (String exp : split) {
-            exp = exp.trim();
-            if (AND.equals(exp) || OR.equals(exp)) {
-                operators.push(exp);
-            } else {
-                criteria.push(Criteria.parse(cleanCriteria(exp)));
-            }
-        }
-        Filter root = new SingleFilter(criteria.pop());
-        while (!operators.isEmpty()) {
-            String operator = operators.pop();
-            if (AND.equals(operator)) {
-                root = root.and(criteria.pop());
-
-            } else {
-                if (criteria.isEmpty()) {
-                    throw new InvalidPathException("Invalid operators " + filter);
-                }
-                root = root.or(criteria.pop());
-            }
-        }
-        if (!operators.isEmpty() || !criteria.isEmpty()) {
-            throw new InvalidPathException("Invalid operators " + filter);
-        }
-
-        if (logger.isDebugEnabled()) logger.debug("Parsed filter: " + root.toString());
-        return root;
-    }
-
-    private static String cleanCriteria(String filter) {
-        int begin = 0;
-        int end = filter.length() - 1;
-
-        char c = filter.charAt(begin);
-        while (c == '[' || c == '?' || c == '(' || c == ' ') {
-            c = filter.charAt(++begin);
-        }
-
-        c = filter.charAt(end);
-        while (c == ')' || c == ' ') {
-            c = filter.charAt(--end);
-        }
-        return filter.substring(begin, end + 1);
+        Predicate f = FilterCompiler.compile(filter);
+        return new SingleFilter(f);
     }
 }
