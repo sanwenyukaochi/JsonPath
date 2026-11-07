@@ -29,6 +29,7 @@ public class JsonSmartMappingProvider implements MappingProvider {
         DEFAULT.registerReader(String.class, new StringReader());
         DEFAULT.registerReader(Date.class, new DateReader());
         DEFAULT.registerReader(BigInteger.class, new BigIntegerReader());
+        DEFAULT.registerReader(boolean.class, new BooleanReader());
     }
 
     private final Callable<JsonReader> factory;
@@ -246,6 +247,23 @@ public class JsonSmartMappingProvider implements MappingProvider {
             }
             throw new MappingException(
                     "can not map a " + src.getClass() + " to " + Date.class.getName());
+        }
+    }
+
+    private static class BooleanReader extends JsonReaderI<Boolean> {
+        public BooleanReader() {
+            super(null);
+        }
+
+        public Boolean convert(Object src) {
+            if (src == null) {
+                return null;
+            }
+            if (Boolean.class.isAssignableFrom(src.getClass())) {
+                return (Boolean) src;
+            }
+            throw new MappingException(
+                    "can not map a " + src.getClass() + " to " + Boolean.class.getName());
         }
     }
 }

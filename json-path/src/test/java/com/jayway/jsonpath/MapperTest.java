@@ -53,4 +53,10 @@ public class MapperTest extends BaseTest {
         assertThat(parse("{\"val\": \"1\"}").read("val", BigInteger.class))
                 .isEqualTo(BigInteger.valueOf(1));
     }
+
+    @Test
+    public void a_Boolean_can_be_converted_to_a_primitive_boolean() {
+        assertThat(parse("{\"val\": true}").read("val", boolean.class)).isTrue();
+        assertThat(parse("{\"val\": false}").read("val", boolean.class)).isFalse();
+    }
 }
