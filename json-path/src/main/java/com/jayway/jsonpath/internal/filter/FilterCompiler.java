@@ -1,5 +1,6 @@
 package com.jayway.jsonpath.internal.filter;
 
+import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.Predicate;
 import com.jayway.jsonpath.internal.CharacterIndex;
@@ -37,9 +38,9 @@ public class FilterCompiler {
 
     private CharacterIndex filter;
 
-    public static Predicate compile(String filterString) {
+    public static Filter compile(String filterString) {
         FilterCompiler compiler = new FilterCompiler(filterString);
-        return compiler.compile();
+        return new CompiledFilter(compiler.compile());
     }
 
     private FilterCompiler(String filterString) {
@@ -80,11 +81,19 @@ public class FilterCompiler {
                 case CLOSE_BRACKET:
                     unbalancedBrackets--;
                     filter.incrementPosition(1);
-                    while (!opsStack.isEmpty()) {
-                        expStack.push(
+                    ExpressionNode expressionNode = expStack.pop();
+                    if (!opsStack.isEmpty()) {
+                        ExpressionNode right = expStack.pop();
+                        expressionNode =
                                 ExpressionNode.createExpressionNode(
-                                        expStack.pop(), opsStack.pop(), expStack.pop()));
+                                        expressionNode, opsStack.pop(), right);
+                        while (!opsStack.isEmpty()) {
+                            expressionNode =
+                                    ExpressionNode.createExpressionNode(
+                                            expressionNode, opsStack.pop(), expStack.pop());
+                        }
                     }
+                    expStack.push(expressionNode);
                     break;
                 case BANG:
                     filter.incrementPosition(1);
@@ -368,5 +377,29 @@ public class FilterCompiler {
 
     private boolean isRelationalOperatorChar(char c) {
         return c == LT || c == GT || c == EQ || c == TILDE || c == BANG;
+    }
+
+    private static final class CompiledFilter extends Filter {
+
+        private final Predicate predicate;
+
+        private CompiledFilter(Predicate predicate) {
+            this.predicate = predicate;
+        }
+
+        @Override
+        public boolean apply(Predicate.PredicateContext ctx) {
+            return predicate.apply(ctx);
+        }
+
+        @Override
+        public String toString() {
+            String predicateString = predicate.toString();
+            if (predicateString.startsWith("(")) {
+                return "[?" + predicateString + "]";
+            } else {
+                return "[?(" + predicateString + ")]";
+            }
+        }
     }
 }

@@ -408,7 +408,7 @@ public abstract class ValueNode {
 
         @Override
         public String toString() {
-            return "'" + string + "'";
+            return "'" + Utils.escape(string, true) + "'";
         }
 
         @Override
