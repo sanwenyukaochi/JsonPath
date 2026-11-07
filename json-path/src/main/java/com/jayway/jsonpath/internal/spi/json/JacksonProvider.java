@@ -21,8 +21,25 @@ public class JacksonProvider extends AbstractJsonProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(JacksonProvider.class);
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final ObjectReader objectReader = objectMapper.reader().forType(Object.class);
+    private static final ObjectMapper defaultObjectMapper = new ObjectMapper();
+    private static final ObjectReader defaultObjectReader =
+            defaultObjectMapper.reader().forType(Object.class);
+
+    protected ObjectMapper objectMapper;
+    protected ObjectReader objectReader;
+
+    public JacksonProvider() {
+        this(defaultObjectMapper, defaultObjectReader);
+    }
+
+    public JacksonProvider(ObjectMapper objectMapper) {
+        this(objectMapper, objectMapper.reader().forType(Object.class));
+    }
+
+    public JacksonProvider(ObjectMapper objectMapper, ObjectReader objectReader) {
+        this.objectMapper = objectMapper;
+        this.objectReader = objectReader;
+    }
 
     public Mode getMode() {
         return Mode.STRICT;
