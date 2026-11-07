@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 
 public class FilterTest extends BaseTest {
@@ -585,6 +586,22 @@ public class FilterTest extends BaseTest {
         assertThat(filter(where("int-arr").eq("[0,1,2,3]")).apply(createPredicateContext(json)))
                 .isEqualTo(false);
         assertThat(filter(where("int-arr").eq("[0,1,2,3,4,5]")).apply(createPredicateContext(json)))
+                .isEqualTo(false);
+    }
+
+    @Test
+    public void array_subsetof_evals() {
+
+        List<String> list = Lists.newArrayList("a", "b", "c", "d", "e", "f", "g");
+        assertThat(filter(where("string-arr").subsetof(list)).apply(createPredicateContext(json)))
+                .isEqualTo(true);
+
+        list = Lists.newArrayList("e", "d", "b", "c", "a");
+        assertThat(filter(where("string-arr").subsetof(list)).apply(createPredicateContext(json)))
+                .isEqualTo(true);
+
+        list = Lists.newArrayList("a", "b", "c", "d");
+        assertThat(filter(where("string-arr").subsetof(list)).apply(createPredicateContext(json)))
                 .isEqualTo(false);
     }
 }

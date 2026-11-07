@@ -5,6 +5,7 @@ import static com.jayway.jsonpath.Filter.filter;
 import static com.jayway.jsonpath.Filter.parse;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collections;
 import java.util.regex.Pattern;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -248,6 +249,15 @@ public class FilterParseTest {
         String filter = c.toString();
         Filter d = parse("[?(@['a'] == 1 || @['b'] == 2)]");
         String parsed = d.toString();
+
+        assertThat(filter).isEqualTo(parsed);
+    }
+
+    @Test
+    public void a_subsetof_filter_can_be_serialized() {
+
+        String filter = filter(where("a").subsetof(Collections.emptyList())).toString();
+        String parsed = parse("[?(@['a'] SUBSETOF [])]").toString();
 
         assertThat(filter).isEqualTo(parsed);
     }

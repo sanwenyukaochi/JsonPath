@@ -147,6 +147,17 @@ public class Criteria implements Predicate {
         return this;
     }
 
+    public Criteria subsetof(Object... o) {
+        return subsetof(Arrays.asList(o));
+    }
+
+    public Criteria subsetof(Collection<?> c) {
+        notNull(c, "collection can not be null");
+        this.criteriaType = RelationalOperator.SUBSETOF;
+        this.right = new ValueNode.ValueListNode(c);
+        return this;
+    }
+
     public Criteria all(Object... o) {
         return all(Arrays.asList(o));
     }
