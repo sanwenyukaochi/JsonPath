@@ -62,12 +62,9 @@ public class PathCompiler {
                 fail("Path must not end wid a scan operation '..'");
             }
             LinkedList filterStack = new LinkedList<Predicate>(asList(filters));
-            String cacheKey = Utils.concat(path, filterStack.toString());
-            Path p = cache.get(cacheKey);
-            if (p == null) {
-                p = new PathCompiler(path.trim(), filterStack).compile();
-                cache.put(cacheKey, p);
-            }
+
+            Path p = new PathCompiler(path.trim(), filterStack).compile();
+
             return p;
         } catch (Exception e) {
             InvalidPathException ipe;

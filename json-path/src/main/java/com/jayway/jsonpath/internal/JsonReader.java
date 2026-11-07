@@ -3,6 +3,7 @@ package com.jayway.jsonpath.internal;
 import static com.jayway.jsonpath.JsonPath.compile;
 import static com.jayway.jsonpath.internal.Utils.notEmpty;
 import static com.jayway.jsonpath.internal.Utils.notNull;
+import static java.util.Arrays.asList;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
@@ -13,10 +14,13 @@ import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.Predicate;
 import com.jayway.jsonpath.ReadContext;
 import com.jayway.jsonpath.TypeRef;
+import com.jayway.jsonpath.spi.cache.Cache;
+import com.jayway.jsonpath.spi.cache.CacheProvider;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,7 +111,20 @@ public class JsonReader implements ParseContext, DocumentContext {
     @Override
     public <T> T read(String path, Predicate... filters) {
         notEmpty(path, "path can not be null or empty");
-        return read(compile(path, filters));
+        Cache cache = CacheProvider.getCache();
+
+        path = path.trim();
+        LinkedList filterStack = new LinkedList<Predicate>(asList(filters));
+        String cacheKey = Utils.concat(path, filterStack.toString());
+
+        JsonPath jsonPath = cache.get(cacheKey);
+        if (jsonPath != null) {
+            return read(jsonPath);
+        } else {
+            jsonPath = compile(path, filters);
+            cache.put(cacheKey, jsonPath);
+            return read(jsonPath);
+        }
     }
 
     @Override
