@@ -90,4 +90,10 @@ public class FilterCompilerTest {
 
         }
     }
+
+    @Test
+    public void string_quoute_style_is_serialized() {
+        assertThat(compile("[?('apa' == 'apa')]").toString()).isEqualTo("[?('apa' == 'apa')]");
+        assertThat(compile("[?('apa' == \"apa\")]").toString()).isEqualTo("[?('apa' == \"apa\")]");
+    }
 }
