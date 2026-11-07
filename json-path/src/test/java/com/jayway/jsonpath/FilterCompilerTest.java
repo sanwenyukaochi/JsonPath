@@ -2,6 +2,7 @@ package com.jayway.jsonpath;
 
 import static com.jayway.jsonpath.internal.filter.FilterCompiler.compile;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
@@ -103,5 +104,14 @@ public class FilterCompilerTest {
     public void string_quote_style_is_serialized() {
         assertThat(compile("[?('apa' == 'apa')]").toString()).isEqualTo("[?('apa' == 'apa')]");
         assertThat(compile("[?('apa' == \"apa\")]").toString()).isEqualTo("[?('apa' == \"apa\")]");
+    }
+
+    @Test
+    public void invalid_path_when_string_literal_is_unquoted() {
+        assertThrows(
+                InvalidPathException.class,
+                () -> {
+                    compile("[?(@.foo == x)]");
+                });
     }
 }
