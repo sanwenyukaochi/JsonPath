@@ -5,10 +5,12 @@ public class BaseTest {
             """
             {
                 "string-property": "string-value",
-                "int-property": 2147483647,
-                "long-property": 9223372036854775807,
+                "int-max-property": 2147483647,
+                "long-max-property": 9223372036854775807,
+                "long-max-property": 9223372036854775807,
                 "boolean-property": true,
                 "null-property": null,
+                "int-small-property": 1,
                 "store": {
                     "book": [
                         {
