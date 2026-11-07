@@ -1,16 +1,28 @@
 package com.jayway.jsonpath;
 
+import static java.util.Arrays.asList;
+
+import com.jayway.jsonpath.internal.Utils;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Stack;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class Filter implements Predicate {
 
+    private static final Logger logger = LoggerFactory.getLogger(Filter.class);
     private static final Pattern OPERATOR_SPLIT = Pattern.compile("((?<=&&|\\|\\|)|(?=&&|\\|\\|))");
     private static final String AND = "&&";
     private static final String OR = "||";
 
-    public static Filter filter(Predicate criteria) {
-        return new SingleFilter(criteria);
+    public static Filter filter(Predicate predicate) {
+        return new SingleFilter(predicate);
+    }
+
+    public static Filter filter(Collection<Predicate> predicates) {
+        return new AndFilter(predicates);
     }
 
     @Override
@@ -45,23 +57,35 @@ public abstract class Filter implements Predicate {
 
     private static final class AndFilter extends Filter {
 
-        private final Predicate left;
-        private final Predicate right;
+        Collection<Predicate> predicates;
+
+        private AndFilter(Collection<Predicate> predicates) {
+            this.predicates = predicates;
+        }
 
         private AndFilter(Predicate left, Predicate right) {
-            this.left = left;
-            this.right = right;
+            this(asList(left, right));
+        }
+
+        public Filter and(final Predicate other) {
+            Collection<Predicate> newPredicates = new ArrayList<Predicate>(predicates);
+            newPredicates.add(other);
+            return new AndFilter(newPredicates);
         }
 
         @Override
         public boolean apply(PredicateContext ctx) {
-            boolean a = left.apply(ctx);
-            return a && right.apply(ctx);
+            for (Predicate predicate : predicates) {
+                if (!predicate.apply(ctx)) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         @Override
         public String toString() {
-            return left.toString() + " && " + right.toString();
+            return "(" + Utils.join(" && ", predicates) + ")";
         }
     }
 
@@ -87,7 +111,7 @@ public abstract class Filter implements Predicate {
 
         @Override
         public String toString() {
-            return left.toString() + " || " + right.toString();
+            return "(" + left.toString() + " || " + right.toString() + ")";
         }
     }
 
@@ -137,6 +161,8 @@ public abstract class Filter implements Predicate {
         if (!operators.isEmpty() || !criteria.isEmpty()) {
             throw new InvalidPathException("Invalid operators " + filter);
         }
+
+        if (logger.isDebugEnabled()) logger.debug("Parsed filter: " + root.toString());
         return root;
     }
 
