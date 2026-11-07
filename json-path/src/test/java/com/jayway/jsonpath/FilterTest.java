@@ -536,4 +536,14 @@ public class FilterTest extends BaseTest {
         assertThat(filter(where("null-key").empty(false)).apply(createPredicateContext(json)))
                 .isEqualTo(false);
     }
+
+    @Test
+    public void criteria_can_be_parsed() {
+
+        Criteria criteria = Criteria.parse("@.foo == 'baar'");
+        assertThat(criteria.toString()).isEqualTo("@['foo'] == 'baar'");
+
+        criteria = Criteria.parse("@.foo");
+        assertThat(criteria.toString()).isEqualTo("@['foo']");
+    }
 }
