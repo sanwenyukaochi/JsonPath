@@ -59,6 +59,15 @@ public class JsonAssertTest {
     }
 
     @Test
+    public void has_path() throws Exception {
+        assertThrows(
+                AssertionError.class,
+                () -> {
+                    with(JSON).assertNotDefined("$.store.bicycle[?(@.color == 'red' )]");
+                });
+    }
+
+    @Test
     public void failed_error_message() throws Exception {
         assertThrows(
                 AssertionError.class,

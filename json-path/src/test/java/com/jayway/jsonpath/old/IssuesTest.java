@@ -130,8 +130,6 @@ public class IssuesTest {
 
             Object o = JsonPath.read(is, "$.project.field[*].@key");
 
-            System.out.println(o);
-
             is.close();
         } catch (Exception e) {
             e.printStackTrace();
