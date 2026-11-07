@@ -62,6 +62,23 @@ public class JsonModelTest {
             }\
             """;
 
+    public static final String INVALID_DOCUMENT =
+            """
+            {?\\?\\?!!?~q`}}}}}"" "store": {
+            """;
+
+    @Test
+    public void invalid_json_throws() throws Exception {
+        assertThrows(
+                InvalidJsonException.class,
+                () -> JsonModel.model(INVALID_DOCUMENT).get("store.id"));
+    }
+
+    @Test
+    public void invalid_path_throws() throws Exception {
+        assertThrows(InvalidPathException.class, () -> JsonModel.model(DOCUMENT).get("a("));
+    }
+
     @Test
     public void a_model_can_be_pretty_printed() throws Exception {
         JsonModel model = JsonModel.model(DOCUMENT);
@@ -108,12 +125,6 @@ public class JsonModelTest {
         assertEquals("value", model.get("$child.key"));
         assertEquals(1, model.<Integer>get("$items[1]"));
         assertEquals(doc, JsonProviderFactory.createProvider().parse(model.toJson()));
-    }
-
-    @Test
-    public void invalid_path_throws() throws Exception {
-        assertThrows(
-                InvalidPathException.class, () -> JsonModel.model(DOCUMENT).get("store.invalid"));
     }
 
     @Test
