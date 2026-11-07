@@ -20,12 +20,21 @@ public class Bench {
 
     protected final String json;
     protected final String path;
-    private final boolean value;
+    private final boolean optionAsValues;
+    private final boolean optionAllwaysReturnList;
+    private final boolean optionMergeMultiProps;
 
-    public Bench(String json, String path, boolean value) {
+    public Bench(
+            String json,
+            String path,
+            boolean optionAsValues,
+            boolean optionAllwaysReturnList,
+            boolean optionMergeMultiProps) {
         this.json = json;
         this.path = path;
-        this.value = value;
+        this.optionAsValues = optionAsValues;
+        this.optionAllwaysReturnList = optionAllwaysReturnList;
+        this.optionMergeMultiProps = optionMergeMultiProps;
     }
 
     public Result runJayway() {
@@ -34,10 +43,15 @@ public class Bench {
         long time;
         Object res = null;
 
-        Configuration configuration =
-                Configuration.defaultConfiguration().options(Option.ALWAYS_RETURN_LIST);
-        if (!value) {
-            configuration = configuration.options(Option.AS_PATH_LIST);
+        Configuration configuration = Configuration.defaultConfiguration();
+        if (optionAllwaysReturnList) {
+            configuration = configuration.addOptions(Option.ALWAYS_RETURN_LIST);
+        }
+        if (optionMergeMultiProps) {
+            configuration = configuration.addOptions(Option.MERGE_MULTI_PROPS);
+        }
+        if (!optionAsValues) {
+            configuration = configuration.addOptions(Option.AS_PATH_LIST);
         }
 
         long now = System.currentTimeMillis();
@@ -73,7 +87,7 @@ public class Bench {
         Iterator<?> query = null;
         long now = System.currentTimeMillis();
         try {
-            if (!value) {
+            if (!optionAsValues) {
                 throw new UnsupportedOperationException("Not supported!");
             }
             io.gatling.jsonpath.JsonPath jsonPath = JsonPath$.MODULE$.compile(path).right().get();
@@ -108,7 +122,7 @@ public class Bench {
 
         long now = System.currentTimeMillis();
         try {
-            if (!value) {
+            if (!optionAsValues) {
                 throw new UnsupportedOperationException("Not supported!");
             }
             com.nebhale.jsonpath.JsonPath compiled = com.nebhale.jsonpath.JsonPath.compile(path);

@@ -46,82 +46,100 @@ class ArrayPathToken extends PathToken {
         }
 
         try {
-            if (operation == Operation.SINGLE_INDEX) {
-                handleArrayIndex(criteria.get(0), currentPath, model, ctx);
-            } else if (operation == Operation.INDEX_SEQUENCE) {
-                for (Integer idx : criteria) {
-                    handleArrayIndex(criteria.get(idx), currentPath, model, ctx);
-                }
-            } else if (Operation.CONTEXT_SIZE == operation) {
-                int length = ctx.jsonProvider().length(model);
-                int idx = length + criteria.get(0);
-                handleArrayIndex(idx, currentPath, model, ctx);
-            } else if (Operation.SLICE_FROM == operation) {
-                int input = criteria.get(0);
-                int length = ctx.jsonProvider().length(model);
-                int from = input;
-                if (from < 0) {
+            int idx;
+            int input;
+            int length;
+            int from;
+            int to;
 
-                    from = length + from;
-                }
-                from = Math.max(0, from);
+            switch (operation) {
+                case SINGLE_INDEX:
+                    handleArrayIndex(criteria.get(0), currentPath, model, ctx);
+                    break;
 
-                logger.debug(
-                        "Slice from index on array with length: {}. From index: {} to: {}. Input: {}",
-                        length,
-                        from,
-                        length - 1,
-                        toString());
+                case INDEX_SEQUENCE:
+                    for (Integer i : criteria) {
+                        handleArrayIndex(criteria.get(i), currentPath, model, ctx);
+                    }
+                    break;
 
-                if (length == 0 || from >= length) {
-                    return;
-                }
-                for (int i = from; i < length; i++) {
-                    handleArrayIndex(i, currentPath, model, ctx);
-                }
-            } else if (Operation.SLICE_TO == operation) {
-                int input = criteria.get(0);
-                int length = ctx.jsonProvider().length(model);
-                int to = input;
-                if (to < 0) {
+                case CONTEXT_SIZE:
+                    length = ctx.jsonProvider().length(model);
+                    idx = length + criteria.get(0);
+                    handleArrayIndex(idx, currentPath, model, ctx);
+                    break;
 
-                    to = length + to;
-                }
-                to = Math.min(length, to);
+                case SLICE_FROM:
+                    input = criteria.get(0);
+                    length = ctx.jsonProvider().length(model);
+                    from = input;
+                    if (from < 0) {
 
-                logger.debug(
-                        "Slice to index on array with length: {}. From index: 0 to: {}. Input: {}",
-                        length,
-                        to,
-                        toString());
+                        from = length + from;
+                    }
+                    from = Math.max(0, from);
 
-                if (length == 0) {
-                    return;
-                }
-                for (int i = 0; i < to; i++) {
-                    handleArrayIndex(i, currentPath, model, ctx);
-                }
-            } else if (Operation.SLICE_BETWEEN == operation) {
-                int from = criteria.get(0);
-                int to = criteria.get(1);
-                int length = ctx.jsonProvider().length(model);
+                    logger.debug(
+                            "Slice from index on array with length: {}. From index: {} to: {}. Input: {}",
+                            length,
+                            from,
+                            length - 1,
+                            toString());
 
-                to = Math.min(length, to);
+                    if (length == 0 || from >= length) {
+                        return;
+                    }
+                    for (int i = from; i < length; i++) {
+                        handleArrayIndex(i, currentPath, model, ctx);
+                    }
+                    break;
 
-                if (from >= to || length == 0) {
-                    return;
-                }
+                case SLICE_TO:
+                    input = criteria.get(0);
+                    length = ctx.jsonProvider().length(model);
+                    to = input;
+                    if (to < 0) {
 
-                logger.debug(
-                        "Slice between indexes on array with length: {}. From index: {} to: {}. Input: {}",
-                        length,
-                        from,
-                        to,
-                        toString());
+                        to = length + to;
+                    }
+                    to = Math.min(length, to);
 
-                for (int i = from; i < to; i++) {
-                    handleArrayIndex(i, currentPath, model, ctx);
-                }
+                    logger.debug(
+                            "Slice to index on array with length: {}. From index: 0 to: {}. Input: {}",
+                            length,
+                            to,
+                            toString());
+
+                    if (length == 0) {
+                        return;
+                    }
+                    for (int i = 0; i < to; i++) {
+                        handleArrayIndex(i, currentPath, model, ctx);
+                    }
+                    break;
+
+                case SLICE_BETWEEN:
+                    from = criteria.get(0);
+                    to = criteria.get(1);
+                    length = ctx.jsonProvider().length(model);
+
+                    to = Math.min(length, to);
+
+                    if (from >= to || length == 0) {
+                        return;
+                    }
+
+                    logger.debug(
+                            "Slice between indexes on array with length: {}. From index: {} to: {}. Input: {}",
+                            length,
+                            from,
+                            to,
+                            toString());
+
+                    for (int i = from; i < to; i++) {
+                        handleArrayIndex(i, currentPath, model, ctx);
+                    }
+                    break;
             }
         } catch (IndexOutOfBoundsException e) {
             throw new PathNotFoundException(
