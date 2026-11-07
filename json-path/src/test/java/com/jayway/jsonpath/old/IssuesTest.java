@@ -681,5 +681,29 @@ public class IssuesTest extends BaseTest {
 
         DocumentContext context = JsonPath.using(conf).parse(json);
         context.delete("$.books[?(@.category == 'reference')]");
+
+        List<String> categories = context.read("$..category", List.class);
+        Assertions.assertThat(categories).containsOnly("fiction");
+    }
+
+    @Test
+    public void issue_79() throws Exception {
+        String json =
+"""
+{\s
+  "c": {
+    "d1": {
+      "url": [ "url1", "url2" ]
+    },
+    "d2": {
+      "url": [ "url3", "url4","url5" ]
+    }
+  }
+}\
+""";
+
+        List<String> res = JsonPath.read(json, "$.c.*.url[2]");
+
+        Assertions.assertThat(res).containsExactly("url5");
     }
 }
