@@ -202,8 +202,8 @@ public class FilterTest extends BaseTest {
         assertTrue(filter(where("foo").exists(true)).apply(createPredicateContext(check)));
         assertFalse(filter(where("foo").exists(false)).apply(createPredicateContext(check)));
 
-        assertTrue(filter(where("foo_null").exists(false)).apply(createPredicateContext(check)));
-        assertFalse(filter(where("foo_null").exists(true)).apply(createPredicateContext(check)));
+        assertTrue(filter(where("foo_null").exists(true)).apply(createPredicateContext(check)));
+        assertFalse(filter(where("foo_null").exists(false)).apply(createPredicateContext(check)));
 
         assertTrue(filter(where("bar").exists(false)).apply(createPredicateContext(check)));
         assertFalse(filter(where("bar").exists(true)).apply(createPredicateContext(check)));
