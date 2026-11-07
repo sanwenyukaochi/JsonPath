@@ -276,6 +276,13 @@ public final class Utils {
         return chars;
     }
 
+    public static byte[] notEmpty(byte[] bytes, String message) {
+        if (bytes == null || bytes.length == 0) {
+            throw new IllegalArgumentException(message);
+        }
+        return bytes;
+    }
+
     public static <T extends CharSequence> T notEmpty(T chars, String message, Object... values) {
         if (chars == null || chars.length() == 0) {
             throw new IllegalArgumentException(String.format(message, values));

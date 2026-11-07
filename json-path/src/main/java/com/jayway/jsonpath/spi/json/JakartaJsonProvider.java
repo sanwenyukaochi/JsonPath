@@ -6,7 +6,6 @@ import com.jayway.jsonpath.JsonPathException;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonBuilderFactory;
-import jakarta.json.JsonException;
 import jakarta.json.JsonNumber;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
@@ -17,6 +16,7 @@ import jakarta.json.JsonValue;
 import jakarta.json.spi.JsonProvider;
 import jakarta.json.stream.JsonParsingException;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -24,6 +24,7 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,30 +55,29 @@ public class JakartaJsonProvider extends AbstractJsonProvider {
 
     @Override
     public Object parse(String json) throws InvalidJsonException {
-        Reader jsonInput = new StringReader(json);
-        try (JsonReader jsonReader = defaultJsonProvider.createReader(jsonInput)) {
-            JsonStructure jsonStruct = jsonReader.read();
-            return mutableJson ? proxyAll(jsonStruct) : jsonStruct;
-        } catch (JsonParsingException e) {
-            throw new InvalidJsonException(e);
-        }
+        return parse(new StringReader(json));
+    }
+
+    @Override
+    public Object parse(byte[] json) throws InvalidJsonException {
+        return parse(new InputStreamReader(new ByteArrayInputStream(json), StandardCharsets.UTF_8));
     }
 
     @Override
     public Object parse(InputStream jsonStream, String charset) throws InvalidJsonException {
-        Reader jsonInput;
         try {
-            jsonInput = new InputStreamReader(jsonStream, charset);
+            return parse(new InputStreamReader(jsonStream, charset));
         } catch (UnsupportedEncodingException e) {
             throw new JsonPathException(e);
         }
+    }
+
+    private Object parse(Reader jsonInput) {
         try (JsonReader jsonReader = defaultJsonProvider.createReader(jsonInput)) {
             JsonStructure jsonStruct = jsonReader.read();
             return mutableJson ? proxyAll(jsonStruct) : jsonStruct;
         } catch (JsonParsingException e) {
             throw new InvalidJsonException(e);
-        } catch (JsonException e) {
-            throw new JsonPathException(e);
         }
     }
 
