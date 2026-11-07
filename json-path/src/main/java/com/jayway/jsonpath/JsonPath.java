@@ -6,7 +6,6 @@ import static org.apache.commons.lang3.Validate.notEmpty;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import com.jayway.jsonpath.internal.IOUtils;
-import com.jayway.jsonpath.internal.Log;
 import com.jayway.jsonpath.internal.PathToken;
 import com.jayway.jsonpath.internal.PathTokenizer;
 import com.jayway.jsonpath.internal.filter.PathTokenFilter;
@@ -21,8 +20,12 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JsonPath {
+
+    private static final Logger LOG = LoggerFactory.getLogger(JsonPath.class.getName());
 
     private static Pattern DEFINITE_PATH_PATTERN =
             Pattern.compile(".*(\\.\\.|\\*|\\[[\\\\/]|\\?|,|:\\s?]|\\[\\s?:|>|\\(|<|=|\\+).*");
@@ -48,8 +51,8 @@ public class JsonPath {
 
         this.tokenizer = new PathTokenizer(jsonPath);
 
-        if (Log.isDebugEnabled()) {
-            Log.debug("New JsonPath:\n{}", this.tokenizer.toString());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("New JsonPath:\n{}", this.tokenizer.toString());
         }
 
         this.filters = new LinkedList<Filter>();
