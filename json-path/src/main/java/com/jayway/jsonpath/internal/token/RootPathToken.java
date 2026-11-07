@@ -55,4 +55,8 @@ public class RootPathToken extends PathToken {
     public boolean isTokenDefinite() {
         return true;
     }
+
+    public boolean isFunctionPath() {
+        return (tail instanceof FunctionPathToken);
+    }
 }

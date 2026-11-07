@@ -1,0 +1,53 @@
+package com.jayway.jsonpath.functions;
+
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.Configurations;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedClass;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@ParameterizedClass
+@MethodSource("configurations")
+public class NumericFunctionTest extends BaseFunctionTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(NumericFunctionTest.class);
+
+    private Configuration conf = Configurations.GSON_CONFIGURATION;
+
+    public NumericFunctionTest(Configuration conf) {
+        logger.debug("Testing with configuration {}", conf.getClass().getName());
+        this.conf = conf;
+    }
+
+    public static Iterable<Configuration> configurations() {
+        return Configurations.configurations();
+    }
+
+    @Test
+    public void testAverageOfDoubles() {
+        verifyMathFunction(conf, "$.numbers.%avg()", 5.5);
+    }
+
+    @Test
+    public void testSumOfDouble() {
+        verifyMathFunction(conf, "$.numbers.%sum()", (10d * (10d + 1d)) / 2d);
+    }
+
+    @Test
+    public void testMaxOfDouble() {
+        verifyMathFunction(conf, "$.numbers.%max()", 10d);
+    }
+
+    @Test
+    public void testMinOfDouble() {
+        verifyMathFunction(conf, "$.numbers.%min()", 1d);
+    }
+
+    @Test
+    public void testStdDevOfDouble() {
+        verifyMathFunction(conf, "$.numbers.%stddev()", 2.8722813232690143d);
+    }
+}
