@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FunctionFactory {
+public class PathFunctionFactory {
 
     public static final Map<String, Class> FUNCTIONS;
 
@@ -29,14 +29,14 @@ public class FunctionFactory {
         FUNCTIONS = Collections.unmodifiableMap(map);
     }
 
-    public static Function newFunction(String name) throws InvalidPathException {
-        Function result = new PassthruFunction();
+    public static PathFunction newFunction(String name) throws InvalidPathException {
+        PathFunction result = new PassthruPathFunction();
 
         if (null != name
                 && FUNCTIONS.containsKey(name)
-                && Function.class.isAssignableFrom(FUNCTIONS.get(name))) {
+                && PathFunction.class.isAssignableFrom(FUNCTIONS.get(name))) {
             try {
-                result = (Function) FUNCTIONS.get(name).newInstance();
+                result = (PathFunction) FUNCTIONS.get(name).newInstance();
             } catch (InstantiationException e) {
                 throw new InvalidPathException(
                         "Function of name: " + name + " cannot be created", e);

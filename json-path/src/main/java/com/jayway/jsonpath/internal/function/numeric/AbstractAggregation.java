@@ -2,9 +2,9 @@ package com.jayway.jsonpath.internal.function.numeric;
 
 import com.jayway.jsonpath.internal.EvaluationContext;
 import com.jayway.jsonpath.internal.PathRef;
-import com.jayway.jsonpath.internal.function.Function;
+import com.jayway.jsonpath.internal.function.PathFunction;
 
-public abstract class AbstractAggregation implements Function {
+public abstract class AbstractAggregation implements PathFunction {
 
     protected abstract void next(Number value);
 
@@ -16,7 +16,6 @@ public abstract class AbstractAggregation implements Function {
 
             Iterable<?> objects = ctx.configuration().jsonProvider().toIterable(model);
             for (Object obj : objects) {
-
                 if (obj instanceof Number) {
                     Number value = (Number) obj;
                     next(value);
