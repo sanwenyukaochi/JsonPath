@@ -500,4 +500,19 @@ public class FilterTest extends BaseTest {
         } catch (InvalidPathException ipe) {
         }
     }
+
+    @Test
+    public void json_evals() {
+        String nest = "{\"a\":true}";
+        String arr = "[1,2]";
+        String json = "{\"foo\":" + arr + ", \"bar\":" + nest + "}";
+        Object tree = Configuration.defaultConfiguration().jsonProvider().parse(json);
+        Predicate.PredicateContext context = createPredicateContext(tree);
+        Filter farr = Filter.parse("[?(@.foo == " + arr + ")]");
+        Filter fobjF = Filter.parse("[?(@.foo == " + nest + ")]");
+        Filter fobjT = Filter.parse("[?(@.bar == " + nest + ")]");
+        assertThat(farr.apply(context)).isEqualTo(true);
+        assertThat(fobjF.apply(context)).isEqualTo(false);
+        assertThat(fobjT.apply(context)).isEqualTo(true);
+    }
 }
