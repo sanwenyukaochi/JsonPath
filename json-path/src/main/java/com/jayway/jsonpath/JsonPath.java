@@ -111,6 +111,11 @@ public class JsonPath {
 
             result = filter.filter(result, configuration, contextFilters, inArrayContext);
 
+            if (result == null && !pathToken.isEndToken()) {
+                throw new PathNotFoundException(
+                        "Path token: '" + pathToken.getFragment() + "' not found.");
+            }
+
             if (!inArrayContext) {
                 inArrayContext = filter.isArrayFilter();
             }
