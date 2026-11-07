@@ -13,7 +13,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.InputStream;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class JsonAssertTest {
@@ -69,19 +68,17 @@ public class JsonAssertTest {
     }
 
     @Test
-    @Disabled
     public void links_document() throws Exception {
 
         with(getResourceAsStream("links.json"))
                 .assertEquals("count", 2)
-                .assertThat("links.gc:this.href", endsWith("?pageNumber=1&pageSize=2"))
-                .assertNotDefined("links.gc:prev")
-                .assertNotDefined("links.gc:next")
+                .assertThat("links['gc:this']href", endsWith("?pageNumber=1&pageSize=2"))
+                .assertNotDefined("links['gc:prev']")
+                .assertNotDefined("links['gc:next']")
                 .assertThat("rows", collectionWithSize(equalTo(2)));
     }
 
     @Test
-    @Disabled
     public void a_document_can_be_expected_not_to_contain_a_path() throws Exception {
         with(JSON).assertNotDefined("$.store.bicycle.cool");
     }
