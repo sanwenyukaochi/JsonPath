@@ -4,6 +4,7 @@ import static com.jayway.jsonpath.internal.Utils.notEmpty;
 import static com.jayway.jsonpath.internal.Utils.notNull;
 
 import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.EvaluationListener;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.Predicate;
@@ -27,6 +28,13 @@ public class JsonReader implements ParseContext, ReadContext {
     public JsonReader(Configuration configuration) {
         notNull(configuration, "configuration can not be null");
         this.configuration = configuration;
+    }
+
+    private JsonReader(Object json, Configuration configuration) {
+        notNull(json, "json can not be null");
+        notNull(configuration, "configuration can not be null");
+        this.configuration = configuration;
+        this.json = json;
     }
 
     @Override
@@ -110,6 +118,10 @@ public class JsonReader implements ParseContext, ReadContext {
     @Override
     public <T> T read(JsonPath path, Class<T> type) {
         return convert(read(path), type, configuration);
+    }
+
+    public ReadContext withListeners(EvaluationListener... listener) {
+        return new JsonReader(json, configuration.evaluationListener(listener));
     }
 
     private <T> T convert(Object obj, Class<T> targetType, Configuration configuration) {

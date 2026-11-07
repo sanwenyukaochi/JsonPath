@@ -3,8 +3,10 @@ package com.jayway.jsonpath.internal.token;
 import static com.jayway.jsonpath.internal.Utils.notNull;
 
 import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.EvaluationListener;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.PathNotFoundException;
+import com.jayway.jsonpath.internal.EvaluationAbortException;
 import com.jayway.jsonpath.internal.EvaluationContext;
 import com.jayway.jsonpath.internal.Path;
 import com.jayway.jsonpath.spi.json.JsonProvider;
@@ -42,6 +44,16 @@ public class EvaluationContextImpl implements EvaluationContext {
         configuration.jsonProvider().setProperty(valueResult, resultIndex, model);
         configuration.jsonProvider().setProperty(pathResult, resultIndex, path);
         resultIndex++;
+        if (!configuration().evaluationListeners().isEmpty()) {
+            int idx = resultIndex - 1;
+            for (EvaluationListener listener : configuration().evaluationListeners()) {
+                EvaluationListener.EvaluationContinuation continuation =
+                        listener.resultFound(new FoundResultImpl(idx, path, model));
+                if (EvaluationListener.EvaluationContinuation.ABORT == continuation) {
+                    throw new EvaluationAbortException();
+                }
+            }
+        }
     }
 
     public JsonProvider jsonProvider() {
@@ -93,5 +105,33 @@ public class EvaluationContextImpl implements EvaluationContext {
             }
         }
         return res;
+    }
+
+    private class FoundResultImpl implements EvaluationListener.FoundResult {
+
+        private final int index;
+        private final String path;
+        private final Object result;
+
+        private FoundResultImpl(int index, String path, Object result) {
+            this.index = index;
+            this.path = path;
+            this.result = result;
+        }
+
+        @Override
+        public int index() {
+            return index;
+        }
+
+        @Override
+        public String path() {
+            return path;
+        }
+
+        @Override
+        public Object result() {
+            return result;
+        }
     }
 }
