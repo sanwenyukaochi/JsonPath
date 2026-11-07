@@ -13,7 +13,7 @@ public class FunctionPathToken extends PathToken {
 
     private final String functionName;
     private final String pathFragment;
-    private final List<Parameter> functionParams;
+    private List<Parameter> functionParams;
 
     public FunctionPathToken(String pathFragment, List<Parameter> parameters) {
         this.pathFragment =
@@ -74,5 +74,9 @@ public class FunctionPathToken extends PathToken {
     @Override
     public String getPathFragment() {
         return "." + pathFragment;
+    }
+
+    public void setParameters(List<Parameter> parameters) {
+        this.functionParams = parameters;
     }
 }

@@ -203,4 +203,8 @@ public abstract class PathToken {
     public abstract boolean isTokenDefinite();
 
     protected abstract String getPathFragment();
+
+    public void setNext(final PathToken next) {
+        this.next = next;
+    }
 }

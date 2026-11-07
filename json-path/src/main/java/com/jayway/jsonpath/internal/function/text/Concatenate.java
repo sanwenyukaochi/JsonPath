@@ -25,11 +25,8 @@ public class Concatenate implements PathFunction {
             }
         }
         if (parameters != null) {
-            for (Parameter param : parameters) {
-                Object value = param.getValue();
-                if (value != null) {
-                    result.append(value.toString());
-                }
+            for (String value : Parameter.toList(String.class, ctx, parameters)) {
+                result.append(value);
             }
         }
         return result.toString();
