@@ -8,6 +8,8 @@ import java.util.Collection;
 
 public interface JsonProvider {
 
+    static final Object UNDEFINED = new Object();
+
     Mode getMode();
 
     Object parse(String json) throws InvalidJsonException;
@@ -40,7 +42,7 @@ public interface JsonProvider {
 
     Object getMapValue(Object obj, String key);
 
-    Object getMapValue(Object obj, String key, boolean throwOnMissing);
+    Object getMapValue(Object obj, String key, boolean signalUndefined);
 
     void setProperty(Object obj, Object key, Object value);
 
