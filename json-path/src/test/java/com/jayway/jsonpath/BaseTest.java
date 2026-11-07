@@ -5,6 +5,7 @@ import com.jayway.jsonpath.internal.path.PredicateContextImpl;
 import com.jayway.jsonpath.spi.json.GsonJsonProvider;
 import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
 import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
+import com.jayway.jsonpath.spi.json.JettisonProvider;
 import com.jayway.jsonpath.spi.json.JsonOrgJsonProvider;
 import com.jayway.jsonpath.spi.json.JsonSmartJsonProvider;
 import com.jayway.jsonpath.spi.json.TapestryJsonProvider;
@@ -17,6 +18,8 @@ import com.jayway.jsonpath.spi.mapper.TapestryMappingProvider;
 import java.util.HashMap;
 
 public class BaseTest {
+    public static final Configuration JETTISON_CONFIGURATION =
+            Configuration.builder().jsonProvider(new JettisonProvider()).build();
     public static final Configuration TAPESTRY_JSON_CONFIGURATION =
             Configuration.builder()
                     .mappingProvider(new TapestryMappingProvider())
