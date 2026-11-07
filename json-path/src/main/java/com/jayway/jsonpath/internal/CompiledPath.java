@@ -27,18 +27,26 @@ public class CompiledPath implements Path {
 
     @Override
     public EvaluationContext evaluate(
-            Object document, Object rootDocument, Configuration configuration) {
+            Object document, Object rootDocument, Configuration configuration, boolean forUpdate) {
         if (logger.isDebugEnabled()) {
             logger.debug("Evaluating path: {}", toString());
         }
 
-        EvaluationContextImpl ctx = new EvaluationContextImpl(this, rootDocument, configuration);
+        EvaluationContextImpl ctx =
+                new EvaluationContextImpl(this, rootDocument, configuration, forUpdate);
         try {
-            root.evaluate("", document, ctx);
+            PathRef op = ctx.forUpdate() ? PathRef.createRoot(rootDocument) : PathRef.NO_OP;
+            root.evaluate("", op, document, ctx);
         } catch (EvaluationAbortException abort) {
         }
 
         return ctx;
+    }
+
+    @Override
+    public EvaluationContext evaluate(
+            Object document, Object rootDocument, Configuration configuration) {
+        return evaluate(document, rootDocument, configuration, false);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.jayway.jsonpath.internal.token;
 
+import com.jayway.jsonpath.internal.PathRef;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,11 +29,13 @@ public class RootPathToken extends PathToken {
     }
 
     @Override
-    public void evaluate(String currentPath, Object model, EvaluationContextImpl ctx) {
+    public void evaluate(
+            String currentPath, PathRef pathRef, Object model, EvaluationContextImpl ctx) {
         if (isLeaf()) {
-            ctx.addResult("$", model);
+            PathRef op = ctx.forUpdate() ? pathRef : PathRef.NO_OP;
+            ctx.addResult("$", op, model);
         } else {
-            next().evaluate("$", model, ctx);
+            next().evaluate("$", pathRef, model, ctx);
         }
     }
 

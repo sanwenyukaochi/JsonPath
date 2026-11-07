@@ -4,6 +4,7 @@ import static java.lang.String.format;
 
 import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.PathNotFoundException;
+import com.jayway.jsonpath.internal.PathRef;
 import com.jayway.jsonpath.internal.Utils;
 import java.util.List;
 import org.slf4j.Logger;
@@ -34,7 +35,8 @@ public class ArrayPathToken extends PathToken {
     }
 
     @Override
-    public void evaluate(String currentPath, Object model, EvaluationContextImpl ctx) {
+    public void evaluate(
+            String currentPath, PathRef parent, Object model, EvaluationContextImpl ctx) {
         if (model == null) {
             throw new PathNotFoundException("The path " + currentPath + " is null");
         }

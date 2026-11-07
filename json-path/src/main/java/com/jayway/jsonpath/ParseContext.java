@@ -7,15 +7,16 @@ import java.net.URL;
 
 public interface ParseContext {
 
-    ReadContext parse(String json);
+    DocumentContext parse(String json);
 
-    ReadContext parse(Object json);
+    DocumentContext parse(Object json);
 
-    ReadContext parse(InputStream json);
+    DocumentContext parse(InputStream json);
 
-    ReadContext parse(InputStream json, String charset);
+    DocumentContext parse(InputStream json, String charset);
 
-    ReadContext parse(File json) throws IOException;
+    DocumentContext parse(File json) throws IOException;
 
-    ReadContext parse(URL json) throws IOException;
+    @Deprecated
+    DocumentContext parse(URL json) throws IOException;
 }
