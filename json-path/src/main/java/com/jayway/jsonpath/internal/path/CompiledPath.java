@@ -93,4 +93,8 @@ public class CompiledPath implements Path {
     public String toString() {
         return root.toString();
     }
+
+    public RootPathToken getRoot() {
+        return root;
+    }
 }

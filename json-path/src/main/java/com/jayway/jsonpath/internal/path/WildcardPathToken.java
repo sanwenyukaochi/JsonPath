@@ -8,7 +8,7 @@ import java.util.Collections;
 
 public class WildcardPathToken extends PathToken {
 
-    WildcardPathToken() {}
+    public WildcardPathToken() {}
 
     @Override
     public void evaluate(
