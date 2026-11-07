@@ -545,4 +545,23 @@ public class IssuesTest {
                         "Chain does not have a discovery event. Possible it was cut by the date that was picked",
                         "No start transcoding events found");
     }
+
+    @Test
+    public void issue_71() {
+        String json =
+"""
+{
+    "logs": [
+        {
+            "message": "it's here",
+            "id": 2
+        }
+    ]
+}\
+""";
+
+        List<String> result = JsonPath.read(json, "$.logs[?(@.message == 'it\\'s here')].message");
+
+        Assertions.assertThat(result).containsExactly("it's here");
+    }
 }
