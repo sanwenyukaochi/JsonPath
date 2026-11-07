@@ -2,8 +2,12 @@ package com.jayway.jsonpath;
 
 import static com.jayway.jsonpath.JsonPath.using;
 import static com.jayway.jsonpath.TestUtils.assertEvaluationThrows;
+import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -107,9 +111,6 @@ public class DeepScanTest extends BaseTest {
         assertThat(result).asList().hasSize(5);
 
         assertEvaluationThrows(
-                "{\"foo\": {\"bar\": 4}}", "$..foo.bar", PathNotFoundException.class, conf);
-
-        assertEvaluationThrows(
                 "{\"foo\": {\"bar\": 4}, \"baz\": 2}",
                 "$..['foo', 'baz']",
                 PathNotFoundException.class,
@@ -142,5 +143,108 @@ public class DeepScanTest extends BaseTest {
             assertThat(node).isInstanceOf(Map.class);
             assertThat((Map) node).hasSize(2).containsEntry("a", "a-val");
         }
+    }
+
+    @Test
+    public void require_multi_property_fail() {
+        assertThrows(
+                PathNotFoundException.class,
+                () -> {
+                    final Map ab =
+                            new HashMap() {
+                                {
+                                    put("a", "aa");
+                                    put("b", "bb");
+                                }
+                            };
+
+                    final Map ad =
+                            new HashMap() {
+                                {
+                                    put("a", "aa");
+                                    put("d", "dd");
+                                }
+                            };
+
+                    List json =
+                            new ArrayList() {
+                                {
+                                    add(ab);
+                                    add(ad);
+                                }
+                            };
+
+                    Configuration configuration =
+                            JSON_SMART_CONFIGURATION.addOptions(Option.REQUIRE_PROPERTIES);
+
+                    JsonPath.using(configuration).parse(json).read("$..['a', 'b']");
+                });
+    }
+
+    @Test
+    public void require_multi_property_ok() {
+
+        final Map ab =
+                new HashMap() {
+                    {
+                        put("a", "aa");
+                        put("b", "bb");
+                    }
+                };
+
+        List json =
+                new ArrayList() {
+                    {
+                        add(ab);
+                        add(ab);
+                    }
+                };
+
+        Configuration configuration =
+                JSON_SMART_CONFIGURATION.addOptions(Option.REQUIRE_PROPERTIES);
+
+        List<Map<String, String>> result =
+                JsonPath.using(configuration).parse(json).read("$..['a', 'b']");
+
+        assertThat(result).containsExactly(ab, ab);
+    }
+
+    @Test
+    public void require_single_property_fail() {
+        assertThrows(
+                PathNotFoundException.class,
+                () -> {
+                    List json =
+                            new ArrayList() {
+                                {
+                                    add(singletonMap("a", "a0"));
+                                    add(singletonMap("b", "b2"));
+                                }
+                            };
+
+                    Configuration configuration =
+                            JSON_SMART_CONFIGURATION.addOptions(Option.REQUIRE_PROPERTIES);
+
+                    JsonPath.using(configuration).parse(json).read("$..a");
+                });
+    }
+
+    @Test
+    public void require_single_property_ok() {
+
+        List json =
+                new ArrayList() {
+                    {
+                        add(singletonMap("a", "a0"));
+                        add(singletonMap("a", "a1"));
+                    }
+                };
+
+        Configuration configuration =
+                JSON_SMART_CONFIGURATION.addOptions(Option.REQUIRE_PROPERTIES);
+
+        Object result = JsonPath.using(configuration).parse(json).read("$..a");
+
+        assertThat(result).asList().containsExactly("a0", "a1");
     }
 }

@@ -17,9 +17,11 @@ public class PathCompiler {
 
     private static final char DOC_CONTEXT = '$';
     private static final char EVAL_CONTEXT = '@';
+
     private static final char OPEN_SQUARE_BRACKET = '[';
     private static final char CLOSE_SQUARE_BRACKET = ']';
-    private static final char OPEN_BRACKET = '(';
+    private static final char OPEN_PARENTHESIS = '(';
+
     private static final char WILDCARD = '*';
     private static final char PERIOD = '.';
     private static final char SPACE = ' ';
@@ -27,7 +29,7 @@ public class PathCompiler {
     private static final char COMMA = ',';
     private static final char SPLIT = ':';
     private static final char MINUS = '-';
-    private static final char TICK = '\'';
+    private static final char SINGLE_QUOTE = '\'';
     private static final char DOUBLE_QUOTE = '"';
 
     private final LinkedList<Predicate> filterStack;
@@ -119,7 +121,7 @@ public class PathCompiler {
     }
 
     private boolean readDotToken(PathTokenAppender appender) {
-        if (path.currentCharIs('.') && path.nextCharIs('.')) {
+        if (path.currentCharIs(PERIOD) && path.nextCharIs(PERIOD)) {
             appender.appendPathToken(PathTokenFactory.crateScanToken());
             path.incrementPosition(2);
         } else if (!path.hasMoreCharacters()) {
@@ -127,7 +129,7 @@ public class PathCompiler {
         } else {
             path.incrementPosition(1);
         }
-        if (path.currentCharIs('.')) {
+        if (path.currentCharIs(PERIOD)) {
             throw new InvalidPathException(
                     "Character '.' on position " + path.position() + " is not valid.");
         }
@@ -233,7 +235,7 @@ public class PathCompiler {
         if (questionMarkIndex == -1) {
             return false;
         }
-        int openBracketIndex = path.indexOfNextSignificantChar(questionMarkIndex, OPEN_BRACKET);
+        int openBracketIndex = path.indexOfNextSignificantChar(questionMarkIndex, OPEN_PARENTHESIS);
         if (openBracketIndex == -1) {
             return false;
         }
@@ -345,7 +347,7 @@ public class PathCompiler {
             return false;
         }
         char potentialStringDelimiter = path.nextSignificantChar();
-        if (potentialStringDelimiter != TICK && potentialStringDelimiter != DOUBLE_QUOTE) {
+        if (potentialStringDelimiter != SINGLE_QUOTE && potentialStringDelimiter != DOUBLE_QUOTE) {
             return false;
         }
 

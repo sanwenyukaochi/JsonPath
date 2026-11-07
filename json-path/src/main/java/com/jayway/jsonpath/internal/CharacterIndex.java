@@ -4,12 +4,12 @@ import com.jayway.jsonpath.InvalidPathException;
 
 public class CharacterIndex {
 
-    private static final char OPEN_BRACKET = '(';
-    private static final char CLOSE_BRACKET = ')';
+    private static final char OPEN_PARENTHESIS = '(';
+    private static final char CLOSE_PARENTHESIS = ')';
     private static final char CLOSE_SQUARE_BRACKET = ']';
     private static final char SPACE = ' ';
     private static final char ESCAPE = '\\';
-    private static final char TICK = '\'';
+    private static final char SINGLE_QUOTE = '\'';
     private static final char MINUS = '-';
     private static final char PERIOD = '.';
     private static final char REGEX = '/';
@@ -82,7 +82,7 @@ public class CharacterIndex {
         int readPosition = startPosition + 1;
         while (inBounds(readPosition)) {
             if (skipStrings) {
-                if (charAt(readPosition) == TICK) {
+                if (charAt(readPosition) == SINGLE_QUOTE) {
                     boolean escaped = false;
                     while (inBounds(readPosition)) {
                         readPosition++;
@@ -94,7 +94,7 @@ public class CharacterIndex {
                             escaped = true;
                             continue;
                         }
-                        if (charAt(readPosition) == TICK) {
+                        if (charAt(readPosition) == SINGLE_QUOTE) {
                             readPosition++;
                             break;
                         }
@@ -128,7 +128,7 @@ public class CharacterIndex {
 
     public int indexOfClosingBracket(int startPosition, boolean skipStrings, boolean skipRegex) {
         return indexOfMatchingCloseChar(
-                startPosition, OPEN_BRACKET, CLOSE_BRACKET, skipStrings, skipRegex);
+                startPosition, OPEN_PARENTHESIS, CLOSE_PARENTHESIS, skipStrings, skipRegex);
     }
 
     public int indexOfNextSignificantChar(char c) {
