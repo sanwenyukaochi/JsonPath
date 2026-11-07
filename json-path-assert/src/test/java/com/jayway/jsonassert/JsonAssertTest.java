@@ -47,7 +47,10 @@ public class JsonAssertTest {
     "bicycle": {
       "color": "red",
       "price": 19.95
-,      "nullValue": null
+,      "gears": [23, 50]
+,      "extra": {"x": 0}
+,      "escape" : "Esc\\b\\f\\n\\r\\t\\u002A",
+      "nullValue": null
     }
   }
 }\
@@ -234,5 +237,25 @@ public class JsonAssertTest {
                     with(getResourceAsStream("lotto.json"))
                             .assertEquals("lotto.winners[0].winnerId1", 24);
                 });
+    }
+
+    @Test
+    public void assert_gears() throws Exception {
+        with(JSON)
+                .assertThat(
+                        "$.store.bicycle[?(@.gears == [23, 50])]",
+                        is(collectionWithSize(equalTo(1))));
+        with(JSON)
+                .assertThat(
+                        "$.store.bicycle[?(@.gears == [23, 77])]",
+                        is(collectionWithSize(equalTo(0))));
+        with(JSON)
+                .assertThat(
+                        "$.store.bicycle[?(@.extra == {\"x\":0})]",
+                        is(collectionWithSize(equalTo(1))));
+        with(JSON)
+                .assertThat(
+                        "$.store.bicycle[?(@.escape == 'Esc\\b\\f\\n\\r\\t\\u002A')]",
+                        is(collectionWithSize(equalTo(1))));
     }
 }
