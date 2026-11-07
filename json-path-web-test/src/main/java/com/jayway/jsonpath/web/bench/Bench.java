@@ -78,7 +78,7 @@ public class Bench {
             } else {
                 result =
                         res != null
-                                ? Configuration.defaultConfiguration().getProvider().toJson(res)
+                                ? Configuration.defaultConfiguration().jsonProvider().toJson(res)
                                 : "null";
             }
             return new Result("jayway", time, result, error);

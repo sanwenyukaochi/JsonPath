@@ -5,7 +5,6 @@ import static com.jayway.jsonpath.internal.Utils.notNull;
 
 import com.jayway.jsonpath.internal.Path;
 import com.jayway.jsonpath.internal.PathCompiler;
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -29,7 +28,7 @@ public class Criteria implements Predicate {
         EQ {
             @Override
             boolean eval(Object expected, Object actual, Configuration configuration) {
-                boolean res = (0 == safeCompare(expected, actual, configuration));
+                boolean res = (0 == configuration.jsonProvider().compare(expected, actual));
                 logger.debug("[{}] {} [{}] => {}", actual, name(), expected, res);
                 return res;
             }
@@ -37,7 +36,7 @@ public class Criteria implements Predicate {
         NE {
             @Override
             boolean eval(Object expected, Object actual, Configuration configuration) {
-                boolean res = (0 != safeCompare(expected, actual, configuration));
+                boolean res = (0 != configuration.jsonProvider().compare(expected, actual));
                 logger.debug("[{}] {} [{}] => {}", actual, name(), expected, res);
                 return res;
             }
@@ -48,7 +47,7 @@ public class Criteria implements Predicate {
                 if ((expected == null) ^ (actual == null)) {
                     return false;
                 }
-                boolean res = (0 > safeCompare(expected, actual, configuration));
+                boolean res = (0 > configuration.jsonProvider().compare(expected, actual));
                 logger.debug("[{}] {} [{}] => {}", actual, name(), expected, res);
                 return res;
             }
@@ -59,7 +58,7 @@ public class Criteria implements Predicate {
                 if ((expected == null) ^ (actual == null)) {
                     return false;
                 }
-                boolean res = (0 >= safeCompare(expected, actual, configuration));
+                boolean res = (0 >= configuration.jsonProvider().compare(expected, actual));
                 logger.debug("[{}] {} [{}] => {}", actual, name(), expected, res);
                 return res;
             }
@@ -70,7 +69,7 @@ public class Criteria implements Predicate {
                 if ((expected == null) ^ (actual == null)) {
                     return false;
                 }
-                boolean res = (0 < safeCompare(expected, actual, configuration));
+                boolean res = (0 < configuration.jsonProvider().compare(expected, actual));
                 logger.debug("[{}] {} [{}] => {}", actual, name(), expected, res);
                 return res;
             }
@@ -81,7 +80,7 @@ public class Criteria implements Predicate {
                 if ((expected == null) ^ (actual == null)) {
                     return false;
                 }
-                boolean res = (0 <= safeCompare(expected, actual, configuration));
+                boolean res = (0 <= configuration.jsonProvider().compare(expected, actual));
                 logger.debug("[{}] {} [{}] => {}", actual, name(), expected, res);
                 return res;
             }
@@ -92,7 +91,7 @@ public class Criteria implements Predicate {
                 boolean res = false;
                 Collection exps = (Collection) expected;
                 for (Object exp : exps) {
-                    if (0 == safeCompare(exp, actual, configuration)) {
+                    if (0 == configuration.jsonProvider().compare(exp, actual)) {
                         res = true;
                         break;
                     }
@@ -115,11 +114,11 @@ public class Criteria implements Predicate {
             boolean eval(Object expected, Object actual, Configuration configuration) {
                 boolean res = true;
                 Collection exps = (Collection) expected;
-                if (configuration.getProvider().isArray(actual)) {
+                if (configuration.jsonProvider().isArray(actual)) {
                     for (Object exp : exps) {
                         boolean found = false;
-                        for (Object check : configuration.getProvider().toIterable(actual)) {
-                            if (0 == safeCompare(exp, check, configuration)) {
+                        for (Object check : configuration.jsonProvider().toIterable(actual)) {
+                            if (0 == configuration.jsonProvider().compare(exp, check)) {
                                 found = true;
                                 break;
                             }
@@ -131,7 +130,7 @@ public class Criteria implements Predicate {
                     }
                     logger.debug(
                             "[{}] {} [{}] => {}",
-                            join(", ", configuration.getProvider().toIterable(actual)),
+                            join(", ", configuration.jsonProvider().toIterable(actual)),
                             name(),
                             join(", ", exps),
                             res);
@@ -148,12 +147,12 @@ public class Criteria implements Predicate {
             boolean eval(Object expected, Object actual, Configuration configuration) {
                 int size = (Integer) expected;
                 boolean res;
-                if (configuration.getProvider().isArray(actual)) {
-                    int length = configuration.getProvider().length(actual);
-                    res = length == size;
+                if (configuration.jsonProvider().isArray(actual)) {
+                    int length = configuration.jsonProvider().length(actual);
+                    res = (length == size);
                     logger.debug("Array with size {} {} {} => {}", length, name(), size, res);
-                } else if (actual instanceof String) {
-                    int length = ((String) actual).length();
+                } else if (configuration.jsonProvider().isString(actual)) {
+                    int length = configuration.jsonProvider().length(actual);
                     res = length == size;
                     logger.debug("String with length {} {} {} => {}", length, name(), size, res);
                 } else {
@@ -219,8 +218,8 @@ public class Criteria implements Predicate {
             boolean eval(Object expected, Object actual, Configuration configuration) {
                 boolean res = false;
                 if (actual != null) {
-                    if (configuration.getProvider().isArray(actual)) {
-                        int len = configuration.getProvider().length(actual);
+                    if (configuration.jsonProvider().isArray(actual)) {
+                        int len = configuration.jsonProvider().length(actual);
                         res = (0 != len);
                         logger.debug("array length = {} {} => {}", len, name(), res);
                     } else if (actual instanceof String) {
@@ -291,7 +290,7 @@ public class Criteria implements Predicate {
             try {
                 Configuration c =
                         Configuration.builder()
-                                .jsonProvider(ctx.configuration().getProvider())
+                                .jsonProvider(ctx.configuration().jsonProvider())
                                 .options()
                                 .build();
                 path.evaluate(ctx.target(), c).getValue();
@@ -302,8 +301,9 @@ public class Criteria implements Predicate {
         } else {
             try {
                 final Object actual = path.evaluate(ctx.target(), ctx.configuration()).getValue();
+
                 return criteriaType.eval(expected, actual, ctx.configuration());
-            } catch (CompareException e) {
+            } catch (ValueCompareException e) {
                 return false;
             } catch (PathNotFoundException e) {
                 return false;
@@ -433,42 +433,6 @@ public class Criteria implements Predicate {
         this.expected = p;
         return this;
     }
-
-    private static int safeCompare(Object expected, Object actual, Configuration configuration) {
-        if (isNullish(expected) && !isNullish(actual)) {
-            return -1;
-        } else if (!isNullish(expected) && isNullish(actual)) {
-            return 1;
-        } else if (isNullish(expected) && isNullish(actual)) {
-            return 0;
-        } else if (expected instanceof String && actual instanceof String) {
-            return ((String) expected).compareTo((String) actual);
-        } else if (expected instanceof Number && actual instanceof Number) {
-            return new BigDecimal(expected.toString()).compareTo(new BigDecimal(actual.toString()));
-        } else if (expected instanceof String && actual instanceof Number) {
-            return new BigDecimal(expected.toString()).compareTo(new BigDecimal(actual.toString()));
-        } else if (expected instanceof String && actual instanceof Boolean) {
-            Boolean e = Boolean.valueOf((String) expected);
-            Boolean a = (Boolean) actual;
-            return e.compareTo(a);
-        } else if (expected instanceof Boolean && actual instanceof Boolean) {
-            Boolean e = (Boolean) expected;
-            Boolean a = (Boolean) actual;
-            return e.compareTo(a);
-        } else {
-            logger.debug(
-                    "Can not compare a {} with a {}",
-                    expected.getClass().getName(),
-                    actual.getClass().getName());
-            throw new CompareException();
-        }
-    }
-
-    private static boolean isNullish(Object o) {
-        return (o == null || ((o instanceof String) && ("null".equals(o))));
-    }
-
-    private static class CompareException extends RuntimeException {}
 
     public static Criteria create(String path, String operator, String expected) {
         if (expected.startsWith("'") && expected.endsWith("'")) {

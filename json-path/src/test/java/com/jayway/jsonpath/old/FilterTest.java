@@ -345,7 +345,7 @@ public class FilterTest extends BaseTest {
                     @Override
                     public boolean apply(PredicateContext ctx) {
                         if (ctx.configuration()
-                                .getProvider()
+                                .jsonProvider()
                                 .getMapValue(ctx.target(), "name")
                                 .equals("rootGrandChild_A")) {
                             return true;

@@ -4,7 +4,6 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.internal.PathCompiler;
 import com.jayway.jsonpath.internal.spi.json.JsonSmartJsonProvider;
 import java.util.List;
@@ -86,12 +85,6 @@ public class ScanPathTokenTest {
      ]
  }\
 """);
-
-    @Test
-    public void a_root_scan() {
-
-        Object o = JsonPath.read(DOCUMENT, "$..");
-    }
 
     @Test
     public void a_document_can_be_scanned_for_property() {

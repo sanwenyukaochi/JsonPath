@@ -4,7 +4,6 @@ import static com.jayway.jsonpath.JsonPath.using;
 import static com.jayway.jsonpath.Option.ALWAYS_RETURN_LIST;
 import static com.jayway.jsonpath.Option.AS_PATH_LIST;
 import static com.jayway.jsonpath.Option.DEFAULT_PATH_LEAF_TO_NULL;
-import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -22,7 +21,7 @@ public class OptionsTest extends BaseTest {
                 () -> {
                     Configuration conf = Configuration.defaultConfiguration();
 
-                    assertThat(using(conf).parse(singletonMap("foo", "bar")).<Object>read("$.baz"))
+                    assertThat(using(conf).parse("{\"foo\" : \"bar\"}").<Object>read("$.baz"))
                             .isNull();
                 });
     }
@@ -32,7 +31,8 @@ public class OptionsTest extends BaseTest {
 
         Configuration conf = Configuration.builder().options(DEFAULT_PATH_LEAF_TO_NULL).build();
 
-        assertThat(using(conf).parse(singletonMap("foo", "bar")).<Object>read("$.baz")).isNull();
+        assertThat(using(conf).parse("{\"foo\" : \"bar\"}").<Object>read("$.baz", Object.class))
+                .isNull();
     }
 
     @Test
@@ -40,7 +40,7 @@ public class OptionsTest extends BaseTest {
 
         Configuration conf = Configuration.defaultConfiguration();
 
-        assertThat(using(conf).parse(singletonMap("foo", "bar")).<Object>read("$.foo"))
+        assertThat(using(conf).parse("{\"foo\" : \"bar\"}").<Object>read("$.foo"))
                 .isInstanceOf(String.class);
     }
 
@@ -49,7 +49,7 @@ public class OptionsTest extends BaseTest {
 
         Configuration conf = Configuration.builder().options(ALWAYS_RETURN_LIST).build();
 
-        assertThat(using(conf).parse(singletonMap("foo", "bar")).<Object>read("$.foo"))
+        assertThat(using(conf).parse("{\"foo\" : \"bar\"}").<Object>read("$.foo"))
                 .isInstanceOf(List.class);
     }
 
@@ -57,15 +57,14 @@ public class OptionsTest extends BaseTest {
     public void a_path_evaluation_is_returned_as_VALUE_by_default() {
         Configuration conf = Configuration.defaultConfiguration();
 
-        assertThat(using(conf).parse(singletonMap("foo", "bar")).<Object>read("$.foo"))
-                .isEqualTo("bar");
+        assertThat(using(conf).parse("{\"foo\" : \"bar\"}").<Object>read("$.foo")).isEqualTo("bar");
     }
 
     @Test
     public void a_path_evaluation_can_be_returned_as_PATH_LIST() {
         Configuration conf = Configuration.builder().options(AS_PATH_LIST).build();
 
-        List<String> pathList = using(conf).parse(singletonMap("foo", "bar")).read("$.foo");
+        List<String> pathList = using(conf).parse("{\"foo\" : \"bar\"}").read("$.foo");
 
         assertThat(pathList).containsOnly("$['foo']");
     }

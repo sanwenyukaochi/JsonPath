@@ -54,8 +54,8 @@ public class JsonPath {
             } else {
                 Object res = path.evaluate(jsonObject, configuration).getValue();
                 if (optAlwaysReturnList && path.isDefinite()) {
-                    Object array = configuration.getProvider().createArray();
-                    configuration.getProvider().setProperty(array, 0, res);
+                    Object array = configuration.jsonProvider().createArray();
+                    configuration.jsonProvider().setProperty(array, 0, res);
                     return (T) array;
                 } else {
                     return (T) res;
@@ -67,12 +67,12 @@ public class JsonPath {
             }
         }
         if (optAsPathList) {
-            return (T) configuration.getProvider().createArray();
+            return (T) configuration.jsonProvider().createArray();
         } else {
             if (optAlwaysReturnList) {
-                return (T) configuration.getProvider().createArray();
+                return (T) configuration.jsonProvider().createArray();
             } else {
-                return (T) (path.isDefinite() ? null : configuration.getProvider().createArray());
+                return (T) (path.isDefinite() ? null : configuration.jsonProvider().createArray());
             }
         }
     }
@@ -87,7 +87,7 @@ public class JsonPath {
         notEmpty(json, "json can not be null or empty");
         notNull(configuration, "jsonProvider can not be null");
 
-        return read(configuration.getProvider().parse(json), configuration);
+        return read(configuration.jsonProvider().parse(json), configuration);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -103,7 +103,7 @@ public class JsonPath {
         InputStream in = null;
         try {
             in = HttpProviderFactory.getProvider().get(jsonURL);
-            return read(configuration.getProvider().parse(in), configuration);
+            return read(configuration.jsonProvider().parse(in), configuration);
         } finally {
             Utils.closeQuietly(in);
         }
@@ -123,7 +123,7 @@ public class JsonPath {
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(jsonFile);
-            return read(configuration.getProvider().parse(fis), configuration);
+            return read(configuration.jsonProvider().parse(fis), configuration);
         } finally {
             Utils.closeQuietly(fis);
         }
@@ -140,7 +140,7 @@ public class JsonPath {
         notNull(configuration, "configuration can not be null");
 
         try {
-            return read(configuration.getProvider().parse(jsonInputStream), configuration);
+            return read(configuration.jsonProvider().parse(jsonInputStream), configuration);
         } finally {
             Utils.closeQuietly(jsonInputStream);
         }
