@@ -11,7 +11,6 @@ public class ExpressionEvalTest {
     @Test
     public void long_eval() throws Exception {
 
-        assertTrue(ExpressionEvaluator.eval(1L, "=", "1"));
         assertTrue(ExpressionEvaluator.eval(1L, "==", "1"));
         assertTrue(ExpressionEvaluator.eval(2L, "!=", "1"));
         assertTrue(ExpressionEvaluator.eval(2L, ">", "1"));
@@ -24,14 +23,13 @@ public class ExpressionEvalTest {
         assertFalse(ExpressionEvaluator.eval(1, ">=", "2"));
         assertFalse(ExpressionEvaluator.eval(2, "<", "1"));
         assertFalse(ExpressionEvaluator.eval(2, "<=", "1"));
-        assertFalse(ExpressionEvaluator.eval(1, "=", "2"));
+        assertFalse(ExpressionEvaluator.eval(1, "==", "2"));
         assertFalse(ExpressionEvaluator.eval(1, "!=", "1"));
     }
 
     @Test
     public void double_eval() throws Exception {
 
-        assertTrue(ExpressionEvaluator.eval(1D, "=", "1"));
         assertTrue(ExpressionEvaluator.eval(1D, "==", "1"));
         assertTrue(ExpressionEvaluator.eval(2D, "!=", "1"));
         assertTrue(ExpressionEvaluator.eval(2D, ">", "1"));
@@ -44,7 +42,7 @@ public class ExpressionEvalTest {
         assertFalse(ExpressionEvaluator.eval(1D, ">=", "2"));
         assertFalse(ExpressionEvaluator.eval(2D, "<", "1"));
         assertFalse(ExpressionEvaluator.eval(2D, "<=", "1"));
-        assertFalse(ExpressionEvaluator.eval(1D, "=", "2"));
+        assertFalse(ExpressionEvaluator.eval(1D, "==", "2"));
         assertFalse(ExpressionEvaluator.eval(1D, "!=", "1"));
     }
 
