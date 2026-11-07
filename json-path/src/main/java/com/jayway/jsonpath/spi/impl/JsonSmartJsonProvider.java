@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
+import net.minidev.json.JSONValue;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
 
@@ -37,7 +38,7 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
 
     public Object parse(String json) {
         try {
-            return parser.parse(json);
+            return parser.parse(json, JSONValue.defaultReader.DEFAULT_ORDERED);
         } catch (ParseException e) {
             throw new InvalidJsonException(e);
         }
@@ -46,7 +47,7 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
     @Override
     public Object parse(Reader jsonReader) throws InvalidJsonException {
         try {
-            return parser.parse(jsonReader);
+            return parser.parse(jsonReader, JSONValue.defaultReader.DEFAULT_ORDERED);
         } catch (ParseException e) {
             throw new InvalidJsonException(e);
         }
@@ -55,7 +56,8 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
     @Override
     public Object parse(InputStream jsonStream) throws InvalidJsonException {
         try {
-            return parser.parse(new InputStreamReader(jsonStream));
+            return parser.parse(
+                    new InputStreamReader(jsonStream), JSONValue.defaultReader.DEFAULT_ORDERED);
         } catch (ParseException e) {
             throw new InvalidJsonException(e);
         }
