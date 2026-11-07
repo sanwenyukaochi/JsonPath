@@ -46,7 +46,7 @@ public class FilterCompilerTest {
         assertThat(compile("[?((@.a && @.b && @.c) || @.x)]").toString())
                 .isEqualTo("[?((@['a'] && @['b'] && @['c']) || @['x'])]");
         assertThat(compile("[?((@.a && @.b || @.c) || @.x)]").toString())
-                .isEqualTo("[?((@['a'] && (@['b'] || @['c'])) || @['x'])]");
+                .isEqualTo("[?(((@['a'] && @['b']) || @['c']) || @['x'])]");
         assertThat(compile("[?((@.a && @.b) || (@.c && @.d))]").toString())
                 .isEqualTo("[?((@['a'] && @['b']) || (@['c'] && @['d']))]");
         assertThat(compile("[?(@.a IN [1,2,3])]").toString()).isEqualTo("[?(@['a'] IN [1,2,3])]");
@@ -71,6 +71,8 @@ public class FilterCompilerTest {
                 .isEqualTo("[?($[\"firstname\"]['lastname'])]");
         assertThat(compile("[?($[\"firstname\", \"lastname\"])]").toString())
                 .isEqualTo("[?($[\"firstname\",\"lastname\"])]");
+        assertThat(compile("[?(((@.a && @.b || @.c)) || @.x)]").toString())
+                .isEqualTo("[?(((@['a'] && @['b']) || @['c']) || @['x'])]");
     }
 
     @Test
@@ -82,6 +84,8 @@ public class FilterCompilerTest {
         assertInvalidPathException("[?(@ == 1' )]");
         assertInvalidPathException("[?(@.foo bar == 1)]");
         assertInvalidPathException("[?(@.i == 5 @.i == 8)]");
+        assertInvalidPathException("[?(!5)]");
+        assertInvalidPathException("[?(!'foo')]");
     }
 
     private void assertInvalidPathException(String filter) {
@@ -114,5 +118,15 @@ public class FilterCompilerTest {
                 () -> {
                     compile("[?(@.foo == x)]");
                 });
+    }
+
+    @Test
+    public void or_has_lower_priority_than_and() {
+        assertThat(
+                        compile(
+                                        "[?(@.category == 'fiction' && @.author == 'Evelyn Waugh' || @.price > 15)]")
+                                .toString())
+                .isEqualTo(
+                        "[?((@['category'] == 'fiction' && @['author'] == 'Evelyn Waugh') || @['price'] > 15)]");
     }
 }
