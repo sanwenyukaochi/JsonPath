@@ -1113,4 +1113,27 @@ public class IssuesTest extends BaseTest {
         Assertions.assertThat(objectNode.get("can delete").isNull());
         Assertions.assertThat(objectNode.get("can't delete").isNull());
     }
+
+    @Test
+    public void issue_309() {
+
+        String json =
+"""
+{
+"jsonArr": [
+   {
+       "name":"nOne"
+   },
+   {
+       "name":"nTwo"
+   }
+   ]
+}\
+""";
+
+        DocumentContext doc = JsonPath.parse(json).set("$.jsonArr[1].name", "Jayway");
+
+        Assertions.assertThat(doc.<Object>read("$.jsonArr[0].name")).isEqualTo("nOne");
+        Assertions.assertThat(doc.<Object>read("$.jsonArr[1].name")).isEqualTo("Jayway");
+    }
 }
