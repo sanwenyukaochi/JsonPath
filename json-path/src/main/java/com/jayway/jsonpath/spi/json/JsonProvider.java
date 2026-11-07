@@ -29,9 +29,13 @@ public interface JsonProvider {
 
     Object getArrayIndex(Object obj, int idx);
 
+    void setArrayIndex(Object array, int idx, Object newValue);
+
     Object getMapValue(Object obj, String key);
 
     void setProperty(Object obj, Object key, Object value);
+
+    void removeProperty(Object obj, Object key);
 
     boolean isMap(Object obj);
 }

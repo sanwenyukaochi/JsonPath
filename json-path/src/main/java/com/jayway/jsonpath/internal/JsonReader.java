@@ -4,6 +4,7 @@ import static com.jayway.jsonpath.internal.Utils.notEmpty;
 import static com.jayway.jsonpath.internal.Utils.notNull;
 
 import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.EvaluationListener;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ParseContext;
@@ -16,7 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-public class JsonReader implements ParseContext, ReadContext {
+public class JsonReader implements ParseContext, DocumentContext {
 
     private final Configuration configuration;
     private Object json;
@@ -38,26 +39,26 @@ public class JsonReader implements ParseContext, ReadContext {
     }
 
     @Override
-    public ReadContext parse(Object json) {
+    public DocumentContext parse(Object json) {
         notNull(json, "json object can not be null");
         this.json = json;
         return this;
     }
 
     @Override
-    public ReadContext parse(String json) {
+    public DocumentContext parse(String json) {
         notEmpty(json, "json string can not be null or empty");
         this.json = configuration.jsonProvider().parse(json);
         return this;
     }
 
     @Override
-    public ReadContext parse(InputStream json) {
+    public DocumentContext parse(InputStream json) {
         return parse(json, "UTF-8");
     }
 
     @Override
-    public ReadContext parse(InputStream json, String charset) {
+    public DocumentContext parse(InputStream json, String charset) {
         notNull(json, "json input stream can not be null");
         notNull(json, "charset can not be null");
         try {
@@ -69,7 +70,7 @@ public class JsonReader implements ParseContext, ReadContext {
     }
 
     @Override
-    public ReadContext parse(File json) throws IOException {
+    public DocumentContext parse(File json) throws IOException {
         notNull(json, "json file can not be null");
         FileInputStream fis = null;
         try {
@@ -82,7 +83,7 @@ public class JsonReader implements ParseContext, ReadContext {
     }
 
     @Override
-    public ReadContext parse(URL json) throws IOException {
+    public DocumentContext parse(URL json) throws IOException {
         notNull(json, "json url can not be null");
         InputStream is = HttpProviderFactory.getProvider().get(json);
         return parse(is);
@@ -130,6 +131,30 @@ public class JsonReader implements ParseContext, ReadContext {
 
     private <T> T convert(Object obj, Class<T> targetType, Configuration configuration) {
         return configuration.mappingProvider().map(obj, targetType, configuration);
+    }
+
+    @Override
+    public DocumentContext set(String path, Object newValue, Predicate... filters) {
+        Object modifiedJson = JsonPath.compile(path, filters).set(json, newValue, configuration);
+        return new JsonReader(modifiedJson, configuration);
+    }
+
+    @Override
+    public DocumentContext delete(String path, Predicate... filters) {
+        Object modifiedJson = JsonPath.compile(path, filters).delete(json, configuration);
+        return new JsonReader(modifiedJson, configuration);
+    }
+
+    @Override
+    public DocumentContext add(String path, Object value, Predicate... filters) {
+        Object modifiedJson = JsonPath.compile(path, filters).add(json, value, configuration);
+        return new JsonReader(modifiedJson, configuration);
+    }
+
+    @Override
+    public DocumentContext put(String path, String key, Object value, Predicate... filters) {
+        Object modifiedJson = JsonPath.compile(path, filters).put(json, key, value, configuration);
+        return new JsonReader(modifiedJson, configuration);
     }
 
     private final class LimitingEvaluationListener implements EvaluationListener {

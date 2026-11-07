@@ -20,6 +20,14 @@ public abstract class AbstractJsonProvider implements JsonProvider {
         return ((List) obj).get(idx);
     }
 
+    public void setArrayIndex(Object array, int index, Object newValue) {
+        if (!isArray(array)) {
+            throw new UnsupportedOperationException();
+        } else {
+            ((List) array).set(index, newValue);
+        }
+    }
+
     public Object getMapValue(Object obj, String key) {
         Map m = (Map) obj;
         if (!m.containsKey(key)) {
@@ -41,6 +49,16 @@ public abstract class AbstractJsonProvider implements JsonProvider {
                 index = list.size();
             }
             list.add(index, value);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void removeProperty(Object obj, Object key) {
+        if (isMap(obj)) ((Map) obj).remove(key.toString());
+        else {
+            List list = (List) obj;
+            int index = key instanceof Integer ? (Integer) key : Integer.parseInt(key.toString());
+            list.remove(index);
         }
     }
 

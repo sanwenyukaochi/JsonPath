@@ -65,4 +65,10 @@ public class ArraySlicingTest {
         List<Integer> result = JsonPath.read(JSON_ARRAY, "$[0,1,2]");
         assertThat(result, Matchers.contains(1, 3, 5));
     }
+
+    @Test
+    public void get_between_index_3() {
+        List<Integer> result = JsonPath.read(JSON_ARRAY, "$[0:2]");
+        assertThat(result, Matchers.contains(1, 3));
+    }
 }

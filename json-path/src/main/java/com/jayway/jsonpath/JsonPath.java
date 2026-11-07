@@ -4,9 +4,11 @@ import static com.jayway.jsonpath.internal.Utils.isTrue;
 import static com.jayway.jsonpath.internal.Utils.notEmpty;
 import static com.jayway.jsonpath.internal.Utils.notNull;
 
+import com.jayway.jsonpath.internal.EvaluationContext;
 import com.jayway.jsonpath.internal.JsonReader;
 import com.jayway.jsonpath.internal.Path;
 import com.jayway.jsonpath.internal.PathCompiler;
+import com.jayway.jsonpath.internal.PathRef;
 import com.jayway.jsonpath.internal.Utils;
 import com.jayway.jsonpath.spi.http.HttpProviderFactory;
 import com.jayway.jsonpath.spi.json.JsonProvider;
@@ -75,6 +77,42 @@ public class JsonPath {
                 return (T) (path.isDefinite() ? null : configuration.jsonProvider().createArray());
             }
         }
+    }
+
+    public <T> T set(Object jsonObject, Object newVal, Configuration configuration) {
+        EvaluationContext evaluationContext =
+                path.evaluate(jsonObject, jsonObject, configuration, true);
+        for (PathRef updateOperation : evaluationContext.updateOperations()) {
+            updateOperation.set(newVal, configuration);
+        }
+        return (T) jsonObject;
+    }
+
+    public <T> T delete(Object jsonObject, Configuration configuration) {
+        EvaluationContext evaluationContext =
+                path.evaluate(jsonObject, jsonObject, configuration, true);
+        for (PathRef updateOperation : evaluationContext.updateOperations()) {
+            updateOperation.delete(configuration);
+        }
+        return (T) jsonObject;
+    }
+
+    public <T> T add(Object jsonObject, Object value, Configuration configuration) {
+        EvaluationContext evaluationContext =
+                path.evaluate(jsonObject, jsonObject, configuration, true);
+        for (PathRef updateOperation : evaluationContext.updateOperations()) {
+            updateOperation.add(value, configuration);
+        }
+        return (T) jsonObject;
+    }
+
+    public <T> T put(Object jsonObject, String key, Object value, Configuration configuration) {
+        EvaluationContext evaluationContext =
+                path.evaluate(jsonObject, jsonObject, configuration, true);
+        for (PathRef updateOperation : evaluationContext.updateOperations()) {
+            updateOperation.put(key, value, configuration);
+        }
+        return (T) jsonObject;
     }
 
     @SuppressWarnings({"unchecked"})
@@ -199,43 +237,43 @@ public class JsonPath {
         return new JsonReader(Configuration.builder().jsonProvider(provider).build());
     }
 
-    public static ReadContext parse(Object json) {
+    public static DocumentContext parse(Object json) {
         return new JsonReader().parse(json);
     }
 
-    public static ReadContext parse(String json) {
+    public static DocumentContext parse(String json) {
         return new JsonReader().parse(json);
     }
 
-    public static ReadContext parse(InputStream json) {
+    public static DocumentContext parse(InputStream json) {
         return new JsonReader().parse(json);
     }
 
-    public static ReadContext parse(File json) throws IOException {
+    public static DocumentContext parse(File json) throws IOException {
         return new JsonReader().parse(json);
     }
 
-    public static ReadContext parse(URL json) throws IOException {
+    public static DocumentContext parse(URL json) throws IOException {
         return new JsonReader().parse(json);
     }
 
-    public static ReadContext parse(Object json, Configuration configuration) {
+    public static DocumentContext parse(Object json, Configuration configuration) {
         return new JsonReader(configuration).parse(json);
     }
 
-    public static ReadContext parse(String json, Configuration configuration) {
+    public static DocumentContext parse(String json, Configuration configuration) {
         return new JsonReader(configuration).parse(json);
     }
 
-    public static ReadContext parse(InputStream json, Configuration configuration) {
+    public static DocumentContext parse(InputStream json, Configuration configuration) {
         return new JsonReader(configuration).parse(json);
     }
 
-    public static ReadContext parse(File json, Configuration configuration) throws IOException {
+    public static DocumentContext parse(File json, Configuration configuration) throws IOException {
         return new JsonReader(configuration).parse(json);
     }
 
-    public static ReadContext parse(URL json, Configuration configuration) throws IOException {
+    public static DocumentContext parse(URL json, Configuration configuration) throws IOException {
         return new JsonReader(configuration).parse(json);
     }
 }
