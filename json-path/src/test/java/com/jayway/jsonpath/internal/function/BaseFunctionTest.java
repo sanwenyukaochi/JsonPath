@@ -32,4 +32,35 @@ public class BaseFunctionTest {
                 .useDelimiter("\\A")
                 .next();
     }
+
+    protected void verifyTextAndNumberFunction(
+            Configuration conf, String pathExpr, Object expectedValue) {
+        verifyFunction(conf, pathExpr, TEXT_AND_NUMBER_SERIES, expectedValue);
+    }
+
+    protected static final String TEXT_AND_NUMBER_SERIES =
+"""
+{
+  "text": [
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f"
+  ],
+  "numbers": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ]
+}\
+""";
 }
