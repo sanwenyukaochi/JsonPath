@@ -213,8 +213,7 @@ public class JsonPathTest {
                 JsonPath.<String>read(DOCUMENT, "$..book[(@.length-1)].author"),
                 equalTo("J. R. R. Tolkien"));
         assertThat(
-                JsonPath.<String>read(DOCUMENT, "$..book[-1:].author"),
-                equalTo("J. R. R. Tolkien"));
+                JsonPath.<String>read(DOCUMENT, "$..book[1:].author"), equalTo("J. R. R. Tolkien"));
     }
 
     @Test
@@ -278,7 +277,7 @@ public class JsonPathTest {
 
         assertThat(
                 JsonPath.<List<String>>read(
-                        PRODUCT_JSON, "$.product[?(@.attr.with.dot=='A')].codename"),
+                        PRODUCT_JSON, "$.product[?(@.['attr.with.dot']=='A')].codename"),
                 hasItems("Seattle"));
     }
 

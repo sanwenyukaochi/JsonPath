@@ -12,12 +12,15 @@ import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
+import net.minidev.json.writer.JsonReaderI;
 
 public class JsonSmartJsonProvider extends AbstractJsonProvider {
 
     private Mode mode;
 
     private JSONParser parser;
+
+    private JsonReaderI<?> containerFactory = JSONValue.defaultReader.DEFAULT;
 
     public JsonSmartJsonProvider() {
         this(Mode.SLACK);
@@ -29,16 +32,16 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
     }
 
     public Map<String, Object> createMap() {
-        return new JSONObject();
+        return (Map<String, Object>) containerFactory.createObject();
     }
 
     public List<Object> createArray() {
-        return new JSONArray();
+        return (List<Object>) containerFactory.createArray();
     }
 
     public Object parse(String json) {
         try {
-            return parser.parse(json, JSONValue.defaultReader.DEFAULT);
+            return parser.parse(json, containerFactory);
         } catch (ParseException e) {
             throw new InvalidJsonException(e);
         }
@@ -47,7 +50,7 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
     @Override
     public Object parse(Reader jsonReader) throws InvalidJsonException {
         try {
-            return parser.parse(jsonReader, JSONValue.defaultReader.DEFAULT);
+            return parser.parse(jsonReader, containerFactory);
         } catch (ParseException e) {
             throw new InvalidJsonException(e);
         }
@@ -56,8 +59,7 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
     @Override
     public Object parse(InputStream jsonStream) throws InvalidJsonException {
         try {
-            return parser.parse(
-                    new InputStreamReader(jsonStream), JSONValue.defaultReader.DEFAULT);
+            return parser.parse(new InputStreamReader(jsonStream), containerFactory);
         } catch (ParseException e) {
             throw new InvalidJsonException(e);
         }

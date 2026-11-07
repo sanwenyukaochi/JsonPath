@@ -1,6 +1,7 @@
 package com.jayway.jsonpath.internal.filter;
 
 import com.jayway.jsonpath.spi.JsonProvider;
+
 import java.util.regex.Pattern;
 
 public class ArrayIndexFilter extends PathTokenFilter {
@@ -39,9 +40,7 @@ public class ArrayIndexFilter extends PathTokenFilter {
                 int get = Integer.parseInt(trimmedCondition);
                 for (int i = 0; i < get; i++) {
                     jsonProvider.setProperty(
-                            result,
-                            jsonProvider.length(result),
-                            jsonProvider.getProperty(obj, i));
+                            result, jsonProvider.length(result), jsonProvider.getProperty(obj, i));
                 }
                 return result;
 

@@ -1,0 +1,322 @@
+{
+    "project": {
+        "@key": "Signaturengruppe ars.hydr.",
+        "field": [
+            {
+                "@key": "Artist",
+                "option": [
+                    {
+                        "$": "SUB",
+                        "@label": "Nieders?chsische Staats- und Universit?tsbibliothek G?ttingen, Germany"
+                    },
+                    {
+                        "$": "DIGIZEIT",
+                        "@label": "DIGIZEITSCHRIFTEN e.V., Nieders?chsische Staats- und Universit?tsbibliothek G?ttingen, Germany"
+                    }
+                ],
+                "required": "false",
+                "source": "werk",
+                "ughbinding": "false"
+            },
+            {
+                "@key": "Schrifttyp",
+                "option": [
+                    {
+                        "$": "gemischt",
+                        "@label": "gemischt"
+                    },
+                    {
+                        "$": "Fraktur",
+                        "@label": "Fraktur"
+                    },
+                    {
+                        "$": "Antiqua",
+                        "@label": "Antiqua"
+                    }
+                ],
+                "required": "false",
+                "source": "werk",
+                "ughbinding": "false"
+            },
+            {
+                "@key": "Titel",
+                "insertionLevel": "topstruct",
+                "required": "true",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "Titel (Sortierung)",
+                "insertionLevel": "topstruct",
+                "required": "true",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "Titel",
+                "insertionLevel": "topstruct",
+                "required": "true",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "Titel (Sortierung)",
+                "insertionLevel": "topstruct",
+                "required": "true",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "Autoren",
+                "insertionLevel": "topstruct",
+                "required": "false",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "ATS",
+                "insertionLevel": "topstruct",
+                "required": "false",
+                "source": "werk",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "TSL",
+                "insertionLevel": "topstruct",
+                "required": "false",
+                "source": "werk",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "PPN analog c-Satz",
+                "insertionLevel": "topstruct",
+                "required": "true",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "PPN digital c-Satz",
+                "insertionLevel": "topstruct",
+                "required": "true",
+                "source": "werk",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "PPN analog a-Satz",
+                "insertionLevel": "topstruct",
+                "required": "true",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "PPN digital a-Satz",
+                "insertionLevel": "topstruct",
+                "required": "true",
+                "source": "werk",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "PPN analog b-Satz",
+                "insertionLevel": "topstruct",
+                "required": "true",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "PPN digital b-Satz",
+                "insertionLevel": "topstruct",
+                "required": "true",
+                "source": "werk",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "ISSN",
+                "insertionLevel": "topstruct",
+                "required": "true",
+                "source": "werk",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "PPN analog Band",
+                "insertionLevel": "firstchild",
+                "required": "true",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "PPN digital Band",
+                "insertionLevel": "firstchild",
+                "required": "true",
+                "source": "werk",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "Titel (Band)",
+                "insertionLevel": "firstchild",
+                "required": "true",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "Titel (Band) (Sortierung)",
+                "insertionLevel": "firstchild",
+                "required": "true",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "Autoren (Band)",
+                "insertionLevel": "firstchild",
+                "required": "false",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "Bandnummer",
+                "insertionLevel": "firstchild",
+                "required": "false",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "Nummer (Sortierung)",
+                "insertionLevel": "firstchild",
+                "required": "false",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "Nummer (Benennung)",
+                "required": "true",
+                "source": "vorlage",
+                "ughbinding": "false"
+            },
+            {
+                "@key": "PPN analog f-Satz",
+                "insertionLevel": "firstchild",
+                "required": "true",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "PPN digital f-Satz",
+                "insertionLevel": "firstchild",
+                "required": "true",
+                "source": "werk",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "Erscheinungsort",
+                "insertionLevel": "topstruct",
+                "required": "false",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "Erscheinungsjahr",
+                "insertionLevel": "topstruct",
+                "required": "false",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "Erscheinungsjahr",
+                "insertionLevel": "firstchild",
+                "required": "false",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "Verlag",
+                "insertionLevel": "firstchild",
+                "required": "false",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "Verlag",
+                "insertionLevel": "topstruct",
+                "required": "false",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "Signatur",
+                "insertionLevel": "boundbook",
+                "required": "false",
+                "source": "vorlage",
+                "ughbinding": "true"
+            },
+            {
+                "@key": "Farbtiefe",
+                "option": [
+                    {
+                        "$": "Bitonal",
+                        "@label": "Bitonal"
+                    },
+                    {
+                        "$": "Farbe",
+                        "@label": "Farbe"
+                    },
+                    {
+                        "$": "Graustufen",
+                        "@label": "Graustufen"
+                    }
+                ],
+                "required": "true",
+                "source": "werk",
+                "ughbinding": "false"
+            },
+            {
+                "@key": "?ffnungswinkel",
+                "option": [
+                    {
+                        "$": "180?",
+                        "@label": "180?"
+                    },
+                    {
+                        "$": "90?",
+                        "@label": "90?"
+                    }
+                ],
+                "required": "true",
+                "source": "werk",
+                "ughbinding": "false"
+            }
+        ],
+        "template": [
+            {
+                "@key": "foo",
+                "collection": [
+                    "Autobiographica",
+                    "DigiWunschbuch",
+                    "Itineraria",
+                    "Manuscriptae",
+                    "Maps",
+                    "Mathematica",
+                    "Nordamericana",
+                    "Wissenschaftsgeschichte",
+                    "Sibirica",
+                    "Varia",
+                    "Zoologica"
+                ]
+            },
+            {
+                "@key": "Digitalisierungsprojekt_ars_hydr",
+                "collection": [
+                    "Autobiographica",
+                    "DigiWunschbuch",
+                    "Itineraria",
+                    "Manuscriptae",
+                    "Maps",
+                    "Mathematica",
+                    "Nordamericana",
+                    "Wissenschaftsgeschichte",
+                    "Sibirica",
+                    "Varia",
+                    "Zoologica"
+                ]
+            }
+        ]
+    }
+}

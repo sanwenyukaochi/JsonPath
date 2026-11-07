@@ -1,6 +1,7 @@
 package com.jayway.jsonpath.internal.filter;
 
 import com.jayway.jsonpath.spi.JsonProvider;
+
 import java.util.Collection;
 
 public class HasFieldFilter extends PathTokenFilter {

@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Map;
@@ -49,7 +50,8 @@ public class ComplianceTest {
                         new Double(3.14),
                         new Boolean(true),
                         (Comparable) null));
-        assertThat(JsonPath.<Boolean>read(json, "$[-1:]"), is(equalTo(null)));
+        List<Object> res = JsonPath.read(json, "$[-1:]");
+        assertTrue(res.get(0) == null);
     }
 
     @Test

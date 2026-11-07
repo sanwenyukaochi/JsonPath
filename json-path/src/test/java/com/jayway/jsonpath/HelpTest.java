@@ -66,6 +66,20 @@ public class HelpTest {
                                 "mimeType": "application/octet-stream"
                             }
                         ]
+                    },
+                    {
+                        "groupType": "series",
+                         "instanceId": "grp://15",
+                         "extra": 1,
+                         "id": "prg://16",
+                        "type": "group",
+                        "media": [
+                            {
+                                "classification": "urn:1.2.3",
+                                "uri": "http://yahoo.com/1.png",
+                                "mimeType": "application/octet-stream"
+                            }
+                        ]
                     }
                 ],
                 "header": {
@@ -75,7 +89,14 @@ public class HelpTest {
             """;
 
     @Test
-    public void sample_one_x() {
+    public void sample_one_a() {
+        System.out.println((Object) JsonPath.read(JSON2, "$.['error', 'header']"));
+        System.out.println(
+                (Object) JsonPath.read(JSON2, "$.contents[*].['groupType', 'type', 'extra']"));
+    }
+
+    @Test
+    public void sample_one_b() {
         System.out.println((Object) JsonPath.read(JSON2, "$.['error', 'header']"));
         System.out.println((Object) JsonPath.read(JSON2, "$.contents[*].['groupType', 'type']"));
     }
