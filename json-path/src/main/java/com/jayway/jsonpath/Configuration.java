@@ -1,10 +1,10 @@
 package com.jayway.jsonpath;
 
 import static com.jayway.jsonpath.internal.Utils.notNull;
+import static java.util.Arrays.asList;
 
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.json.JsonProviderFactory;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
@@ -27,6 +27,13 @@ public class Configuration {
 
     public JsonProvider getProvider() {
         return provider;
+    }
+
+    public Configuration addOptions(Option... options) {
+        EnumSet<Option> opts = EnumSet.noneOf(Option.class);
+        opts.addAll(this.options);
+        opts.addAll(asList(options));
+        return Configuration.builder().jsonProvider(provider).options(opts).build();
     }
 
     public Configuration options(Option... options) {
@@ -57,7 +64,7 @@ public class Configuration {
         }
 
         public ConfigurationBuilder options(Option... flags) {
-            this.options.addAll(Arrays.asList(flags));
+            this.options.addAll(asList(flags));
             return this;
         }
 

@@ -44,7 +44,8 @@ public class IndexResource {
 
         boolean value = "VALUE".equalsIgnoreCase(type);
 
-        return createView(json, path, value, template, new Bench(json, path, value).runAll());
+        return createView(
+                json, path, value, template, new Bench(json, path, value, true, true).runAll());
     }
 
     private Viewable createView(
