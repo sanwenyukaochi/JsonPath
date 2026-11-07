@@ -263,7 +263,11 @@ public class Criteria implements Predicate {
                 }
                 if (logger.isDebugEnabled())
                     logger.debug(
-                            "[{}] {} [{}] => {}", right.toString(), name(), left.toString(), res);
+                            "[{}] {} [{}] => {}",
+                            right == null ? "null" : right.toString(),
+                            name(),
+                            left == null ? "null" : left.toString(),
+                            res);
                 return res;
             }
 
