@@ -117,9 +117,19 @@ public class EvaluationListenerTest extends BaseTest {
                 };
 
         Configuration configuration1 = Configuration.builder().evaluationListener(listener).build();
-        Configuration configuration2 = configuration1.evaluationListener();
+        Configuration configuration2 = configuration1.setEvaluationListeners();
 
-        assertThat(configuration1.evaluationListeners()).hasSize(1);
-        assertThat(configuration2.evaluationListeners()).hasSize(0);
+        assertThat(configuration1.getEvaluationListeners()).hasSize(1);
+        assertThat(configuration2.getEvaluationListeners()).hasSize(0);
+    }
+
+    @Test
+    public void evaluation_results_can_be_limited() {
+
+        List<String> res = JsonPath.parse(JSON_DOCUMENT).limit(1).read("$..title", List.class);
+        assertThat(res).containsExactly("Sayings of the Century");
+
+        res = JsonPath.parse(JSON_DOCUMENT).limit(2).read("$..title", List.class);
+        assertThat(res).containsExactly("Sayings of the Century", "Sword of Honour");
     }
 }
