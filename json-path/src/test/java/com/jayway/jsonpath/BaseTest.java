@@ -5,8 +5,10 @@ import com.jayway.jsonpath.internal.token.PredicateContextImpl;
 import com.jayway.jsonpath.spi.json.GsonJsonProvider;
 import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
 import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
+import com.jayway.jsonpath.spi.json.JsonSmartJsonProvider;
 import com.jayway.jsonpath.spi.mapper.GsonMappingProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import com.jayway.jsonpath.spi.mapper.JsonSmartMappingProvider;
 
 import java.util.HashMap;
 
@@ -30,7 +32,10 @@ public class BaseTest {
                     .build();
 
     public static final Configuration JSON_SMART_CONFIGURATION =
-            Configuration.defaultConfiguration();
+            Configuration.builder()
+                    .mappingProvider(new JsonSmartMappingProvider())
+                    .jsonProvider(new JsonSmartJsonProvider())
+                    .build();
 
     public static final String JSON_BOOK_DOCUMENT =
 """

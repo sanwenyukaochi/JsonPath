@@ -11,5 +11,7 @@ public interface Path {
 
     boolean isDefinite();
 
+    boolean isFunctionPath();
+
     boolean isRootPath();
 }

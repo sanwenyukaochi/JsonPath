@@ -45,4 +45,8 @@ public class PathTokenFactory {
     public static PathToken createPredicatePathToken(Predicate predicate) {
         return new PredicatePathToken(predicate);
     }
+
+    public static PathToken createFunctionPathToken(String function) {
+        return new FunctionPathToken((function));
+    }
 }

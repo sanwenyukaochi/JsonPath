@@ -1,5 +1,6 @@
 package com.jayway.jsonpath.internal.token;
 
+import com.jayway.jsonpath.Function;
 import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.PathNotFoundException;
@@ -188,6 +189,15 @@ public abstract class PathToken {
     @Override
     public boolean equals(Object obj) {
         return super.equals(obj);
+    }
+
+    public void invoke(
+            Function function,
+            String currentPath,
+            PathRef parent,
+            Object model,
+            EvaluationContextImpl ctx) {
+        ctx.addResult(currentPath, parent, function.invoke(currentPath, parent, model, ctx));
     }
 
     public abstract void evaluate(
