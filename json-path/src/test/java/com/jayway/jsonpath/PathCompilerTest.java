@@ -331,4 +331,13 @@ public class PathCompilerTest {
                     compile("$['1','2',]");
                 });
     }
+
+    @Test
+    public void property_must_be_separated_by_commas() {
+        assertThrows(
+                InvalidPathException.class,
+                () -> {
+                    compile("$['aaa'}'bbb']");
+                });
+    }
 }
