@@ -57,4 +57,22 @@ public class JsonOrgJsonProviderTest extends BaseTest {
 
         assertThat(books.length()).isEqualTo(2);
     }
+
+    @Test
+    public void read_book_length() {
+        Object result =
+                using(Configuration.defaultConfiguration())
+                        .parse(JSON_BOOK_STORE_DOCUMENT)
+                        .read("$.length($..book)");
+        assertThat(result).isEqualTo(4);
+    }
+
+    @Test
+    public void read_book_length_using_translated_query() {
+        Integer result =
+                using(Configuration.defaultConfiguration())
+                        .parse(JSON_BOOK_STORE_DOCUMENT)
+                        .read("$..book.length()");
+        assertThat(result).isEqualTo(4);
+    }
 }

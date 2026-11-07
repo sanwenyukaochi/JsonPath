@@ -122,4 +122,27 @@ public class BaseTest {
         return new PredicateContextImpl(
                 check, check, Configuration.defaultConfiguration(), new HashMap<Path, Object>());
     }
+
+    public static String JSON_BOOK_STORE_DOCUMENT =
+"""
+{
+    "store": {
+        "book": [
+            {
+                "category": "reference"
+            },
+            {
+                "category": "fiction"
+            },
+            {
+                "category": "fiction"
+            },
+            {
+                "category": "fiction"
+            }
+        ]
+    },
+    "expensive": 10
+}\
+""";
 }
