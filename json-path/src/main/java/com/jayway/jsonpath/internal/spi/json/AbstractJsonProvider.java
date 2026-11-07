@@ -1,5 +1,6 @@
 package com.jayway.jsonpath.internal.spi.json;
 
+import com.jayway.jsonpath.JsonPathException;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import java.util.Collection;
 import java.util.List;
@@ -64,7 +65,7 @@ public abstract class AbstractJsonProvider implements JsonProvider {
         } else if (obj instanceof String) {
             return ((String) obj).length();
         }
-        throw new RuntimeException(
+        throw new JsonPathException(
                 "length operation can not applied to " + obj != null
                         ? obj.getClass().getName()
                         : "null");

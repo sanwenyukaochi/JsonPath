@@ -1,7 +1,7 @@
 package com.jayway.jsonpath;
 
 @SuppressWarnings("serial")
-public class InvalidJsonException extends RuntimeException {
+public class InvalidJsonException extends JsonPathException {
 
     public InvalidJsonException() {}
 
