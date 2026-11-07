@@ -427,11 +427,11 @@ public class FilterTest extends BaseTest {
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(json);
 
         List<Map<String, Object>> result =
-                JsonPath.read(doc, "$.fields[?]", filter(where("errors").notEmpty()));
+                JsonPath.read(doc, "$.fields[?]", filter(where("errors").empty(false)));
         assertEquals(1, result.size());
 
         List<Map<String, Object>> result2 =
-                JsonPath.read(doc, "$.fields[?]", filter(where("name").notEmpty()));
+                JsonPath.read(doc, "$.fields[?]", filter(where("name").empty(false)));
         assertEquals(2, result2.size());
     }
 
