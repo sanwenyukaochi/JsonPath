@@ -1,4 +1,4 @@
-package com.jayway.jsonpath.functions;
+package com.jayway.jsonpath.internal.function;
 
 import static com.jayway.jsonpath.JsonPath.using;
 import static org.assertj.core.api.Assertions.assertThat;

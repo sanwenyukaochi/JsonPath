@@ -50,8 +50,7 @@ public class PathCompilerTest {
         assertThrows(
                 InvalidPathException.class,
                 () -> {
-                    assertThat(compile("$.").toString());
-                    assertThat(compile("$.prop.").toString());
+                    compile("$.");
                 });
     }
 
@@ -60,8 +59,7 @@ public class PathCompilerTest {
         assertThrows(
                 InvalidPathException.class,
                 () -> {
-                    assertThat(compile("$..").toString());
-                    assertThat(compile("$.prop..").toString());
+                    compile("$..");
                 });
     }
 
@@ -270,5 +268,23 @@ public class PathCompilerTest {
         List<String> result = JsonPath.read(json, "$.logs[?(@.message == '] it')].message");
 
         assertThat(result).containsExactly("] it");
+    }
+
+    @Test
+    public void a_path_may_not_end_with_period_2() {
+        assertThrows(
+                InvalidPathException.class,
+                () -> {
+                    compile("$.prop.");
+                });
+    }
+
+    @Test
+    public void a_path_may_not_end_with_scan_2() {
+        assertThrows(
+                InvalidPathException.class,
+                () -> {
+                    compile("$.prop..");
+                });
     }
 }
