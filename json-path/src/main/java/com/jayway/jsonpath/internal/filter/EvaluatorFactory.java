@@ -33,6 +33,8 @@ public class EvaluatorFactory {
         evaluators.put(RelationalOperator.MATCHES, new PredicateMatchEvaluator());
         evaluators.put(RelationalOperator.TYPE, new TypeEvaluator());
         evaluators.put(RelationalOperator.SUBSETOF, new SubsetOfEvaluator());
+        evaluators.put(RelationalOperator.ANYOF, new AnyOfEvaluator());
+        evaluators.put(RelationalOperator.NONEOF, new NoneOfEvaluator());
     }
 
     public static Evaluator createEvaluator(RelationalOperator operator) {
@@ -305,6 +307,80 @@ public class EvaluatorFactory {
                 leftValueListNode = left.asValueListNode();
             }
             return leftValueListNode.subsetof(rightValueListNode);
+        }
+    }
+
+    private static class AnyOfEvaluator implements Evaluator {
+        @Override
+        public boolean evaluate(ValueNode left, ValueNode right, Predicate.PredicateContext ctx) {
+            ValueListNode rightValueListNode;
+            if (right.isJsonNode()) {
+                ValueNode vn = right.asJsonNode().asValueListNode(ctx);
+                if (vn.isUndefinedNode()) {
+                    return false;
+                } else {
+                    rightValueListNode = vn.asValueListNode();
+                }
+            } else {
+                rightValueListNode = right.asValueListNode();
+            }
+            ValueListNode leftValueListNode;
+            if (left.isJsonNode()) {
+                ValueNode vn = left.asJsonNode().asValueListNode(ctx);
+                if (vn.isUndefinedNode()) {
+                    return false;
+                } else {
+                    leftValueListNode = vn.asValueListNode();
+                }
+            } else {
+                leftValueListNode = left.asValueListNode();
+            }
+
+            for (ValueNode leftValueNode : leftValueListNode) {
+                for (ValueNode rightValueNode : rightValueListNode) {
+                    if (leftValueNode.equals(rightValueNode)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+
+    private static class NoneOfEvaluator implements Evaluator {
+        @Override
+        public boolean evaluate(ValueNode left, ValueNode right, Predicate.PredicateContext ctx) {
+            ValueListNode rightValueListNode;
+            if (right.isJsonNode()) {
+                ValueNode vn = right.asJsonNode().asValueListNode(ctx);
+                if (vn.isUndefinedNode()) {
+                    return false;
+                } else {
+                    rightValueListNode = vn.asValueListNode();
+                }
+            } else {
+                rightValueListNode = right.asValueListNode();
+            }
+            ValueListNode leftValueListNode;
+            if (left.isJsonNode()) {
+                ValueNode vn = left.asJsonNode().asValueListNode(ctx);
+                if (vn.isUndefinedNode()) {
+                    return false;
+                } else {
+                    leftValueListNode = vn.asValueListNode();
+                }
+            } else {
+                leftValueListNode = left.asValueListNode();
+            }
+
+            for (ValueNode leftValueNode : leftValueListNode) {
+                for (ValueNode rightValueNode : rightValueListNode) {
+                    if (leftValueNode.equals(rightValueNode)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
     }
 }

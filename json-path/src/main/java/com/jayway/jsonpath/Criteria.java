@@ -161,6 +161,28 @@ public class Criteria implements Predicate {
         return this;
     }
 
+    public Criteria anyof(Object... o) {
+        return subsetof(Arrays.asList(o));
+    }
+
+    public Criteria anyof(Collection<?> c) {
+        notNull(c, "collection can not be null");
+        this.criteriaType = RelationalOperator.ANYOF;
+        this.right = new ValueListNode(c);
+        return this;
+    }
+
+    public Criteria noneof(Object... o) {
+        return subsetof(Arrays.asList(o));
+    }
+
+    public Criteria noneof(Collection<?> c) {
+        notNull(c, "collection can not be null");
+        this.criteriaType = RelationalOperator.NONEOF;
+        this.right = new ValueListNode(c);
+        return this;
+    }
+
     public Criteria all(Object... o) {
         return all(Arrays.asList(o));
     }
