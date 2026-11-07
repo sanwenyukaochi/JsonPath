@@ -340,4 +340,56 @@ public class PathCompilerTest {
                     compile("$['aaa'}'bbb']");
                 });
     }
+
+    @Test
+    public void issue_predicate_can_have_double_quotes() {
+        String json =
+"""
+{
+    "logs": [
+        {
+            "message": "\\"it\\"",
+        }
+    ]
+}\
+""";
+        List<String> result = JsonPath.read(json, "$.logs[?(@.message == '\"it\"')].message");
+        assertThat(result).containsExactly("\"it\"");
+    }
+
+    @Test
+    public void issue_predicate_can_have_single_quotes() {
+        String json =
+"""
+{
+    "logs": [
+        {
+            "message": "'it'",
+        }
+    ]
+}\
+""";
+        DocumentContext parse = JsonPath.parse(json);
+        JsonPath compile = JsonPath.compile("$.logs[?(@.message == \"'it'\")].message");
+        List<String> result = parse.read(compile);
+        assertThat(result).containsExactly("'it'");
+    }
+
+    @Test
+    public void issue_predicate_can_have_single_quotes_escaped() {
+        String json =
+"""
+{
+    "logs": [
+        {
+            "message": "'it'",
+        }
+    ]
+}\
+""";
+        DocumentContext parse = JsonPath.parse(json);
+        JsonPath compile = JsonPath.compile("$.logs[?(@.message == '\\'it\\'')].message");
+        List<String> result = parse.read(compile);
+        assertThat(result).containsExactly("'it'");
+    }
 }
