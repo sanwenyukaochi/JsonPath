@@ -178,9 +178,14 @@ public class Criteria implements Predicate {
         return this;
     }
 
+    @Deprecated
     public Criteria notEmpty() {
-        this.criteriaType = RelationalOperator.NOT_EMPTY;
-        this.right = ValueNode.TRUE;
+        return empty(false);
+    }
+
+    public Criteria empty(boolean empty) {
+        this.criteriaType = RelationalOperator.EMPTY;
+        this.right = empty ? ValueNode.TRUE : ValueNode.FALSE;
         return this;
     }
 
