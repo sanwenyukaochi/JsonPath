@@ -10,12 +10,8 @@ import java.util.concurrent.Callable;
 import net.minidev.json.JSONValue;
 import net.minidev.json.writer.JsonReader;
 import net.minidev.json.writer.JsonReaderI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class JsonSmartMappingProvider implements MappingProvider {
-
-    private static final Logger logger = LoggerFactory.getLogger(JsonSmartMappingProvider.class);
 
     private static JsonReader DEFAULT = new JsonReader();
 
