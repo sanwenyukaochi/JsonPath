@@ -12,14 +12,24 @@ import java.util.regex.Pattern;
 
 public class ArrayEvalFilter extends PathTokenFilter {
 
-    private static final Pattern PATTERN =
-            Pattern.compile("\\[\\s?\\?\\(\\s?(@.*?)\\s?([!=<>]+)\\s?(.*?)\\s?\\)\\s?]");
+    private static final Pattern CONDITION_STATEMENT_PATTERN =
+            Pattern.compile("\\[\\s?\\?\\(.*?[!=<>]+.*?\\)\\s?]");
+    private static final Pattern PATTERN = Pattern.compile("\\s?(@.*?)\\s?([!=<>]+)\\s?(.*?)\\s?");
 
-    private final ConditionStatement conditionStatement;
+    private ConditionStatement[] conditionStatements;
 
-    public ArrayEvalFilter(ConditionStatement statement) {
-        super(statement.condition);
-        this.conditionStatement = statement;
+    public ArrayEvalFilter(String condition) {
+        super(condition);
+
+        condition = condition.trim();
+        condition = condition.substring(3, condition.length() - 2);
+
+        String[] split = condition.split("&&");
+
+        conditionStatements = new ConditionStatement[split.length];
+        for (int i = 0; i < split.length; i++) {
+            conditionStatements[i] = createConditionStatement(split[i]);
+        }
     }
 
     @Override
@@ -37,7 +47,7 @@ public class ArrayEvalFilter extends PathTokenFilter {
         }
         Object result = jsonProvider.createArray();
         for (Object item : src) {
-            if (isMatch(item, conditionStatement, configuration)) {
+            if (isMatch(item, configuration, conditionStatements)) {
                 jsonProvider.setProperty(result, jsonProvider.length(result), item);
             }
         }
@@ -55,19 +65,32 @@ public class ArrayEvalFilter extends PathTokenFilter {
     }
 
     private boolean isMatch(
-            Object check, ConditionStatement conditionStatement, Configuration configuration) {
+            Object check, Configuration configuration, ConditionStatement... conditionStatements) {
         try {
-            Object value =
-                    conditionStatement.path.read(
-                            check, configuration.options(Option.THROW_ON_MISSING_PROPERTY));
-            return ExpressionEvaluator.eval(
-                    value, conditionStatement.getOperator(), conditionStatement.getExpected());
+            for (ConditionStatement conditionStatement : conditionStatements) {
+                Object value =
+                        conditionStatement.path.read(
+                                check, configuration.options(Option.THROW_ON_MISSING_PROPERTY));
+                boolean match =
+                        ExpressionEvaluator.eval(
+                                value,
+                                conditionStatement.getOperator(),
+                                conditionStatement.getExpected());
+                if (!match) {
+                    return false;
+                }
+            }
+            return true;
         } catch (PathNotFoundException e) {
             return false;
         } catch (RuntimeException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    static boolean isConditionStatement(String condition) {
+        return CONDITION_STATEMENT_PATTERN.matcher(condition).matches();
     }
 
     static ConditionStatement createConditionStatement(String condition) {

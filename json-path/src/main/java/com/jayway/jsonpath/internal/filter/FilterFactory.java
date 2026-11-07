@@ -42,10 +42,8 @@ public class FilterFactory {
         } else if (pathFragment.contains("[")) {
 
             if (pathFragment.startsWith("[?")) {
-                ArrayEvalFilter.ConditionStatement conditionStatement =
-                        ArrayEvalFilter.createConditionStatement(pathFragment);
-                if (conditionStatement != null) {
-                    return new ArrayEvalFilter(conditionStatement);
+                if (ArrayEvalFilter.isConditionStatement(pathFragment)) {
+                    return new ArrayEvalFilter(pathFragment);
                 } else if (!pathFragment.contains("=")
                         && !pathFragment.contains("<")
                         && !pathFragment.contains(">")) {
