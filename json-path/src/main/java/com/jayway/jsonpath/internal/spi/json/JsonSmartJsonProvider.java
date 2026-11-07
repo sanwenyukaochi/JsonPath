@@ -4,6 +4,7 @@ import com.jayway.jsonpath.InvalidJsonException;
 import com.jayway.jsonpath.spi.json.Mode;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 import net.minidev.json.JSONArray;
@@ -40,11 +41,13 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
     }
 
     @Override
-    public Object parse(InputStream jsonStream) throws InvalidJsonException {
+    public Object parse(InputStream jsonStream, String charset) throws InvalidJsonException {
         try {
-            return createParser().parse(new InputStreamReader(jsonStream), orderedMapper);
+            return createParser().parse(new InputStreamReader(jsonStream, charset), orderedMapper);
         } catch (ParseException e) {
             throw new InvalidJsonException(e);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
         }
     }
 
