@@ -269,7 +269,7 @@ public class PathCompiler {
                     continue;
                 }
 
-                if (c == OPEN_BRACE || isDigit(c) || DOUBLE_QUOTE == c) {
+                if (c == OPEN_BRACE || isDigit(c) || DOUBLE_QUOTE == c || MINUS == c) {
                     type = ParamType.JSON;
                 } else if (isPathContext(c)) {
                     type = ParamType.PATH;
