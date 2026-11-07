@@ -261,4 +261,22 @@ public class FilterParseTest {
 
         assertThat(filter).isEqualTo(parsed);
     }
+
+    @Test
+    public void a_anyof_filter_can_be_serialized() {
+
+        String filter = filter(where("a").anyof(Collections.emptyList())).toString();
+        String parsed = parse("[?(@['a'] ANYOF [])]").toString();
+
+        assertThat(filter).isEqualTo(parsed);
+    }
+
+    @Test
+    public void a_noneof_filter_can_be_serialized() {
+
+        String filter = filter(where("a").noneof(Collections.emptyList())).toString();
+        String parsed = parse("[?(@['a'] NONEOF [])]").toString();
+
+        assertThat(filter).isEqualTo(parsed);
+    }
 }
