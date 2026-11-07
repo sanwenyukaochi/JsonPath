@@ -12,7 +12,6 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.jayway.jsonpath.InvalidPathException;
 import java.io.InputStream;
 import org.junit.jupiter.api.Test;
 
@@ -205,10 +204,35 @@ public class JsonAssertTest {
     @Test
     public void assert_that_invalid_path_is_thrown() {
         assertThrows(
-                InvalidPathException.class,
+                AssertionError.class,
                 () -> {
                     JsonAsserter asserter = JsonAssert.with("{\"foo\":\"bar\"}");
                     asserter.assertEquals("$foo", "bar");
+                });
+    }
+
+    @Test
+    public void testAssertEqualsInteger() throws Exception {
+        with(getResourceAsStream("lotto.json")).assertEquals("lotto.winners[0].winnerId", 23);
+    }
+
+    @Test
+    public void testAssertEqualsIntegerInvalidExpected() throws Exception {
+        assertThrows(
+                AssertionError.class,
+                () -> {
+                    with(getResourceAsStream("lotto.json"))
+                            .assertEquals("lotto.winners[0].winnerId", 24);
+                });
+    }
+
+    @Test
+    public void testAssertEqualsIntegerInvalidField() throws Exception {
+        assertThrows(
+                AssertionError.class,
+                () -> {
+                    with(getResourceAsStream("lotto.json"))
+                            .assertEquals("lotto.winners[0].winnerId1", 24);
                 });
     }
 }

@@ -21,7 +21,14 @@ public class JsonAsserterImpl implements JsonAsserter {
 
     @SuppressWarnings("unchecked")
     public <T> JsonAsserter assertThat(String path, Matcher<T> matcher) {
-        T obj = JsonPath.<T>read(jsonObject, path);
+        T obj = null;
+
+        try {
+            obj = JsonPath.<T>read(jsonObject, path);
+        } catch (Exception e) {
+            throw new AssertionError(String.format("Error reading JSON path [%s]", path), e);
+        }
+
         if (!matcher.matches(obj)) {
 
             throw new AssertionError(
@@ -51,7 +58,6 @@ public class JsonAsserterImpl implements JsonAsserter {
     public JsonAsserter assertNotDefined(String path) {
 
         try {
-
             Configuration c = Configuration.defaultConfiguration();
 
             JsonPath.using(c).parse(jsonObject).read(path);
@@ -65,7 +71,6 @@ public class JsonAsserterImpl implements JsonAsserter {
     @Override
     public JsonAsserter assertNotDefined(String path, String message) {
         try {
-
             Configuration c = Configuration.defaultConfiguration();
 
             JsonPath.using(c).parse(jsonObject).read(path);
