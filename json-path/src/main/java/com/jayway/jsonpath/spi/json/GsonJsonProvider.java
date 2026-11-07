@@ -1,7 +1,6 @@
 package com.jayway.jsonpath.spi.json;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -22,14 +21,23 @@ import java.util.Map;
 
 public class GsonJsonProvider extends AbstractJsonProvider {
 
-    private static final JsonParser parser = new JsonParser();
-    private static final Gson gson = new GsonBuilder().create();
+    private static final JsonParser PARSER = new JsonParser();
+    private final Gson gson;
 
-    public Object unwrap(Object o) {
+    public GsonJsonProvider() {
+        this(new Gson());
+    }
+
+    public GsonJsonProvider(final Gson gson) {
+        this.gson = gson;
+    }
+
+    public Object unwrap(final Object o) {
 
         if (o == null) {
             return null;
         }
+
         if (!(o instanceof JsonElement)) {
             return o;
         }
@@ -49,10 +57,11 @@ public class GsonJsonProvider extends AbstractJsonProvider {
                 return unwrapNumber(p.getAsNumber());
             }
         }
+
         return o;
     }
 
-    private static Number unwrapNumber(Number n) {
+    private static Number unwrapNumber(final Number n) {
         Number unwrapped;
 
         if (n instanceof LazilyParsedNumber) {
@@ -70,27 +79,29 @@ public class GsonJsonProvider extends AbstractJsonProvider {
         } else {
             unwrapped = n;
         }
+
         return unwrapped;
     }
 
     @Override
-    public Object parse(String json) throws InvalidJsonException {
-        return parser.parse(json);
+    public Object parse(final String json) throws InvalidJsonException {
+        return PARSER.parse(json);
     }
 
     @Override
-    public Object parse(InputStream jsonStream, String charset) throws InvalidJsonException {
+    public Object parse(final InputStream jsonStream, final String charset)
+            throws InvalidJsonException {
 
         try {
-            return parser.parse(new InputStreamReader(jsonStream, charset));
+            return PARSER.parse(new InputStreamReader(jsonStream, charset));
         } catch (UnsupportedEncodingException e) {
             throw new JsonPathException(e);
         }
     }
 
     @Override
-    public String toJson(Object obj) {
-        return obj.toString();
+    public String toJson(final Object obj) {
+        return gson.toJson(obj);
     }
 
     @Override
@@ -104,17 +115,17 @@ public class GsonJsonProvider extends AbstractJsonProvider {
     }
 
     @Override
-    public boolean isArray(Object obj) {
+    public boolean isArray(final Object obj) {
         return (obj instanceof JsonArray || obj instanceof List);
     }
 
     @Override
-    public Object getArrayIndex(Object obj, int idx) {
+    public Object getArrayIndex(final Object obj, final int idx) {
         return toJsonArray(obj).get(idx);
     }
 
     @Override
-    public void setArrayIndex(Object array, int index, Object newValue) {
+    public void setArrayIndex(final Object array, final int index, final Object newValue) {
         if (!isArray(array)) {
             throw new UnsupportedOperationException();
         } else {
@@ -128,7 +139,7 @@ public class GsonJsonProvider extends AbstractJsonProvider {
     }
 
     @Override
-    public Object getMapValue(Object obj, String key) {
+    public Object getMapValue(final Object obj, final String key) {
         JsonObject jsonObject = toJsonObject(obj);
         Object o = jsonObject.get(key);
         if (!jsonObject.has(key)) {
@@ -139,9 +150,10 @@ public class GsonJsonProvider extends AbstractJsonProvider {
     }
 
     @Override
-    public void setProperty(Object obj, Object key, Object value) {
-        if (isMap(obj)) toJsonObject(obj).add(key.toString(), createJsonElement(value));
-        else {
+    public void setProperty(final Object obj, final Object key, final Object value) {
+        if (isMap(obj)) {
+            toJsonObject(obj).add(key.toString(), createJsonElement(value));
+        } else {
             JsonArray array = toJsonArray(obj);
             int index;
             if (key != null) {
@@ -149,6 +161,7 @@ public class GsonJsonProvider extends AbstractJsonProvider {
             } else {
                 index = array.size();
             }
+
             if (index == array.size()) {
                 array.add(createJsonElement(value));
             } else {
@@ -158,9 +171,10 @@ public class GsonJsonProvider extends AbstractJsonProvider {
     }
 
     @SuppressWarnings("unchecked")
-    public void removeProperty(Object obj, Object key) {
-        if (isMap(obj)) toJsonObject(obj).remove(key.toString());
-        else {
+    public void removeProperty(final Object obj, final Object key) {
+        if (isMap(obj)) {
+            toJsonObject(obj).remove(key.toString());
+        } else {
             JsonArray array = toJsonArray(obj);
             int index = key instanceof Integer ? (Integer) key : Integer.parseInt(key.toString());
             array.remove(index);
@@ -168,22 +182,23 @@ public class GsonJsonProvider extends AbstractJsonProvider {
     }
 
     @Override
-    public boolean isMap(Object obj) {
+    public boolean isMap(final Object obj) {
 
         return (obj instanceof JsonObject);
     }
 
     @Override
-    public Collection<String> getPropertyKeys(Object obj) {
+    public Collection<String> getPropertyKeys(final Object obj) {
         List<String> keys = new ArrayList<String>();
         for (Map.Entry<String, JsonElement> entry : toJsonObject(obj).entrySet()) {
             keys.add(entry.getKey());
         }
+
         return keys;
     }
 
     @Override
-    public int length(Object obj) {
+    public int length(final Object obj) {
         if (isArray(obj)) {
             return toJsonArray(obj).size();
         } else if (isMap(obj)) {
@@ -196,6 +211,7 @@ public class GsonJsonProvider extends AbstractJsonProvider {
                 }
             }
         }
+
         throw new JsonPathException(
                 "length operation can not applied to " + obj != null
                         ? obj.getClass().getName()
@@ -203,28 +219,29 @@ public class GsonJsonProvider extends AbstractJsonProvider {
     }
 
     @Override
-    public Iterable<?> toIterable(Object obj) {
+    public Iterable<?> toIterable(final Object obj) {
         JsonArray arr = toJsonArray(obj);
         List<Object> values = new ArrayList<Object>(arr.size());
         for (Object o : arr) {
             values.add(unwrap(o));
         }
+
         return values;
     }
 
-    private JsonElement createJsonElement(Object o) {
+    private JsonElement createJsonElement(final Object o) {
         return gson.toJsonTree(o);
     }
 
-    private JsonArray toJsonArray(Object o) {
+    private JsonArray toJsonArray(final Object o) {
         return (JsonArray) o;
     }
 
-    private JsonObject toJsonObject(Object o) {
+    private JsonObject toJsonObject(final Object o) {
         return (JsonObject) o;
     }
 
-    private JsonElement toJsonElement(Object o) {
+    private JsonElement toJsonElement(final Object o) {
         return (JsonElement) o;
     }
 }
