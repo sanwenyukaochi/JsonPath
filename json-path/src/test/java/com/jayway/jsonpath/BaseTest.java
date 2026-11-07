@@ -2,7 +2,9 @@ package com.jayway.jsonpath;
 
 import com.jayway.jsonpath.internal.Path;
 import com.jayway.jsonpath.internal.spi.json.GsonJsonProvider;
+import com.jayway.jsonpath.internal.spi.json.JacksonJsonProvider;
 import com.jayway.jsonpath.internal.spi.mapper.GsonMappingProvider;
+import com.jayway.jsonpath.internal.spi.mapper.JacksonMappingProvider;
 import com.jayway.jsonpath.internal.token.PredicateContextImpl;
 
 import java.util.HashMap;
@@ -12,6 +14,12 @@ public class BaseTest {
             Configuration.builder()
                     .mappingProvider(new GsonMappingProvider())
                     .jsonProvider(new GsonJsonProvider())
+                    .build();
+
+    public static final Configuration JACKSON_CONFIGURATION =
+            Configuration.builder()
+                    .mappingProvider(new JacksonMappingProvider())
+                    .jsonProvider(new JacksonJsonProvider())
                     .build();
 
     public static final String JSON_DOCUMENT =
