@@ -9,5 +9,5 @@ public enum Option {
 
     SUPPRESS_EXCEPTIONS,
 
-    REQUIRE_PATH_PROPERTIES
+    REQUIRE_PROPERTIES
 }
