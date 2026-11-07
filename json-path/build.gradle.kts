@@ -3,7 +3,7 @@ plugins {
 }
 
 description = "Java DSL for easy testing and reading of JSON data"
-version = "1.2.0-SNAPSHOT"
+version = "1.2.0"
 
 dependencies {
     compileOnly("tools.jackson.core:jackson-databind")
