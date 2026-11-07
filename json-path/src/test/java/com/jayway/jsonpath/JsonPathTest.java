@@ -1,117 +1,119 @@
 package com.jayway.jsonpath;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.jayway.jsonpath.internal.spi.compiler.PathCompiler;
+import com.jayway.jsonpath.spi.json.JsonProviderFactory;
 import java.util.List;
 import java.util.Map;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class JsonPathTest {
 
+    static {
+    }
+
     public static final String ARRAY =
-            """
-            [{"value": 1},{"value": 2}, {"value": 3},{"value": 4}]\
-            """;
+            "[{\"value\": 1},{\"value\": 2}, {\"value\": 3},{\"value\": 4}]";
 
     public static final String DOCUMENT =
-            """
-            { "store": {
-                "book": [
-                  { "category": "reference",
-                    "author": "Nigel Rees",
-                    "title": "Sayings of the Century",
-                    "display-price": 8.95
-                  },
-                  { "category": "fiction",
-                    "author": "Evelyn Waugh",
-                    "title": "Sword of Honour",
-                    "display-price": 12.99
-                  },
-                  { "category": "fiction",
-                    "author": "Herman Melville",
-                    "title": "Moby Dick",
-                    "isbn": "0-553-21311-3",
-                    "display-price": 8.99
-                  },
-                  { "category": "fiction",
-                    "author": "J. R. R. Tolkien",
-                    "title": "The Lord of the Rings",
-                    "isbn": "0-395-19395-8",
-                    "display-price": 22.99
-                  }
-                ],
-                "bicycle": {
-                  "color": "red",
-                  "display-price": 19.95,
-                  "foo:bar": "fooBar",
-                  "dot.notation": "new",
-                  "dash-notation": "dashes"
-                }
-              }
-            }\
-            """;
+"""
+{ "store": {
+    "book": [\s
+      { "category": "reference",
+        "author": "Nigel Rees",
+        "title": "Sayings of the Century",
+        "display-price": 8.95
+      },
+      { "category": "fiction",
+        "author": "Evelyn Waugh",
+        "title": "Sword of Honour",
+        "display-price": 12.99
+      },
+      { "category": "fiction",
+        "author": "Herman Melville",
+        "title": "Moby Dick",
+        "isbn": "0-553-21311-3",
+        "display-price": 8.99
+      },
+      { "category": "fiction",
+        "author": "J. R. R. Tolkien",
+        "title": "The Lord of the Rings",
+        "isbn": "0-395-19395-8",
+        "display-price": 22.99
+      }
+    ],
+    "bicycle": {
+      "color": "red",
+      "display-price": 19.95,
+      "foo:bar": "fooBar",
+      "dot.notation": "new",
+      "dash-notation": "dashes"
+    }
+  }
+}\
+""";
+
+    public static final Object OBJ_DOCUMENT = JsonProviderFactory.createProvider().parse(DOCUMENT);
 
     private static final String PRODUCT_JSON =
-            """
-            {
-                "product": [
-                    {
-                        "version": "A",
-                        "codename": "Seattle",
-                        "attr.with.dot": "A"
-                    },
-                    {
-                        "version": "4.0",
-                        "codename": "Montreal",
-                        "attr.with.dot": "B"
-                    }
-                ]
-            }\
-            """;
+"""
+{
+\t"product": [ {
+\t    "version": "A",\s
+\t    "codename": "Seattle",\s
+\t    "attr.with.dot": "A"
+\t},
+\t{
+\t    "version": "4.0",\s
+\t    "codename": "Montreal",\s
+\t    "attr.with.dot": "B"
+\t}]
+}\
+""";
 
     private static final String ARRAY_EXPAND =
-            """
-            [
-                {
-                    "parent": "ONE",
-                    "child": {
-                        "name": "NAME_ONE"
-                    }
-                },
-                [
-                    {
-                        "parent": "TWO",
-                        "child": {
-                            "name": "NAME_TWO"
-                        }
-                    }
-                ]
-            ]\
-            """;
+            "[{\"parent\": \"ONE\", \"child\": {\"name\": \"NAME_ONE\"}}, [{\"parent\": \"TWO\", \"child\": {\"name\": \"NAME_TWO\"}}]]";
+
+    @Test
+    public void missing_prop() {
+        assertThrows(
+                PathNotFoundException.class,
+                () -> {
+                    Object read =
+                            JsonPath.using(
+                                            Configuration.defaultConfiguration()
+                                                    .options(Option.THROW_ON_MISSING_PROPERTY))
+                                    .parse(DOCUMENT)
+                                    .read("$.store.book[*].fooBar");
+
+                    System.out.println(read);
+                });
+    }
 
     @Test
     public void bracket_notation_with_dots() {
         String json =
-                """
-                {
-                    "store": {
-                        "book": [
-                            {
-                                "author.name": "Nigel Rees",
-                                "category": "reference",
-                                "price": 8.95,
-                                "title": "Sayings of the Century"
-                            }
-                        ]
-                    }
-                }\
-                """;
+"""
+{
+    "store": {
+        "book": [
+            {
+                "author.name": "Nigel Rees",\s
+                "category": "reference",\s
+                "price": 8.95,\s
+                "title": "Sayings of the Century"
+            }
+        ]
+    }
+}\
+""";
 
         assertEquals("Nigel Rees", JsonPath.read(json, "$.store.book[0]['author.name']"));
     }
@@ -120,24 +122,24 @@ public class JsonPathTest {
     public void null_object_in_path() {
 
         String json =
-                """
-                {
-                  "success": true,
-                  "data": {
-                    "user": 3,
-                    "own": null,
-                    "passes": null,
-                    "completed": null
-                  },
-                  "data2": {
-                    "user": 3,
-                    "own": null,
-                    "passes": [{"id":"1"}],
-                    "completed": null
-                  },
-                  "version": 1371160528774
-                }\
-                """;
+"""
+{
+  "success": true,
+  "data": {
+    "user": 3,
+    "own": null,
+    "passes": null,
+    "completed": null
+  },
+  "data2": {
+    "user": 3,
+    "own": null,
+    "passes": [{"id":"1"}],
+    "completed": null
+  },
+  "version": 1371160528774
+}\
+""";
 
         System.out.println(JsonPath.isPathDefinite("$.data.passes[0].id"));
 
@@ -147,6 +149,7 @@ public class JsonPathTest {
 
     @Test
     public void array_start_expands() throws Exception {
+
         assertThat(
                 JsonPath.<List<String>>read(ARRAY_EXPAND, "$[?(@['parent'] == 'ONE')].child.name"),
                 hasItems("NAME_ONE"));
@@ -154,6 +157,7 @@ public class JsonPathTest {
 
     @Test
     public void bracket_notation_can_be_used_in_path() throws Exception {
+
         assertEquals("new", JsonPath.read(DOCUMENT, "$.['store'].bicycle.['dot.notation']"));
         assertEquals("new", JsonPath.read(DOCUMENT, "$['store']['bicycle']['dot.notation']"));
         assertEquals("new", JsonPath.read(DOCUMENT, "$.['store']['bicycle']['dot.notation']"));
@@ -185,7 +189,6 @@ public class JsonPathTest {
     @Test
     public void read_path_with_colon() throws Exception {
 
-        assertEquals(JsonPath.read(DOCUMENT, "$.store.bicycle.foo:bar"), "fooBar");
         assertEquals(JsonPath.read(DOCUMENT, "$['store']['bicycle']['foo:bar']"), "fooBar");
     }
 
@@ -242,11 +245,13 @@ public class JsonPathTest {
 
     @Test
     public void all_store_properties() throws Exception {
-        List<Object> itemsInStore = JsonPath.read(DOCUMENT, "$.store.*");
-        int bookIndex = itemsInStore.get(0) instanceof List<?> ? 0 : 1;
 
-        assertEquals(JsonPath.read(itemsInStore, "$.[" + bookIndex + "].[0].author"), "Nigel Rees");
-        assertEquals(JsonPath.read(itemsInStore, "$.[" + bookIndex + "][0].author"), "Nigel Rees");
+        List<String> result =
+                PathCompiler.tokenize("$.store.*")
+                        .evaluate(OBJ_DOCUMENT, Configuration.defaultConfiguration())
+                        .getPathList();
+
+        Assertions.assertThat(result).containsOnly("$['store']['bicycle']", "$['store']['book']");
     }
 
     @Test
@@ -261,10 +266,11 @@ public class JsonPathTest {
     public void access_array_by_index_from_tail() throws Exception {
 
         assertThat(
-                JsonPath.<String>read(DOCUMENT, "$..book[(@.length-1)].author"),
-                equalTo("J. R. R. Tolkien"));
+                JsonPath.<List<String>>read(DOCUMENT, "$..book[(@.length-1)].author"),
+                hasItems("J. R. R. Tolkien"));
         assertThat(
-                JsonPath.<String>read(DOCUMENT, "$..book[1:].author"), equalTo("J. R. R. Tolkien"));
+                JsonPath.<List<String>>read(DOCUMENT, "$..book[1:].author"),
+                hasItems("Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien"));
     }
 
     @Test

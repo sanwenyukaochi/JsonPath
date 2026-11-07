@@ -2,8 +2,8 @@ package com.jayway.jsonpath;
 
 import static com.jayway.jsonpath.internal.Utils.notNull;
 
-import com.jayway.jsonpath.spi.JsonProvider;
-import com.jayway.jsonpath.spi.JsonProviderFactory;
+import com.jayway.jsonpath.spi.json.JsonProvider;
+import com.jayway.jsonpath.spi.json.JsonProviderFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -12,13 +12,13 @@ import java.util.Set;
 public class Configuration {
 
     private final JsonProvider provider;
-    private final EnumSet<Option> options;
+    private final Set<Option> options;
 
     private Configuration(JsonProvider provider, EnumSet<Option> options) {
         notNull(provider, "provider can not be null");
         notNull(options, "options can not be null");
         this.provider = provider;
-        this.options = options;
+        this.options = Collections.unmodifiableSet(options);
     }
 
     public Configuration provider(JsonProvider provider) {

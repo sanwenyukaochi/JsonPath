@@ -1,6 +1,12 @@
 package com.jayway.jsonpath.internal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class JsonFormatter {
+
+    private static final Logger logger = LoggerFactory.getLogger(JsonFormatter.class);
+
     private static final String INDENT = "   ";
 
     private static final String NEW_LINE = System.getProperty("line.separator");
@@ -11,11 +17,21 @@ public class JsonFormatter {
 
     private static boolean isEscaped(StringBuilder sb, int index) {
         boolean escaped = false;
-        while (index > 0 && sb.charAt(--index) == '\\') escaped = !escaped;
+        int idx = Math.min(index, sb.length());
+        try {
+            while (idx > 0 && sb.charAt(--idx) == '\\') {
+                escaped = !escaped;
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to check escaped ", e);
+        }
         return escaped;
     }
 
     public static String prettyPrint(String input) {
+
+        input = input.replaceAll("[\\r\\n]", "");
+
         StringBuilder output = new StringBuilder(input.length() * 2);
         boolean quoteOpened = false;
         int depth = 0;

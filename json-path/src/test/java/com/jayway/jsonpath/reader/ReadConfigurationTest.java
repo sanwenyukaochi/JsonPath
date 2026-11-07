@@ -3,13 +3,16 @@ package com.jayway.jsonpath.reader;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
-import com.jayway.jsonpath.spi.JsonProvider;
-import com.jayway.jsonpath.spi.JsonProviderFactory;
+import com.jayway.jsonpath.spi.json.JsonProvider;
+import com.jayway.jsonpath.spi.json.JsonProviderFactory;
+
+import org.junit.jupiter.api.Test;
 
 public class ReadConfigurationTest {
 
     private static JsonProvider provider = JsonProviderFactory.createProvider();
 
+    @Test
     public void fluent() {
 
         Configuration configuration = Configuration.defaultConfiguration();

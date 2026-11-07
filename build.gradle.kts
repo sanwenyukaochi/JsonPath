@@ -113,6 +113,7 @@ subprojects {
             add("implementation", "net.minidev:json-smart:2.6.1")
             add("implementation", "tools.jackson.core:jackson-databind:3.2.4")
             add("api", "org.hamcrest:hamcrest-library:3.0")
+            add("testImplementation", "org.assertj:assertj-core:3.27.7")
             add("testImplementation", "commons-io:commons-io:2.22.0")
             add("implementation", "org.slf4j:slf4j-api:2.0.20")
             add("testImplementation", "org.slf4j:slf4j-simple:2.0.20")
@@ -125,6 +126,7 @@ subprojects {
         add("implementation", "org.slf4j:slf4j-api")
         add("testImplementation", "org.slf4j:slf4j-simple")
         add("testImplementation", "org.hamcrest:hamcrest-library")
+        add("testImplementation", "org.assertj:assertj-core")
         add("testImplementation", "org.junit.jupiter:junit-jupiter")
         add("testRuntimeOnly", "org.junit.platform:junit-platform-launcher")
     }

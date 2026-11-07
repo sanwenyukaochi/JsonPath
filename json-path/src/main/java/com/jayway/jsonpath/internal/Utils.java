@@ -12,8 +12,39 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class Utils {
+
+    public static final String CR = System.getProperty("line.separator");
+
+    public static List<Integer> createRange(int start, int end) {
+        List<Integer> range = new ArrayList<Integer>();
+        for (int i = start; i < end; i++) {
+            range.add(i);
+        }
+        return range;
+    }
+
+    public static String join(String delimiter, String wrap, Iterable<? extends Object> objs) {
+        Iterator<? extends Object> iter = objs.iterator();
+        if (!iter.hasNext()) {
+            return "";
+        }
+
+        StringBuilder buffer = new StringBuilder();
+        buffer.append(wrap).append(iter.next()).append(wrap);
+        while (iter.hasNext()) {
+            buffer.append(delimiter).append(wrap).append(iter.next()).append(wrap);
+        }
+        return buffer.toString();
+    }
+
+    public static String join(String delimiter, Iterable<? extends Object> objs) {
+        return join(delimiter, "", objs);
+    }
 
     public static void closeQuietly(Closeable closeable) {
         try {
@@ -22,6 +53,32 @@ public class Utils {
             }
         } catch (IOException ignore) {
         }
+    }
+
+    public static boolean isInt(String str) {
+        if (str == null) {
+            return false;
+        }
+        int sz = str.length();
+        for (int i = 0; i < sz; i++) {
+            if (Character.isDigit(str.charAt(i)) == false) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isNumeric(String str) {
+        if (str == null) {
+            return false;
+        }
+        int sz = str.length();
+        for (int i = 0; i < sz; i++) {
+            if (Character.isDigit(str.charAt(i)) == false && !(str.charAt(i) == '.')) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static boolean isEmpty(CharSequence cs) {

@@ -6,8 +6,10 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.jayway.jsonassert.JsonAsserter;
-import com.jayway.jsonpath.InvalidPathException;
+import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.PathNotFoundException;
 import org.hamcrest.Matcher;
 
 public class JsonAsserterImpl implements JsonAsserter {
@@ -50,10 +52,14 @@ public class JsonAsserterImpl implements JsonAsserter {
     public JsonAsserter assertNotDefined(String path) {
 
         try {
-            Object o = JsonPath.read(jsonObject, path);
+
+            Configuration c =
+                    Configuration.builder().options(Option.THROW_ON_MISSING_PROPERTY).build();
+
+            JsonPath.using(c).parse(jsonObject).read(path);
             throw new AssertionError(
                     format("Document contains the path <%s> but was expected not to.", path));
-        } catch (InvalidPathException e) {
+        } catch (PathNotFoundException e) {
         }
         return this;
     }
@@ -61,10 +67,15 @@ public class JsonAsserterImpl implements JsonAsserter {
     @Override
     public JsonAsserter assertNotDefined(String path, String message) {
         try {
-            Object o = JsonPath.read(jsonObject, path);
+
+            Configuration c =
+                    Configuration.builder().options(Option.THROW_ON_MISSING_PROPERTY).build();
+
+            JsonPath.using(c).parse(jsonObject).read(path);
+
             throw new AssertionError(
                     format("Document contains the path <%s> but was expected not to.", path));
-        } catch (InvalidPathException e) {
+        } catch (PathNotFoundException e) {
         }
         return this;
     }

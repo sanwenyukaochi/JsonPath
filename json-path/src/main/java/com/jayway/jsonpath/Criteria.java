@@ -1,16 +1,20 @@
 package com.jayway.jsonpath;
 
+import static com.jayway.jsonpath.internal.Utils.isNumeric;
 import static com.jayway.jsonpath.internal.Utils.notNull;
 import static java.util.Arrays.asList;
 
 import com.jayway.jsonpath.internal.Utils;
+import com.jayway.jsonpath.internal.spi.compiler.PathCompiler;
+import com.jayway.jsonpath.spi.compiler.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class Criteria {
@@ -34,7 +38,7 @@ public class Criteria {
 
     private static final Object NOT_SET = new Object();
 
-    private final JsonPath key;
+    private final Path key;
 
     private final List<Criteria> criteriaChain;
 
@@ -47,37 +51,42 @@ public class Criteria {
         Utils.notEmpty(key, "key can not be null or empty");
         this.criteriaChain = new ArrayList<Criteria>();
         this.criteriaChain.add(this);
-        this.key = JsonPath.compile(key);
+        this.key = PathCompiler.tokenize(key);
+    }
+
+    private Criteria(Path path) {
+        Utils.notNull(path, "path can not be null");
+        this.criteriaChain = new ArrayList<Criteria>();
+        this.criteriaChain.add(this);
+        this.key = path;
     }
 
     private Criteria(List<Criteria> criteriaChain, String key) {
         Utils.notEmpty(key, "key can not be null or empty");
         this.criteriaChain = criteriaChain;
+
         this.criteriaChain.add(this);
-        this.key = JsonPath.compile(key);
+
+        this.key = PathCompiler.tokenize(key);
     }
 
-    JsonPath getKey() {
+    Path getKey() {
         return this.key;
     }
 
-    boolean matches(Map<String, Object> map, Configuration configuration) {
-
-        if (this.criteriaChain.size() == 1) {
-            return criteriaChain.get(0).singleObjectApply(map, configuration);
-        } else {
-            for (Criteria c : this.criteriaChain) {
-                if (!c.singleObjectApply(map, configuration)) {
-                    return false;
-                }
+    boolean matches(Object map, Configuration configuration) {
+        for (Criteria c : this.criteriaChain) {
+            if (!c.singleObjectApply(map, configuration)) {
+                return false;
             }
-            return true;
         }
+        return true;
     }
 
-    private static Object readSafely(JsonPath path, Map<String, Object> map) {
+    private static Object readSafely(Path path, Object map) {
         try {
-            return path.read(map);
+            return path.evaluate(map, Configuration.defaultConfiguration()).get();
+
         } catch (InvalidPathException e) {
             return null;
         }
@@ -97,7 +106,7 @@ public class Criteria {
         return predicate.accept((T) singleObjectOrCollection);
     }
 
-    boolean singleObjectApply(Map<String, Object> map, final Configuration configuration) {
+    private boolean singleObjectApply(Object map, final Configuration configuration) {
 
         for (CriteriaType key : this.criteria.keySet()) {
 
@@ -231,7 +240,9 @@ public class Criteria {
                 return !empty;
 
             } else if (CriteriaType.EXISTS.equals(key)) {
-
+                if (configuration.getProvider().isArray(map)) {
+                    return false;
+                }
                 final boolean exp = (Boolean) expectedVal;
                 return objectOrAnyCollectionItemMatches(
                         map,
@@ -241,15 +252,24 @@ public class Criteria {
                                 boolean act = true;
                                 Object res;
                                 try {
-                                    res =
-                                            getKey().read(
-                                                            value,
-                                                            configuration.options(
-                                                                    Option
-                                                                            .THROW_ON_MISSING_PROPERTY));
+                                    Set<Option> options =
+                                            new HashSet<Option>() {
+                                                {
+                                                    add(Option.THROW_ON_MISSING_PROPERTY);
+                                                }
+                                            };
 
+                                    res =
+                                            getKey().evaluate(
+                                                            value,
+                                                            Configuration.defaultConfiguration()
+                                                                    .options(
+                                                                            Option
+                                                                                    .THROW_ON_MISSING_PROPERTY))
+                                                    .get();
                                     if (configuration.getProvider().isArray(res)) {
-                                        if (getKey().isPathDefinite()) {
+
+                                        if (getKey().isDefinite()) {
                                             act = true;
                                         } else {
                                             act = (configuration.getProvider().length(res) > 0);
@@ -329,6 +349,10 @@ public class Criteria {
 
         }
         return true;
+    }
+
+    public static Criteria where(Path key) {
+        return new Criteria(key);
     }
 
     public static Criteria where(String key) {
@@ -419,9 +443,9 @@ public class Criteria {
         return this;
     }
 
-    public Criteria size(int s) {
+    public Criteria size(int size) {
         checkFilterCanBeApplied(CriteriaType.SIZE);
-        criteria.put(CriteriaType.SIZE, s);
+        criteria.put(CriteriaType.SIZE, size);
         return this;
     }
 
@@ -448,13 +472,53 @@ public class Criteria {
         return this;
     }
 
+    public Criteria matches(String operator, String expected) {
+        Object check;
+
+        if (expected.startsWith("'") && expected.endsWith("'")) {
+            check = expected.substring(1, expected.length() - 1);
+        } else if ("true".equals(expected)) {
+            check = Boolean.TRUE;
+        } else if ("false".equals(expected)) {
+            check = Boolean.FALSE;
+        } else if ("null".equals(expected)) {
+            check = null;
+        } else if (isNumeric(expected)) {
+            if (expected.contains(".")) {
+                check = Double.parseDouble(expected);
+            } else {
+                check = Integer.parseInt(expected);
+            }
+        } else {
+            throw new UnsupportedOperationException("Type not supported: " + expected);
+        }
+        if ("==".equals(operator)) {
+            return is(check);
+        } else if (">".equals(operator)) {
+            return gt(check);
+        } else if (">=".equals(operator)) {
+            return gte(check);
+        } else if ("<".equals(operator)) {
+            return lt(check);
+        } else if ("<=".equals(operator)) {
+            return lte(check);
+        } else if ("!=".equals(operator)) {
+            return ne(check);
+        } else if ("<>".equals(operator)) {
+            return ne(check);
+        } else {
+            throw new UnsupportedOperationException("Operator not supported: " + operator);
+        }
+    }
+
     public Criteria andOperator(Criteria... criteria) {
         criteriaChain.add(new Criteria("$and").is(asList(criteria)));
         return this;
     }
 
     private void checkFilterCanBeApplied(CriteriaType type) {
-        if (getKey().getTokenizer().size() > 2) {
+
+        if (getKey().tokenCount() > 2) {
             throw new IllegalArgumentException(
                     "Cannot use " + type + " filter on a multi-level path expression");
         }
@@ -462,5 +526,24 @@ public class Criteria {
 
     private interface Predicate<T> {
         boolean accept(T value);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        Iterator<Criteria> iterator = criteriaChain.iterator();
+        Criteria c = iterator.next();
+
+        if (c.isValue != NOT_SET) {
+            sb.append("@")
+                    .append(
+                            key.toString().substring(1)
+                                    + " == "
+                                    + ((c.isValue instanceof String)
+                                            ? ("'" + c.isValue + "'")
+                                            : c.isValue.toString()));
+        }
+        return sb.toString();
     }
 }

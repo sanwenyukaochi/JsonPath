@@ -3,78 +3,45 @@ package com.jayway.jsonpath;
 import static com.jayway.jsonpath.internal.Utils.isTrue;
 import static com.jayway.jsonpath.internal.Utils.notEmpty;
 import static com.jayway.jsonpath.internal.Utils.notNull;
-import static java.util.Arrays.asList;
 
 import com.jayway.jsonpath.internal.JsonReader;
-import com.jayway.jsonpath.internal.PathToken;
-import com.jayway.jsonpath.internal.PathTokenizer;
 import com.jayway.jsonpath.internal.Utils;
-import com.jayway.jsonpath.internal.filter.PathTokenFilter;
-import com.jayway.jsonpath.spi.HttpProviderFactory;
-import com.jayway.jsonpath.spi.JsonProvider;
-import com.jayway.jsonpath.spi.JsonProviderFactory;
+import com.jayway.jsonpath.internal.spi.compiler.PathCompiler;
+import com.jayway.jsonpath.spi.compiler.Path;
+import com.jayway.jsonpath.spi.http.HttpProviderFactory;
+import com.jayway.jsonpath.spi.json.JsonProvider;
+import com.jayway.jsonpath.spi.json.JsonProviderFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Pattern;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class JsonPath {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JsonPath.class.getName());
-
-    private static Pattern DEFINITE_PATH_PATTERN =
+    private static final Pattern DEFINITE_PATH_PATTERN =
             Pattern.compile(".*(\\.\\.|\\*|\\[[\\\\/]|\\?|,|:\\s?]|\\[\\s?:|>|\\(|<|=|\\+).*");
 
-    private PathTokenizer tokenizer;
-    private LinkedList<Filter> filters;
+    private final Path path;
 
-    private JsonPath(String jsonPath, Filter[] filters) {
-
+    private JsonPath(String jsonPath, Filter2[] filters) {
         notNull(jsonPath, "path can not be null");
-        jsonPath = jsonPath.trim();
-        notEmpty(jsonPath, "path can not be empty");
-
-        int filterCountInPath = Utils.countMatches(jsonPath, "[?]");
-        isTrue(
-                filterCountInPath == filters.length,
-                "Filters in path ([?]) does not match provided filters.");
-
-        this.tokenizer = new PathTokenizer(jsonPath);
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("New JsonPath:\n{}", this.tokenizer.toString());
-        }
-
-        this.filters = new LinkedList<Filter>();
-        this.filters.addAll(asList(filters));
-    }
-
-    PathTokenizer getTokenizer() {
-        return this.tokenizer;
-    }
-
-    public JsonPath copy() {
-        Filter[] filterCopy = filters.isEmpty() ? new Filter[0] : new Filter[filters.size()];
-        return new JsonPath(tokenizer.getPath(), filters.toArray(filterCopy));
+        this.path = PathCompiler.tokenize(jsonPath, filters);
     }
 
     public String getPath() {
-        return this.tokenizer.getPath();
+        return this.path.toString();
     }
 
     public static boolean isPathDefinite(String path) {
         String preparedPath = path.replaceAll("\"[^\"\\\\\\n\r]*\"", "");
-
         return !DEFINITE_PATH_PATTERN.matcher(preparedPath).matches();
     }
 
     public boolean isPathDefinite() {
-        return JsonPath.isPathDefinite(getPath());
+        return path.isDefinite();
     }
 
     @SuppressWarnings({"unchecked"})
@@ -83,43 +50,16 @@ public class JsonPath {
     }
 
     public <T> T read(Object jsonObject, Configuration configuration) {
-        notNull(jsonObject, "json can not be null");
-        notNull(configuration, "configuration can not be null");
 
-        if (this.getPath().equals("$")) {
+        return path.evaluate(jsonObject, configuration).get();
+    }
 
-            return (T) jsonObject;
-        }
+    public List<String> readPathList(Object jsonObject) {
+        return readPathList(jsonObject, Configuration.defaultConfiguration());
+    }
 
-        if (!configuration.getProvider().isContainer(jsonObject)) {
-            throw new IllegalArgumentException("Invalid container object");
-        }
-
-        LinkedList<Filter> contextFilters = new LinkedList<Filter>(filters);
-
-        Object result = jsonObject;
-
-        boolean inArrayContext = false;
-
-        for (PathToken pathToken : tokenizer) {
-            PathTokenFilter filter = pathToken.getFilter();
-
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Applying filter: " + filter + " to " + result);
-            }
-
-            result = filter.filter(result, configuration, contextFilters, inArrayContext);
-
-            if (result == null && !pathToken.isEndToken()) {
-                throw new PathNotFoundException(
-                        "Path token: '" + pathToken.getFragment() + "' not found.");
-            }
-
-            if (!inArrayContext) {
-                inArrayContext = filter.isArrayFilter();
-            }
-        }
-        return (T) result;
+    public List<String> readPathList(Object jsonObject, Configuration configuration) {
+        return path.evaluate(jsonObject, configuration).getPathList();
     }
 
     @SuppressWarnings({"unchecked"})
@@ -197,34 +137,36 @@ public class JsonPath {
         }
     }
 
-    public static JsonPath compile(String jsonPath, Filter... filters) {
+    public static JsonPath compile(String jsonPath, Filter2... filters) {
         notEmpty(jsonPath, "json can not be null or empty");
 
         return new JsonPath(jsonPath, filters);
     }
 
     @SuppressWarnings({"unchecked"})
-    public static <T> T read(Object json, String jsonPath, Filter... filters) {
-        return compile(jsonPath, filters).read(json);
-    }
+    public static <T> T read(Object json, String jsonPath, Filter2... filters) {
 
-    @SuppressWarnings({"unchecked"})
-    public static <T> T read(String json, String jsonPath, Filter... filters) {
         return new JsonReader().parse(json).read(jsonPath, filters);
     }
 
     @SuppressWarnings({"unchecked"})
-    public static <T> T read(URL jsonURL, String jsonPath, Filter... filters) throws IOException {
+    public static <T> T read(String json, String jsonPath, Filter2... filters) {
+        return new JsonReader().parse(json).read(jsonPath, filters);
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public static <T> T read(URL jsonURL, String jsonPath, Filter2... filters) throws IOException {
         return new JsonReader().parse(jsonURL).read(jsonPath, filters);
     }
 
     @SuppressWarnings({"unchecked"})
-    public static <T> T read(File jsonFile, String jsonPath, Filter... filters) throws IOException {
+    public static <T> T read(File jsonFile, String jsonPath, Filter2... filters)
+            throws IOException {
         return new JsonReader().parse(jsonFile).read(jsonPath, filters);
     }
 
     @SuppressWarnings({"unchecked"})
-    public static <T> T read(InputStream jsonInputStream, String jsonPath, Filter... filters)
+    public static <T> T read(InputStream jsonInputStream, String jsonPath, Filter2... filters)
             throws IOException {
         return new JsonReader().parse(jsonInputStream).read(jsonPath, filters);
     }
