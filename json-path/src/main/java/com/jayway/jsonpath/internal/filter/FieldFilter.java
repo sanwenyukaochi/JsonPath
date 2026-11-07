@@ -25,7 +25,7 @@ public class FieldFilter extends PathTokenFilter {
             boolean inArrayContext) {
         if (jsonProvider.isList(obj)) {
             if (!inArrayContext) {
-                return null;
+                throw new InvalidPathException("Trying to access field on array");
             } else {
                 List<Object> result = jsonProvider.createList();
                 for (Object current : jsonProvider.toList(obj)) {

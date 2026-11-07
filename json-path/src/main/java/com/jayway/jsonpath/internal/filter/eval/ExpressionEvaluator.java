@@ -1,5 +1,7 @@
 package com.jayway.jsonpath.internal.filter.eval;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -151,6 +153,52 @@ public class ExpressionEvaluator {
                             || operator == Operator.less_or_greater_than) {
                         return !a.equals(e);
                     }
+                default:
+                    throw new UnsupportedOperationException("Cannot handle operator " + operator);
+            }
+        } else if (actual instanceof BigInteger) {
+
+            BigInteger a = (BigInteger) actual;
+            BigInteger e = new BigInteger(expected.trim());
+
+            switch (operator) {
+                case equal:
+                    return a.compareTo(e) == 0;
+                case not_equal:
+                    return a.compareTo(e) != 0;
+                case less_or_greater_than:
+                    return a.compareTo(e) != 0;
+                case greater_than:
+                    return a.compareTo(e) > 0;
+                case greater_than_or_equal:
+                    return a.compareTo(e) >= 0;
+                case less_than:
+                    return a.compareTo(e) < 0;
+                case less_than_or_equal:
+                    return a.compareTo(e) <= 0;
+                default:
+                    throw new UnsupportedOperationException("Cannot handle operator " + operator);
+            }
+        } else if (actual instanceof BigDecimal) {
+
+            BigDecimal a = (BigDecimal) actual;
+            BigDecimal e = new BigDecimal(expected);
+
+            switch (operator) {
+                case equal:
+                    return a.compareTo(e) == 0;
+                case not_equal:
+                    return a.compareTo(e) != 0;
+                case less_or_greater_than:
+                    return a.compareTo(e) != 0;
+                case greater_than:
+                    return a.compareTo(e) > 0;
+                case greater_than_or_equal:
+                    return a.compareTo(e) >= 0;
+                case less_than:
+                    return a.compareTo(e) < 0;
+                case less_than_or_equal:
+                    return a.compareTo(e) <= 0;
                 default:
                     throw new UnsupportedOperationException("Cannot handle operator " + operator);
             }

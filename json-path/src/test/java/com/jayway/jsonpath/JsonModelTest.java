@@ -3,6 +3,7 @@ package com.jayway.jsonpath;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -113,5 +114,30 @@ public class JsonModelTest {
     public void invalid_path_throws() throws Exception {
         assertThrows(
                 InvalidPathException.class, () -> JsonModel.model(DOCUMENT).get("store.invalid"));
+    }
+
+    @Test
+    public void query_for_null_property_returns_null() {
+        String documentWithNull =
+                """
+                {
+                    "store": {
+                        "book": {
+                            "color": null
+                        }
+                    }
+                }\
+                """;
+
+        Object color = JsonModel.model(documentWithNull).get("store.book.color");
+
+        assertNull(color);
+    }
+
+    @Test
+    public void query_for_property_on_array_throws() throws Exception {
+        assertThrows(
+                InvalidPathException.class,
+                () -> JsonModel.model(DOCUMENT).get("store.book.color"));
     }
 }
