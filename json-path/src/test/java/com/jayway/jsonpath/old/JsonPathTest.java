@@ -93,7 +93,7 @@ public class JsonPathTest extends BaseTest {
                     Object read2 =
                             JsonPath.using(
                                             Configuration.defaultConfiguration()
-                                                    .addOptions(Option.REQUIRE_PATH_PROPERTIES))
+                                                    .addOptions(Option.REQUIRE_PROPERTIES))
                                     .parse(DOCUMENT)
                                     .read("$.store.book[*].fooBar.not");
                 });

@@ -34,7 +34,7 @@ public abstract class PathToken {
                         propertyVal = null;
                     } else {
                         if (ctx.options().contains(Option.SUPPRESS_EXCEPTIONS)
-                                && !ctx.options().contains(Option.REQUIRE_PATH_PROPERTIES)) {
+                                && !ctx.options().contains(Option.REQUIRE_PROPERTIES)) {
                             return;
                         } else {
                             throw new PathNotFoundException("No results for path: " + evalPath);
@@ -42,11 +42,11 @@ public abstract class PathToken {
                     }
                 } else {
                     if (!isUpstreamDefinite()
-                            && !ctx.options().contains(Option.REQUIRE_PATH_PROPERTIES)
+                            && !ctx.options().contains(Option.REQUIRE_PROPERTIES)
                             && !ctx.options().contains(Option.SUPPRESS_EXCEPTIONS)) {
                         return;
                     } else {
-                        throw new PathNotFoundException(evalPath);
+                        throw new PathNotFoundException("Missing property in path " + evalPath);
                     }
                 }
             }
@@ -62,10 +62,12 @@ public abstract class PathToken {
                 throw new InvalidPathException(
                         "Multi properties can only be used as path leafs: " + evalPath);
             }
+
+            Object merged = ctx.jsonProvider().createMap();
             for (String property : properties) {
-                evalPath = currentPath + "['" + property + "']";
+                Object propertyVal = null;
                 if (hasProperty(property, model, ctx)) {
-                    Object propertyVal = readObjectProperty(property, model, ctx);
+                    propertyVal = readObjectProperty(property, model, ctx);
                     if (propertyVal == JsonProvider.UNDEFINED) {
                         if (ctx.options().contains(Option.DEFAULT_PATH_LEAF_TO_NULL)) {
                             propertyVal = null;
@@ -73,13 +75,18 @@ public abstract class PathToken {
                             continue;
                         }
                     }
-                    ctx.addResult(evalPath, propertyVal);
                 } else {
                     if (ctx.options().contains(Option.DEFAULT_PATH_LEAF_TO_NULL)) {
-                        ctx.addResult(evalPath, null);
+                        propertyVal = null;
+                    } else if (ctx.options().contains(Option.REQUIRE_PROPERTIES)) {
+                        throw new PathNotFoundException("Missing property in path " + evalPath);
+                    } else {
+                        continue;
                     }
                 }
+                ctx.jsonProvider().setProperty(merged, property, propertyVal);
             }
+            ctx.addResult(evalPath, merged);
         }
     }
 

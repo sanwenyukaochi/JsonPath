@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -79,5 +80,10 @@ public class JacksonJsonProvider extends AbstractJsonProvider {
     @Override
     public List<Object> createArray() {
         return new LinkedList<Object>();
+    }
+
+    @Override
+    public Object createMap() {
+        return new LinkedHashMap<String, Object>();
     }
 }

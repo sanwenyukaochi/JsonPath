@@ -33,6 +33,10 @@ public class JsonSmartJsonProvider extends AbstractJsonProvider {
         return orderedMapper.createArray();
     }
 
+    public Object createMap() {
+        return orderedMapper.createObject();
+    }
+
     public Object parse(String json) {
         try {
             return createParser().parse(json, orderedMapper);

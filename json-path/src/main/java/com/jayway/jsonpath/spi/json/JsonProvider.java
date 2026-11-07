@@ -17,6 +17,8 @@ public interface JsonProvider {
 
     Object createArray();
 
+    Object createMap();
+
     boolean isArray(Object obj);
 
     int length(Object obj);
