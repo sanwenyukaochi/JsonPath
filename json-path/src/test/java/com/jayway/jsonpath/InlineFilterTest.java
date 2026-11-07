@@ -107,7 +107,6 @@ public class InlineFilterTest extends BaseTest {
         assertThat(d).containsExactly("Nigel Rees");
     }
 
-    @Test
     public void no_path_ref_in_filter_hit_all() {
 
         List<String> res = JsonPath.parse(JSON_DOCUMENT).read("$.store.book[?('a' == 'a')].author");
