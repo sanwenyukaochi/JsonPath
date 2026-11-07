@@ -11,9 +11,9 @@ import org.junit.jupiter.api.Test;
 
 public class FilterTest extends BaseTest {
 
-    Configuration conf = Configuration.defaultConfiguration();
     Object json =
-            conf.getProvider()
+            Configuration.defaultConfiguration()
+                    .jsonProvider()
                     .parse(
                             """
                             {

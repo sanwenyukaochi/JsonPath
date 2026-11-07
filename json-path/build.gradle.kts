@@ -7,6 +7,8 @@ version = "0.9.2-SNAPSHOT"
 
 dependencies {
     compileOnly("tools.jackson.core:jackson-databind")
+    compileOnly("com.google.code.gson:gson")
     implementation("net.minidev:json-smart")
     testImplementation("tools.jackson.core:jackson-databind")
+    testImplementation("com.google.code.gson:gson")
 }

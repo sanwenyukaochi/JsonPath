@@ -7,17 +7,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.jayway.jsonpath.BaseTest;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.internal.PathCompiler;
-import com.jayway.jsonpath.internal.spi.json.JsonSmartJsonProvider;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class JsonPathTest {
+public class JsonPathTest extends BaseTest {
 
     static {
     }
@@ -63,7 +63,7 @@ public class JsonPathTest {
 }\
 """;
 
-    public static final Object OBJ_DOCUMENT = new JsonSmartJsonProvider().parse(DOCUMENT);
+    public static final Object OBJ_DOCUMENT = JsonPath.parse(DOCUMENT).json();
 
     private static final String PRODUCT_JSON =
 """

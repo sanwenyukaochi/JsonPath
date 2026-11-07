@@ -1,6 +1,7 @@
 package com.jayway.jsonpath.spi.json;
 
 import com.jayway.jsonpath.InvalidJsonException;
+import com.jayway.jsonpath.ValueCompareException;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -10,6 +11,10 @@ public interface JsonProvider {
 
     static final Object UNDEFINED = new Object();
 
+    Object unwrap(Object obj);
+
+    int compare(Object expected, Object providerParsed) throws ValueCompareException;
+
     Object parse(String json) throws InvalidJsonException;
 
     Object parse(Reader jsonReader) throws InvalidJsonException;
@@ -18,15 +23,19 @@ public interface JsonProvider {
 
     String toJson(Object obj);
 
+    Object createNull();
+
     Object createMap();
 
     Object createArray();
 
     boolean isArray(Object obj);
 
+    boolean isString(Object obj);
+
     int length(Object obj);
 
-    Iterable<Object> toIterable(Object obj);
+    Iterable<?> toIterable(Object obj);
 
     Collection<String> getPropertyKeys(Object obj);
 
