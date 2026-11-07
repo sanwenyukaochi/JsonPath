@@ -69,18 +69,18 @@ public class JsonModelTest {
                 {"status":"REQUEST_DENIED"}\
                 """);
         URL url = response.toUri().toURL();
-        assertEquals("REQUEST_DENIED", JsonModel.create(url).get("status"));
+        assertEquals("REQUEST_DENIED", JsonModel.model(url).get("status"));
     }
 
     @Test
     public void a_json_document_can_be_fetched_with_a_InputStream() throws Exception {
         ByteArrayInputStream bis = new ByteArrayInputStream(DOCUMENT.getBytes());
-        assertEquals("Nigel Rees", JsonModel.create(bis).get("store.book[0].author"));
+        assertEquals("Nigel Rees", JsonModel.model(bis).get("store.book[0].author"));
     }
 
     @Test
     public void test_a_sub_model_can_be_fetched_and_read() throws Exception {
-        JsonModel model = JsonModel.create(DOCUMENT);
+        JsonModel model = JsonModel.model(DOCUMENT);
         assertEquals("Nigel Rees", model.getModel("$store.book[0]").get("author"));
         assertEquals(
                 "Nigel Rees", model.getModel(JsonPath.compile("$store.book[0]")).get("author"));
@@ -92,7 +92,7 @@ public class JsonModelTest {
         doc.put("items", asList(0, 1, 2));
         doc.put("child", Collections.singletonMap("key", "value"));
 
-        JsonModel model = JsonModel.create(doc);
+        JsonModel model = JsonModel.model(doc);
 
         assertEquals("value", model.get("$child.key"));
         assertEquals(1, model.<Integer>get("$items[1]"));
@@ -102,6 +102,6 @@ public class JsonModelTest {
     @Test
     public void invalid_path_throws() throws Exception {
         assertThrows(
-                InvalidPathException.class, () -> JsonModel.create(DOCUMENT).get("store.invalid"));
+                InvalidPathException.class, () -> JsonModel.model(DOCUMENT).get("store.invalid"));
     }
 }

@@ -10,7 +10,6 @@ dependencies {
     implementation("net.minidev:json-smart")
     testImplementation("org.hamcrest:hamcrest-library")
     implementation("commons-lang:commons-lang")
-    implementation("commons-io:commons-io")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("tools.jackson.core:jackson-databind")

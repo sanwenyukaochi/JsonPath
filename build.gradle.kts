@@ -114,7 +114,6 @@ subprojects {
             add("implementation", "tools.jackson.core:jackson-databind:3.2.4")
             add("api", "org.hamcrest:hamcrest-library:3.0")
             add("implementation", "commons-lang:commons-lang:2.6")
-            add("implementation", "commons-io:commons-io:2.22.0")
         }
         add(
             "testImplementation",
