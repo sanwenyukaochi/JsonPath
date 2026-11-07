@@ -176,7 +176,17 @@ public class JsonPath {
         EvaluationContext evaluationContext =
                 path.evaluate(jsonObject, jsonObject, configuration, true);
         for (PathRef updateOperation : evaluationContext.updateOperations()) {
-            updateOperation.renameKey(oldKeyName, newKeyName, configuration);
+            boolean optSuppressExceptions =
+                    configuration.containsOption(Option.SUPPRESS_EXCEPTIONS);
+            try {
+                updateOperation.renameKey(oldKeyName, newKeyName, configuration);
+            } catch (RuntimeException e) {
+                if (!optSuppressExceptions) {
+                    throw e;
+                } else {
+
+                }
+            }
         }
         return resultByConfiguration(jsonObject, configuration, evaluationContext);
     }
