@@ -104,4 +104,9 @@ public class NestedFunctionTest extends BaseFunctionTest {
         verifyMathFunction(conf, "$.sum(5)", 5.0);
         verifyMathFunction(conf, "$.sum(50)", 50.0);
     }
+
+    @Test
+    public void testStringAndNumberConcat() {
+        verifyTextAndNumberFunction(conf, "$.concat($.text[0], $.numbers[0])", "a1");
+    }
 }
