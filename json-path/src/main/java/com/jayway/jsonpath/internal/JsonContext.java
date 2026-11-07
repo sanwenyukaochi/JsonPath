@@ -3,7 +3,6 @@ package com.jayway.jsonpath.internal;
 import static com.jayway.jsonpath.JsonPath.compile;
 import static com.jayway.jsonpath.internal.Utils.notEmpty;
 import static com.jayway.jsonpath.internal.Utils.notNull;
-import static java.util.Arrays.asList;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
@@ -16,7 +15,7 @@ import com.jayway.jsonpath.ReadContext;
 import com.jayway.jsonpath.TypeRef;
 import com.jayway.jsonpath.spi.cache.Cache;
 import com.jayway.jsonpath.spi.cache.CacheProvider;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -203,7 +202,10 @@ public class JsonContext implements DocumentContext {
 
     private JsonPath pathFromCache(String path, Predicate[] filters) {
         Cache cache = CacheProvider.getCache();
-        String cacheKey = Utils.concat(path, new LinkedList<Predicate>(asList(filters)).toString());
+        String cacheKey =
+                filters == null || filters.length == 0
+                        ? path
+                        : Utils.concat(path, Arrays.toString(filters));
         JsonPath jsonPath = cache.get(cacheKey);
         if (jsonPath == null) {
             jsonPath = compile(path, filters);
