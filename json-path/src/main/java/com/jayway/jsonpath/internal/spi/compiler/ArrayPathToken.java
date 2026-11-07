@@ -121,7 +121,8 @@ class ArrayPathToken extends PathToken {
                 }
             }
         } catch (IndexOutOfBoundsException e) {
-            throw new PathNotFoundException(e);
+            throw new PathNotFoundException(
+                    "Index out of bounds when evaluating path " + currentPath);
         }
     }
 
