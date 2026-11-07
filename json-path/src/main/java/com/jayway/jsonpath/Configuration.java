@@ -4,7 +4,7 @@ import static com.jayway.jsonpath.internal.Utils.notNull;
 import static java.util.Arrays.asList;
 
 import com.jayway.jsonpath.internal.spi.json.JsonSmartJsonProvider;
-import com.jayway.jsonpath.internal.spi.mapper.DefaultMappingProvider;
+import com.jayway.jsonpath.internal.spi.mapper.JsonSmartMappingProvider;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public class Configuration {
     private static Defaults DEFAULTS =
             new Defaults() {
 
-                private final MappingProvider mappingProvider = new DefaultMappingProvider();
+                private final MappingProvider mappingProvider = new JsonSmartMappingProvider();
 
                 public JsonProvider jsonProvider() {
                     return new JsonSmartJsonProvider();
