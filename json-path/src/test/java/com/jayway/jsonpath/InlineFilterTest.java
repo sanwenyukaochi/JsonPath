@@ -1,5 +1,7 @@
 package com.jayway.jsonpath;
 
+import static com.jayway.jsonpath.TestUtils.assertHasNoResults;
+import static com.jayway.jsonpath.TestUtils.assertHasOneResult;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -194,5 +196,36 @@ public class InlineFilterTest extends BaseTest {
         List<Integer> isNull = JsonPath.parse(ints).read("$[?(!@)]");
         assertThat(isNull).containsExactly(new Integer[] {});
         assertThat(isNull).containsExactly(new Integer[] {});
+    }
+
+    @Test
+    public void equality_check_does_not_break_evaluation() {
+        assertHasOneResult("[{\"value\":\"5\"}]", "$[?(@.value=='5')]");
+        assertHasOneResult("[{\"value\":5}]", "$[?(@.value==5)]");
+
+        assertHasOneResult("[{\"value\":\"5.1.26\"}]", "$[?(@.value=='5.1.26')]");
+
+        assertHasNoResults("[{\"value\":\"5\"}]", "$[?(@.value=='5.1.26')]");
+        assertHasNoResults("[{\"value\":5}]", "$[?(@.value=='5.1.26')]");
+        assertHasNoResults("[{\"value\":5.1}]", "$[?(@.value=='5.1.26')]");
+
+        assertHasNoResults("[{\"value\":\"5.1.26\"}]", "$[?(@.value=='5')]");
+        assertHasNoResults("[{\"value\":\"5.1.26\"}]", "$[?(@.value==5)]");
+        assertHasNoResults("[{\"value\":\"5.1.26\"}]", "$[?(@.value==5.1)]");
+    }
+
+    @Test
+    public void lt_check_does_not_break_evaluation() {
+        assertHasOneResult("[{\"value\":\"5\"}]", "$[?(@.value<'7')]");
+        assertHasNoResults("[{\"value\":\"7\"}]", "$[?(@.value<'5')]");
+
+        assertHasOneResult("[{\"value\":5}]", "$[?(@.value<7)]");
+        assertHasNoResults("[{\"value\":7}]", "$[?(@.value<5)]");
+
+        assertHasOneResult("[{\"value\":5}]", "$[?(@.value<7.1)]");
+        assertHasNoResults("[{\"value\":7}]", "$[?(@.value<5.1)]");
+
+        assertHasOneResult("[{\"value\":5.1}]", "$[?(@.value<7)]");
+        assertHasNoResults("[{\"value\":7.1}]", "$[?(@.value<5)]");
     }
 }
