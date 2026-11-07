@@ -17,11 +17,11 @@ public abstract class AbstractJsonProvider implements JsonProvider {
     }
 
     public Object getArrayIndex(Object obj, int idx) {
-        return getArrayIndex(obj, idx, true);
+        return ((List) obj).get(idx);
     }
 
-    public Object getArrayIndex(Object obj, int idx, boolean unwrap) {
-        return ((List) obj).get(idx);
+    public final Object getArrayIndex(Object obj, int idx, boolean unwrap) {
+        return getArrayIndex(obj, idx);
     }
 
     public void setArrayIndex(Object array, int index, Object newValue) {
@@ -97,5 +97,10 @@ public abstract class AbstractJsonProvider implements JsonProvider {
     public Iterable<? extends Object> toIterable(Object obj) {
         if (isArray(obj)) return ((Iterable) obj);
         else return ((Map) obj).values();
+    }
+
+    @Override
+    public Object unwrap(Object obj) {
+        return obj;
     }
 }

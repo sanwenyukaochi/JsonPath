@@ -29,6 +29,7 @@ public interface JsonProvider {
 
     Object getArrayIndex(Object obj, int idx);
 
+    @Deprecated
     Object getArrayIndex(Object obj, int idx, boolean unwrap);
 
     void setArrayIndex(Object array, int idx, Object newValue);
@@ -40,4 +41,6 @@ public interface JsonProvider {
     void removeProperty(Object obj, Object key);
 
     boolean isMap(Object obj);
+
+    Object unwrap(Object obj);
 }
