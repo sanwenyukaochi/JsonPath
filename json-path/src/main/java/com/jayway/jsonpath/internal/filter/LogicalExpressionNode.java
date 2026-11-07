@@ -38,13 +38,12 @@ public class LogicalExpressionNode extends ExpressionNode {
     }
 
     public LogicalExpressionNode append(ExpressionNode expressionNode) {
-        chain.add(expressionNode);
+        chain.add(0, expressionNode);
         return this;
     }
 
     @Override
     public String toString() {
-
         return "(" + Utils.join(" " + operator.getOperatorString() + " ", chain) + ")";
     }
 

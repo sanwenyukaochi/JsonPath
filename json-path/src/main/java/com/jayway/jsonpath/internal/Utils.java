@@ -1,51 +1,13 @@
 package com.jayway.jsonpath.internal;
 
 import com.jayway.jsonpath.JsonPathException;
-import com.jayway.jsonpath.ValueCompareException;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamClass;
-import java.io.OutputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.io.StringWriter;
 import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 
 public final class Utils {
-
-    public static final String CR = System.getProperty("line.separator");
-    private static final char BACKSLASH = '\\';
-
-    public static List<Integer> createRange(int start, int end) {
-        if (end <= start) {
-            throw new IllegalArgumentException(
-                    "Cannot create range from "
-                            + start
-                            + " to "
-                            + end
-                            + ", end must be greater than start.");
-        }
-        if (start == end - 1) {
-            return Collections.emptyList();
-        }
-        List<Integer> range = new ArrayList<Integer>(end - start - 1);
-        for (int i = start; i < end; i++) {
-            range.add(i);
-        }
-        return range;
-    }
-
-    public static <T> Iterable<T> reverse(final List<T> list) {
-        return new ListReverser<T>(list);
-    }
 
     public static String join(String delimiter, String wrap, Iterable<? extends Object> objs) {
         Iterator<? extends Object> iter = objs.iterator();
@@ -108,76 +70,159 @@ public final class Utils {
         }
     }
 
-    public static boolean isInt(String str) {
+    public static String escape(String str, boolean escapeSingleQuote) {
         if (str == null) {
-            return false;
+            return null;
         }
-        int sz = str.length();
-        for (int i = 0; i < sz; i++) {
-            if (Character.isDigit(str.charAt(i)) == false) {
-                return false;
-            }
-        }
-        return true;
-    }
+        int len = str.length();
+        StringWriter writer = new StringWriter(len * 2);
 
-    public static boolean isNumeric(String str) {
-        if (str == null || str.trim().isEmpty()) {
-            return false;
-        }
-        int sz = str.length();
-        for (int i = 0; i < sz; i++) {
-            if (Character.isDigit(str.charAt(i)) == false && !(str.charAt(i) == '.')) {
-                return false;
-            }
-        }
-        return true;
-    }
+        for (int i = 0; i < len; i++) {
+            char ch = str.charAt(i);
 
-    public static String unescape(String s) {
-        if (s.indexOf(BACKSLASH) == -1) {
-            return s;
-        }
-        StringBuilder sb = new StringBuilder(s.length());
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == BACKSLASH) {
-                char c2 = s.charAt(++i);
-                switch (c2) {
-                    case '\\':
-                        c2 = '\\';
+            if (ch > 0xfff) {
+                writer.write("\\u" + hex(ch));
+            } else if (ch > 0xff) {
+                writer.write("\\u0" + hex(ch));
+            } else if (ch > 0x7f) {
+                writer.write("\\u00" + hex(ch));
+            } else if (ch < 32) {
+                switch (ch) {
+                    case '\b':
+                        writer.write('\\');
+                        writer.write('b');
                         break;
-                    case 'b':
-                        c2 = '\b';
+                    case '\n':
+                        writer.write('\\');
+                        writer.write('n');
                         break;
-                    case 'f':
-                        c2 = '\f';
+                    case '\t':
+                        writer.write('\\');
+                        writer.write('t');
                         break;
-                    case 'n':
-                        c2 = '\n';
+                    case '\f':
+                        writer.write('\\');
+                        writer.write('f');
                         break;
-                    case 'r':
-                        c2 = '\r';
+                    case '\r':
+                        writer.write('\\');
+                        writer.write('r');
                         break;
-                    case 't':
-                        c2 = '\t';
-                        break;
-                    case 'u':
-                        try {
-                            String hex = s.substring(i + 1, i + 5);
-                            c2 = (char) Integer.parseInt(hex, 16);
-                            i += 4;
-                        } catch (Exception e) {
-                            throw new ValueCompareException("\\u parse failed", e);
+                    default:
+                        if (ch > 0xf) {
+                            writer.write("\\u00" + hex(ch));
+                        } else {
+                            writer.write("\\u000" + hex(ch));
                         }
                         break;
                 }
-                sb.append(c2);
             } else {
-                sb.append(c);
+                switch (ch) {
+                    case '\'':
+                        if (escapeSingleQuote) {
+                            writer.write('\\');
+                        }
+                        writer.write('\'');
+                        break;
+                    case '"':
+                        writer.write('\\');
+                        writer.write('"');
+                        break;
+                    case '\\':
+                        writer.write('\\');
+                        writer.write('\\');
+                        break;
+                    case '/':
+                        writer.write('\\');
+                        writer.write('/');
+                        break;
+                    default:
+                        writer.write(ch);
+                        break;
+                }
             }
         }
-        return sb.toString();
+        return writer.toString();
+    }
+
+    public static String unescape(String str) {
+        if (str == null) {
+            return null;
+        }
+        int len = str.length();
+        StringWriter writer = new StringWriter(len);
+        StringBuffer unicode = new StringBuffer(4);
+        boolean hadSlash = false;
+        boolean inUnicode = false;
+        for (int i = 0; i < len; i++) {
+            char ch = str.charAt(i);
+            if (inUnicode) {
+                unicode.append(ch);
+                if (unicode.length() == 4) {
+                    try {
+                        int value = Integer.parseInt(unicode.toString(), 16);
+                        writer.write((char) value);
+                        unicode.setLength(0);
+                        inUnicode = false;
+                        hadSlash = false;
+                    } catch (NumberFormatException nfe) {
+                        throw new JsonPathException(
+                                "Unable to parse unicode value: " + unicode, nfe);
+                    }
+                }
+                continue;
+            }
+            if (hadSlash) {
+                hadSlash = false;
+                switch (ch) {
+                    case '\\':
+                        writer.write('\\');
+                        break;
+                    case '\'':
+                        writer.write('\'');
+                        break;
+                    case '\"':
+                        writer.write('"');
+                        break;
+                    case 'r':
+                        writer.write('\r');
+                        break;
+                    case 'f':
+                        writer.write('\f');
+                        break;
+                    case 't':
+                        writer.write('\t');
+                        break;
+                    case 'n':
+                        writer.write('\n');
+                        break;
+                    case 'b':
+                        writer.write('\b');
+                        break;
+                    case 'u':
+                        {
+                            inUnicode = true;
+                            break;
+                        }
+                    default:
+                        writer.write(ch);
+                        break;
+                }
+                continue;
+            } else if (ch == '\\') {
+                hadSlash = true;
+                continue;
+            }
+            writer.write(ch);
+        }
+        if (hadSlash) {
+            writer.write('\\');
+        }
+        return writer.toString();
+    }
+
+    public static String hex(char ch) {
+        return Integer.toHexString(ch).toUpperCase();
     }
 
     public static boolean isEmpty(CharSequence cs) {
@@ -186,19 +231,6 @@ public final class Utils {
 
     static int indexOf(CharSequence cs, CharSequence searchChar, int start) {
         return cs.toString().indexOf(searchChar.toString(), start);
-    }
-
-    public static int countMatches(CharSequence str, CharSequence sub) {
-        if (isEmpty(str) || isEmpty(sub)) {
-            return 0;
-        }
-        int count = 0;
-        int idx = 0;
-        while ((idx = indexOf(str, sub, idx)) != -1) {
-            count++;
-            idx += sub.length();
-        }
-        return count;
     }
 
     public static <T> T notNull(T object, String message, Object... values) {
@@ -244,115 +276,7 @@ public final class Utils {
         if (null == o) {
             return null;
         }
-
         return o.toString();
-    }
-
-    public static void serialize(Serializable obj, OutputStream outputStream) {
-        if (outputStream == null) {
-            throw new IllegalArgumentException("The OutputStream must not be null");
-        }
-        ObjectOutputStream out = null;
-        try {
-
-            out = new ObjectOutputStream(outputStream);
-            out.writeObject(obj);
-
-        } catch (IOException ex) {
-            throw new JsonPathException(ex);
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException ex) {
-
-            }
-        }
-    }
-
-    public static byte[] serialize(Serializable obj) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-        serialize(obj, baos);
-        return baos.toByteArray();
-    }
-
-    public static Object deserialize(InputStream inputStream) {
-        if (inputStream == null) {
-            throw new IllegalArgumentException("The InputStream must not be null");
-        }
-        ObjectInputStream in = null;
-        try {
-
-            in = new ObjectInputStream(inputStream);
-            return in.readObject();
-
-        } catch (ClassNotFoundException ex) {
-            throw new JsonPathException(ex);
-        } catch (IOException ex) {
-            throw new JsonPathException(ex);
-        } finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (IOException ex) {
-
-            }
-        }
-    }
-
-    public static Object deserialize(byte[] objectData) {
-        if (objectData == null) {
-            throw new IllegalArgumentException("The byte[] must not be null");
-        }
-        ByteArrayInputStream bais = new ByteArrayInputStream(objectData);
-        return deserialize(bais);
-    }
-
-    static class ClassLoaderAwareObjectInputStream extends ObjectInputStream {
-        private ClassLoader classLoader;
-
-        public ClassLoaderAwareObjectInputStream(InputStream in, ClassLoader classLoader)
-                throws IOException {
-            super(in);
-            this.classLoader = classLoader;
-        }
-
-        @Override
-        protected Class<?> resolveClass(ObjectStreamClass desc)
-                throws IOException, ClassNotFoundException {
-            String name = desc.getName();
-            try {
-                return Class.forName(name, false, classLoader);
-            } catch (ClassNotFoundException ex) {
-                return Class.forName(name, false, Thread.currentThread().getContextClassLoader());
-            }
-        }
-    }
-
-    private static class ListReverser<T> implements Iterable<T> {
-        private ListIterator<T> listIterator;
-
-        public ListReverser(List<T> wrappedList) {
-            this.listIterator = wrappedList.listIterator(wrappedList.size());
-        }
-
-        public Iterator<T> iterator() {
-            return new Iterator<T>() {
-                public boolean hasNext() {
-                    return listIterator.hasPrevious();
-                }
-
-                public T next() {
-                    return listIterator.previous();
-                }
-
-                public void remove() {
-                    listIterator.remove();
-                }
-            };
-        }
     }
 
     private Utils() {}
