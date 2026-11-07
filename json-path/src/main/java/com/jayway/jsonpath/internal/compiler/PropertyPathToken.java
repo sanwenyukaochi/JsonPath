@@ -29,7 +29,7 @@ public class PropertyPathToken extends PathToken {
 
     @Override
     boolean isTokenDefinite() {
-        return true;
+        return properties.size() == 1;
     }
 
     @Override
