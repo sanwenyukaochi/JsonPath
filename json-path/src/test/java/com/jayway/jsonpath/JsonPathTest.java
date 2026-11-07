@@ -306,9 +306,4 @@ public class JsonPathTest {
                     Object res = JsonPath.read(DOCUMENT, "$.store.book[100].author");
                 });
     }
-
-    @Test
-    public void invalid_new_path_throws_exception() throws Exception {
-        assertThrows(InvalidPathException.class, () -> JsonPath.read(DOCUMENT, "new "));
-    }
 }

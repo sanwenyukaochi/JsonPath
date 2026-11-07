@@ -1,7 +1,6 @@
-package com.jayway.jsonpath.reader;
+package com.jayway.jsonpath.internal;
 
 import com.jayway.jsonpath.InvalidPathException;
-import com.jayway.jsonpath.spi.JsonProvider;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -14,7 +13,7 @@ public class PathTokenizer implements Iterable<PathToken> {
     private int index = 0;
     private List<PathToken> pathTokens = new LinkedList<PathToken>();
 
-    public PathTokenizer(String jsonPath, JsonProvider jsonProvider) {
+    public PathTokenizer(String jsonPath) {
 
         if (!jsonPath.startsWith("$") && !jsonPath.startsWith("$[")) {
             jsonPath = "$." + jsonPath;

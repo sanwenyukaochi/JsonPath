@@ -1,4 +1,4 @@
-package com.jayway.jsonpath.reader.filter;
+package com.jayway.jsonpath.internal.filter;
 
 import com.jayway.jsonpath.spi.JsonProvider;
 

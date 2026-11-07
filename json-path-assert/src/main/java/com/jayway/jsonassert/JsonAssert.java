@@ -7,6 +7,7 @@ import com.jayway.jsonassert.impl.matcher.IsEmptyCollection;
 import com.jayway.jsonassert.impl.matcher.IsMapContainingKey;
 import com.jayway.jsonassert.impl.matcher.IsMapContainingValue;
 import com.jayway.jsonpath.spi.JsonProvider;
+import com.jayway.jsonpath.spi.JsonProviderFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,7 +20,7 @@ import org.hamcrest.Matcher;
 
 public class JsonAssert {
 
-    private static JsonProvider jsonProvider = JsonProvider.getInstance();
+    private static JsonProvider jsonProvider = JsonProviderFactory.getInstance();
 
     public static void setJsonProvider(JsonProvider jsonProvider) {
         JsonAssert.jsonProvider = jsonProvider;

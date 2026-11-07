@@ -1,8 +1,28 @@
 package com.jayway.jsonpath;
 
+import com.jayway.jsonpath.spi.impl.JacksonProvider;
+
 import org.junit.jupiter.api.Test;
 
-public class JsonPathExtendedTest {
+public class JsonProviderTest {
+
+    public static final String ARRAY =
+            """
+            [
+                {
+                    "value": 1
+                },
+                {
+                    "value": 2
+                },
+                {
+                    "value": 3
+                },
+                {
+                    "value": 4
+                }
+            ]\
+            """;
 
     public static final String DOCUMENT =
             """
@@ -47,8 +67,21 @@ public class JsonPathExtendedTest {
             """;
 
     @Test
-    public void test_1() throws Exception {
+    public void parse_document() throws Exception {
 
-        JsonPath path = JsonPath.compile("$.store.book[*].title");
+        JacksonProvider provider = new JacksonProvider();
+
+        Object o = provider.parse(DOCUMENT);
+
+        System.out.println(o);
+    }
+
+    @Test
+    public void parse_array() throws Exception {
+        JacksonProvider provider = new JacksonProvider();
+
+        Object o = provider.parse(ARRAY);
+
+        System.out.println(o);
     }
 }

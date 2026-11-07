@@ -1,4 +1,4 @@
-package com.jayway.jsonpath.reader.filter.eval;
+package com.jayway.jsonpath.internal.filter.eval;
 
 public class ExpressionEvaluator {
 

@@ -12,7 +12,7 @@ import java.util.Map;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
-public class ComplianceTests {
+public class ComplianceTest {
 
     @Test
     public void test_one() throws Exception {
@@ -88,6 +88,7 @@ public class ComplianceTests {
         assertThat(JsonPath.<String>read(json, "$.points[(@.length-1)].id"), equalTo("i6"));
     }
 
+    @SuppressWarnings("UnusedAssignment")
     @Test
     public void test_four() throws Exception {
         String json =
