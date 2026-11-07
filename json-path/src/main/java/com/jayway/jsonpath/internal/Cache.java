@@ -31,7 +31,9 @@ public class Cache {
     }
 
     public Path get(String key) {
-        removeThenAddKey(key);
+        if (map.containsKey(key)) {
+            removeThenAddKey(key);
+        }
         return map.get(key);
     }
 
