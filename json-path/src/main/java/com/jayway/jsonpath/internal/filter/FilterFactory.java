@@ -7,14 +7,15 @@ public class FilterFactory {
             new PassthroughFilter("[*]", true);
     private static final PathTokenFilter WILDCARD_FILTER = new WildcardFilter("*");
     private static final PathTokenFilter SCAN_FILTER = new ScanFilter("..");
+    private static final PathTokenFilter ARRAY_QUERY_FILTER = new ArrayQueryFilter("[?]");
 
     public static PathTokenFilter createFilter(String pathFragment) {
 
-        if ("$".equals(pathFragment)) {
+        if (DOCUMENT_FILTER.getCondition().equals(pathFragment)) {
 
             return DOCUMENT_FILTER;
 
-        } else if ("[*]".equals(pathFragment)) {
+        } else if (ALL_ARRAY_ITEMS_FILTER.getCondition().equals(pathFragment)) {
 
             return ALL_ARRAY_ITEMS_FILTER;
 
@@ -22,17 +23,17 @@ public class FilterFactory {
 
             return WILDCARD_FILTER;
 
-        } else if (pathFragment.contains("..")) {
+        } else if (SCAN_FILTER.getCondition().equals(pathFragment)) {
 
             return SCAN_FILTER;
+
+        } else if (ARRAY_QUERY_FILTER.getCondition().equals(pathFragment)) {
+
+            return ARRAY_QUERY_FILTER;
 
         } else if (!pathFragment.contains("[")) {
 
             return new FieldFilter(pathFragment);
-
-        } else if (pathFragment.equals("[?]")) {
-
-            return new ArrayQueryFilter(pathFragment);
 
         } else if (pathFragment.contains("[")) {
 
@@ -52,6 +53,7 @@ public class FilterFactory {
             }
         }
 
-        throw new UnsupportedOperationException("..");
+        throw new UnsupportedOperationException(
+                "can not find filter for path fragment " + pathFragment);
     }
 }

@@ -189,9 +189,7 @@ public class JsonModel {
 
         if (modelRef.getClass().isAssignableFrom(clazz)) {
             throw new InvalidModelPathException(
-                    jsonPath
-                            + " does nor refer to a Map but "
-                            + (currentToken != null ? currentToken.getClass().getName() : "null"));
+                    jsonPath + " does nor refer to a Map but " + currentToken.getClass().getName());
         }
         return clazz.cast(modelRef);
     }
