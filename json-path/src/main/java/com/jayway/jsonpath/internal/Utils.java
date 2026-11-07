@@ -161,6 +161,22 @@ public final class Utils {
         }
     }
 
+    public static void onlyOneIsTrue(final String message, final boolean... expressions) {
+        if (!onlyOneIsTrueNonThrow(expressions)) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
+    public static boolean onlyOneIsTrueNonThrow(final boolean... expressions) {
+        int count = 0;
+        for (final boolean expression : expressions) {
+            if (expression && ++count > 1) {
+                return false;
+            }
+        }
+        return 1 == count;
+    }
+
     public static <T extends CharSequence> T notEmpty(T chars, String message, Object... values) {
         if (chars == null) {
             throw new IllegalArgumentException(String.format(message, values));
