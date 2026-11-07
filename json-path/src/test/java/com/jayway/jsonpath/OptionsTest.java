@@ -4,7 +4,10 @@ import static com.jayway.jsonpath.JsonPath.using;
 import static com.jayway.jsonpath.Option.ALWAYS_RETURN_LIST;
 import static com.jayway.jsonpath.Option.AS_PATH_LIST;
 import static com.jayway.jsonpath.Option.DEFAULT_PATH_LEAF_TO_NULL;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.HashMap;
@@ -83,5 +86,23 @@ public class OptionsTest extends BaseTest {
 
         assertThat(result).isInstanceOf(List.class);
         assertThat((List) result).containsOnly("a", "b");
+    }
+
+    @Test
+    public void when_property_is_required_exception_is_thrown() {
+        List<Map<String, String>> model =
+                asList(singletonMap("a", "a-val"), singletonMap("b", "b-val"));
+
+        Configuration conf = Configuration.defaultConfiguration();
+
+        assertThat(using(conf).parse(model).read("$[*].a", List.class)).containsExactly("a-val");
+
+        conf = conf.addOptions(Option.REQUIRE_PATH_PROPERTIES);
+
+        try {
+            using(conf).parse(model).read("$[*].a", List.class);
+            fail("Should throw PathNotFoundException");
+        } catch (PathNotFoundException pnf) {
+        }
     }
 }

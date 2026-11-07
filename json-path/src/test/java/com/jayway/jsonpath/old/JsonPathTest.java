@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.jayway.jsonpath.BaseTest;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.internal.PathCompiler;
 import java.util.List;
@@ -90,7 +91,9 @@ public class JsonPathTest extends BaseTest {
                 PathNotFoundException.class,
                 () -> {
                     Object read2 =
-                            JsonPath.using(Configuration.defaultConfiguration())
+                            JsonPath.using(
+                                            Configuration.defaultConfiguration()
+                                                    .addOptions(Option.REQUIRE_PATH_PROPERTIES))
                                     .parse(DOCUMENT)
                                     .read("$.store.book[*].fooBar.not");
                 });
@@ -139,11 +142,12 @@ public class JsonPathTest extends BaseTest {
   "version": 1371160528774
 }\
 """;
-
-        System.out.println(JsonPath.isPathDefinite("$.data.passes[0].id"));
-
-        System.out.println((Object) JsonPath.read(json, "$.data2.passes[0].id"));
-        System.out.println(JsonPath.isPathDefinite("$.data2.passes[0].id"));
+        try {
+            JsonPath.read(json, "$.data.passes[0].id");
+            Assertions.fail("Expected PathNotFoundException");
+        } catch (PathNotFoundException e) {
+        }
+        Assertions.assertThat(JsonPath.<String>read(json, "$.data2.passes[0].id")).isEqualTo("1");
     }
 
     @Test
@@ -174,7 +178,6 @@ public class JsonPathTest extends BaseTest {
         List<Object> matches = JsonPath.read(ARRAY, "$.[?(@.value == 1)]");
 
         assertEquals(1, matches.size());
-        System.out.println(matches);
     }
 
     @Test
@@ -182,7 +185,6 @@ public class JsonPathTest extends BaseTest {
         Integer matches = JsonPath.read(ARRAY, "$.[1].value");
 
         assertEquals(new Integer(2), matches);
-        System.out.println(matches);
     }
 
     @Test
@@ -214,6 +216,7 @@ public class JsonPathTest extends BaseTest {
         JsonPath path = JsonPath.compile("$.store.book[*]");
 
         List<Object> list = path.read(DOCUMENT);
+        Assertions.assertThat(list.size()).isEqualTo(4);
     }
 
     @Test
@@ -313,10 +316,7 @@ public class JsonPathTest extends BaseTest {
 
     @Test
     public void all_books() throws Exception {
-
-        Object books = JsonPath.<List<String>>read(DOCUMENT, "$..book");
-
-        System.out.println(books);
+        Assertions.assertThat(JsonPath.<List<Object>>read(DOCUMENT, "$..book")).hasSize(1);
     }
 
     @Test
@@ -359,7 +359,7 @@ public class JsonPathTest extends BaseTest {
         assertThrows(
                 PathNotFoundException.class,
                 () -> {
-                    Object res = JsonPath.read(DOCUMENT, "$.store.book[100].author");
+                    JsonPath.read(DOCUMENT, "$.store.book[100].author");
                 });
     }
 
