@@ -1,7 +1,5 @@
 package com.jayway.jsonpath.web.bench;
 
-import static java.util.Arrays.asList;
-
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
@@ -9,7 +7,9 @@ import com.jayway.jsonpath.internal.spi.json.JacksonProvider;
 import com.jayway.jsonpath.spi.json.JsonProviderFactory;
 import io.gatling.jsonpath.JsonPath$;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.boon.json.JsonParser;
 import org.boon.json.ObjectMapper;
 import org.boon.json.implementation.JsonParserCharArray;
@@ -21,20 +21,23 @@ public class Bench {
     protected final String json;
     protected final String path;
     private final boolean optionAsValues;
-    private final boolean optionAllwaysReturnList;
-    private final boolean optionMergeMultiProps;
+    private final boolean flagWrap;
+    private final boolean flagMerge;
+    private final boolean flagSuppress;
 
     public Bench(
             String json,
             String path,
             boolean optionAsValues,
-            boolean optionAllwaysReturnList,
-            boolean optionMergeMultiProps) {
+            boolean flagWrap,
+            boolean flagMerge,
+            boolean flagSuppress) {
         this.json = json;
         this.path = path;
         this.optionAsValues = optionAsValues;
-        this.optionAllwaysReturnList = optionAllwaysReturnList;
-        this.optionMergeMultiProps = optionMergeMultiProps;
+        this.flagWrap = flagWrap;
+        this.flagMerge = flagMerge;
+        this.flagSuppress = flagSuppress;
     }
 
     public Result runJayway() {
@@ -44,11 +47,14 @@ public class Bench {
         Object res = null;
 
         Configuration configuration = Configuration.defaultConfiguration();
-        if (optionAllwaysReturnList) {
+        if (flagWrap) {
             configuration = configuration.addOptions(Option.ALWAYS_RETURN_LIST);
         }
-        if (optionMergeMultiProps) {
+        if (flagMerge) {
             configuration = configuration.addOptions(Option.MERGE_MULTI_PROPS);
+        }
+        if (flagSuppress) {
+            configuration = configuration.addOptions(Option.SUPPRESS_EXCEPTIONS);
         }
         if (!optionAsValues) {
             configuration = configuration.addOptions(Option.AS_PATH_LIST);
@@ -136,8 +142,12 @@ public class Bench {
         }
     }
 
-    public List<Result> runAll() {
-        return asList(runJayway(), runBoon(), runNebhale());
+    public Map<String, Result> runAll() {
+        Map<String, Result> res = new HashMap<String, Result>();
+        res.put("jayway", runJayway());
+        res.put("boon", runBoon());
+        res.put("nebhale", runNebhale());
+        return res;
     }
 
     private String getError(Exception e) {

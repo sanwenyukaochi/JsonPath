@@ -10,9 +10,11 @@ import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +23,7 @@ import org.glassfish.jersey.server.mvc.Viewable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("")
+@Path("/")
 @Produces(MediaType.TEXT_HTML)
 public class IndexResource {
 
@@ -30,22 +32,35 @@ public class IndexResource {
     public static final Map<String, String> TEMPLATES = loadTemplates();
 
     @GET
-    public Viewable get(@QueryParam("template") @DefaultValue("goessner") String template) {
-        return createView(TEMPLATES.get(template), "$.store.book[0].title", true, template, null);
+    @Path("templates/{template}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTemplate(@PathParam("template") @DefaultValue("goessner") String template) {
+        return Response.ok(TEMPLATES.get(template)).build();
     }
 
     @POST
+    @Path("eval")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Viewable post(
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTemplate(
             @FormParam("json") String json,
             @FormParam("path") String path,
             @FormParam("type") String type,
-            @FormParam("template") String template) {
+            @FormParam("flagWrap") boolean flagWrap,
+            @FormParam("flagMerge") boolean flagMerge,
+            @FormParam("flagSuppress") boolean flagSuppress) {
 
         boolean value = "VALUE".equalsIgnoreCase(type);
 
-        return createView(
-                json, path, value, template, new Bench(json, path, value, true, true).runAll());
+        Map<String, Result> resultMap =
+                new Bench(json, path, value, flagWrap, flagMerge, flagSuppress).runAll();
+
+        return Response.ok(resultMap).build();
+    }
+
+    @GET
+    public Viewable get(@QueryParam("template") @DefaultValue("goessner") String template) {
+        return createView(TEMPLATES.get(template), "$.store.book[0].title", true, template, null);
     }
 
     private Viewable createView(
@@ -96,6 +111,7 @@ public class IndexResource {
                                     .getResourceAsStream("json/20k.json"));
 
             Map<String, String> templates = new HashMap<String, String>();
+            templates.put("blank", "null");
             templates.put("goessner", goessner);
             templates.put("twitter", twitter);
             templates.put("webapp", webapp);

@@ -7,5 +7,7 @@ public enum Option {
 
     AS_PATH_LIST,
 
-    MERGE_MULTI_PROPS
+    MERGE_MULTI_PROPS,
+
+    SUPPRESS_EXCEPTIONS
 }

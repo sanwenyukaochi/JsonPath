@@ -44,7 +44,32 @@ public class JsonPath {
     }
 
     public <T> T read(Object jsonObject, Configuration configuration) {
-        return (T) path.evaluate(jsonObject, configuration).getWithOptions();
+        boolean optAsPathList = configuration.getOptions().contains(Option.AS_PATH_LIST);
+        boolean optAlwaysReturnList =
+                configuration.getOptions().contains(Option.ALWAYS_RETURN_LIST);
+        boolean optSuppressExceptions =
+                configuration.getOptions().contains(Option.SUPPRESS_EXCEPTIONS);
+        boolean optThrowOnMissingProperty =
+                configuration.getOptions().contains(Option.THROW_ON_MISSING_PROPERTY);
+
+        Object result = null;
+        try {
+            result = path.evaluate(jsonObject, configuration).getWithOptions();
+        } catch (RuntimeException e) {
+            if (optThrowOnMissingProperty
+                    || (!optThrowOnMissingProperty && !optSuppressExceptions)) {
+                throw e;
+            } else {
+                if (optSuppressExceptions) {
+                    if (path.isDefinite() && !optAlwaysReturnList && !optAsPathList) {
+                        result = null;
+                    } else {
+                        result = configuration.getProvider().createArray();
+                    }
+                }
+            }
+        }
+        return (T) result;
     }
 
     @SuppressWarnings({"unchecked"})
