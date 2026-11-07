@@ -3,6 +3,8 @@ package com.jayway.jsonpath;
 import static com.jayway.jsonpath.JsonPath.parse;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import org.junit.jupiter.api.Test;
 
@@ -38,5 +40,17 @@ public class MapperTest extends BaseTest {
         Date now = new Date();
         assertThat(parse("{\"val\": " + now.getTime() + "}").read("val", Date.class))
                 .isEqualTo(now);
+    }
+
+    @Test
+    public void a_String_can_be_converted_to_a_BigDecimal() {
+        assertThat(parse("{\"val\": \"1.5\"}").read("val", BigDecimal.class))
+                .isEqualTo(BigDecimal.valueOf(1.5d));
+    }
+
+    @Test
+    public void a_String_can_be_converted_to_a_BigInteger() {
+        assertThat(parse("{\"val\": \"1\"}").read("val", BigInteger.class))
+                .isEqualTo(BigInteger.valueOf(1));
     }
 }
