@@ -3,7 +3,6 @@ package com.jayway.jsonpath.internal.spi.json;
 import com.jayway.jsonpath.ValueCompareException;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -106,12 +105,7 @@ public abstract class AbstractJsonProvider implements JsonProvider {
     @SuppressWarnings("unchecked")
     public Collection<String> getPropertyKeys(Object obj) {
         if (isArray(obj)) {
-            List l = (List) obj;
-            List<String> keys = new ArrayList<String>(l.size());
-            for (int i = 0; i < l.size(); i++) {
-                keys.add(String.valueOf(i));
-            }
-            return keys;
+            throw new UnsupportedOperationException();
         } else {
             return ((Map) obj).keySet();
         }
