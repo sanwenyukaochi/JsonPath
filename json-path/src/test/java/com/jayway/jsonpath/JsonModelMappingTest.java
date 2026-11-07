@@ -1,5 +1,8 @@
 package com.jayway.jsonpath;
 
+import static com.jayway.jsonpath.Criteria.where;
+import static com.jayway.jsonpath.Filter.filter;
+import static com.jayway.jsonpath.JsonModel.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
@@ -51,9 +54,34 @@ public class JsonModelMappingTest {
             """;
 
     @Test
+    public void map_and_filter_can_be_combined() throws Exception {
+
+        JsonModel model = JsonModel.model(DOCUMENT);
+
+        Filter filter =
+                Filter.filter(Criteria.where("category").is("fiction").and("price").gt(10D));
+
+        List<Book> books = model.map("$.store.book[?]", filter).toList().of(Book.class);
+
+        JsonPath jsonPath =
+                JsonPath.compile(
+                        "$.store.book[?]",
+                        filter(where("category").is("fiction").and("price").gt(10D)));
+
+        Object read = jsonPath.read(DOCUMENT);
+
+        List<Book> books1 =
+                JsonModel.model(DOCUMENT).map("$.store.book[?]", filter).toListOf(Book.class);
+
+        model(DOCUMENT);
+
+        System.out.println("");
+    }
+
+    @Test
     public void map_a_json_model_to_an_Class() throws Exception {
 
-        JsonModel model = JsonModel.create(DOCUMENT);
+        JsonModel model = JsonModel.model(DOCUMENT);
 
         Book book = model.map("$.store.book[1]").to(Book.class);
 
@@ -65,7 +93,7 @@ public class JsonModelMappingTest {
 
     @Test
     public void map_a_json_model_to_a_List() throws Exception {
-        JsonModel model = JsonModel.create(DOCUMENT);
+        JsonModel model = JsonModel.model(DOCUMENT);
 
         List<Book> booksList = model.map("$.store.book[0,1]").toListOf(Book.class);
 
@@ -92,7 +120,7 @@ public class JsonModelMappingTest {
     @Test
     public void map_a_json_model_to_a_Set() throws Exception {
 
-        JsonModel model = JsonModel.create(DOCUMENT);
+        JsonModel model = JsonModel.model(DOCUMENT);
 
         Set<Book> bookSet = model.map("$.store.book[1]").toSetOf(Book.class);
 

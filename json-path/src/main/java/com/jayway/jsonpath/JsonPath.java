@@ -7,21 +7,20 @@ import static org.apache.commons.lang.Validate.notNull;
 
 import com.jayway.jsonpath.internal.PathToken;
 import com.jayway.jsonpath.internal.PathTokenizer;
+import com.jayway.jsonpath.internal.Util;
 import com.jayway.jsonpath.internal.filter.PathTokenFilter;
+import com.jayway.jsonpath.spi.HttpProviderFactory;
 import com.jayway.jsonpath.spi.JsonProvider;
 import com.jayway.jsonpath.spi.JsonProviderFactory;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import org.apache.commons.io.IOUtils;
 
 public class JsonPath {
 
@@ -94,12 +93,12 @@ public class JsonPath {
     public <T> T read(URL jsonURL) throws IOException {
         notNull(jsonURL, "json URL can not be null");
 
-        BufferedReader in = null;
+        InputStream in = null;
         try {
-            in = new BufferedReader(new InputStreamReader(jsonURL.openStream()));
+            in = HttpProviderFactory.getProvider().get(jsonURL);
             return (T) read(JsonProviderFactory.createProvider().parse(in));
         } finally {
-            IOUtils.closeQuietly(in);
+            Util.closeQuietly(in);
         }
     }
 
@@ -113,7 +112,7 @@ public class JsonPath {
             fis = new FileInputStream(jsonFile);
             return (T) read(JsonProviderFactory.createProvider().parse(fis));
         } finally {
-            IOUtils.closeQuietly(fis);
+            Util.closeQuietly(fis);
         }
     }
 
@@ -124,7 +123,7 @@ public class JsonPath {
         try {
             return (T) read(JsonProviderFactory.createProvider().parse(jsonInputStream));
         } finally {
-            IOUtils.closeQuietly(jsonInputStream);
+            Util.closeQuietly(jsonInputStream);
         }
     }
 
