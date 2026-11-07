@@ -12,7 +12,7 @@ public class Issue629 {
     public void testUncloseParenthesis() throws IOException {
         try {
             JsonPath jsonPath = JsonPath.compile("$.A.B.C.D(");
-            fail();
+            fail("accepted jsonpath with unclosed parentheses");
         } catch (Exception e) {
             assertTrue(e.getMessage().startsWith("Arguments to function:"));
         }
@@ -22,7 +22,7 @@ public class Issue629 {
     public void testUncloseParenthesisWithNestedCall() throws IOException {
         try {
             JsonPath jsonPath = JsonPath.compile("$.A.B.C.sum(D()");
-            fail();
+            fail("accepted jsonpath with unclosed parentheses");
         } catch (Exception e) {
             assertTrue(e.getMessage().startsWith("Arguments to function:"));
         }
