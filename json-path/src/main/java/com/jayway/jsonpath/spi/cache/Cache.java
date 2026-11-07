@@ -4,7 +4,7 @@ import com.jayway.jsonpath.JsonPath;
 
 public interface Cache {
 
-    public JsonPath get(String key);
+    JsonPath get(String key);
 
-    public void put(String key, JsonPath value);
+    void put(String key, JsonPath value);
 }
