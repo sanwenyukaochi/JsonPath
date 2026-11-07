@@ -9,5 +9,7 @@ public interface EvaluationContext {
 
     <T> T get();
 
+    Object getWithOptions();
+
     List<String> getPathList();
 }

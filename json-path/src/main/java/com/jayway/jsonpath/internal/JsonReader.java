@@ -14,7 +14,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.List;
 
 public class JsonReader implements ParseContext, ReadContext {
 
@@ -86,17 +85,5 @@ public class JsonReader implements ParseContext, ReadContext {
     public <T> T read(JsonPath path) {
         notNull(path, "path can not be null");
         return path.read(json, configuration);
-    }
-
-    @Override
-    public List<String> readPathList(String path, Filter... filters) {
-        notEmpty(path, "path can not be null or empty");
-        return readPathList(JsonPath.compile(path, filters));
-    }
-
-    @Override
-    public List<String> readPathList(JsonPath path) {
-        notNull(path, "path can not be null");
-        return path.readPathList(json, configuration);
     }
 }
