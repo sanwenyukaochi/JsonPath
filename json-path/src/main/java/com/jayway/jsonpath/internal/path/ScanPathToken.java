@@ -112,7 +112,7 @@ public class ScanPathToken extends PathToken {
         return "..";
     }
 
-    private static interface Predicate {
+    private interface Predicate {
         boolean matches(Object model);
     }
 
@@ -172,13 +172,9 @@ public class ScanPathToken extends PathToken {
 
         @Override
         public boolean matches(Object model) {
+
             if (!ctx.jsonProvider().isMap(model)) {
                 return false;
-            }
-
-            if (ctx.options().contains(Option.REQUIRE_PROPERTIES)) {
-
-                return true;
             }
 
             if (!propertyPathToken.isTokenDefinite()) {
