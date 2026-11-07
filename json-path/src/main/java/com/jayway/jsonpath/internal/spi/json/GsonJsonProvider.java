@@ -28,7 +28,7 @@ public class GsonJsonProvider extends AbstractJsonProvider {
     private static final JsonParser parser = new JsonParser();
     private static final Gson gson = new GsonBuilder().create();
 
-    public static Object unwrap(Object o) {
+    public Object unwrap(Object o) {
 
         if (o == null) {
             return null;
@@ -113,16 +113,7 @@ public class GsonJsonProvider extends AbstractJsonProvider {
 
     @Override
     public Object getArrayIndex(Object obj, int idx) {
-        return getArrayIndex(obj, idx, true);
-    }
-
-    @Override
-    public Object getArrayIndex(Object obj, int idx, boolean unwrap) {
-        if (unwrap) {
-            return unwrap(toJsonArray(obj).get(idx));
-        } else {
-            return toJsonArray(obj).get(idx);
-        }
+        return toJsonArray(obj).get(idx);
     }
 
     @Override
