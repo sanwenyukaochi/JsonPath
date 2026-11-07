@@ -129,4 +129,11 @@ public class FilterCompilerTest {
                 .isEqualTo(
                         "[?((@['category'] == 'fiction' && @['author'] == 'Evelyn Waugh') || @['price'] > 15)]");
     }
+
+    @Test
+    public void compile_and_serialize_not_exists_filter() {
+        Filter compiled = compile("[?(!@.foo)]");
+        String serialized = compiled.toString();
+        assertThat(serialized).isEqualTo("[?(!@['foo'])]");
+    }
 }
