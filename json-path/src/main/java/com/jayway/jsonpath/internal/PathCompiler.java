@@ -16,12 +16,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PathCompiler {
-
-    private static final Logger logger = LoggerFactory.getLogger(PathCompiler.class);
 
     private static final char DOC_CONTEXT = '$';
     private static final char EVAL_CONTEXT = '@';
