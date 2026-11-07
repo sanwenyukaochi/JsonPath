@@ -19,7 +19,7 @@ import tools.jackson.databind.node.JsonNodeFactory;
 import tools.jackson.databind.node.ObjectNode;
 import tools.jackson.databind.node.StringNode;
 
-public class JacksonTreeJsonProvider extends AbstractJsonProvider {
+public class JacksonJsonNodeJsonProvider extends AbstractJsonProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(JacksonJsonProvider.class);
 
@@ -31,11 +31,11 @@ public class JacksonTreeJsonProvider extends AbstractJsonProvider {
         return objectMapper;
     }
 
-    public JacksonTreeJsonProvider() {
+    public JacksonJsonNodeJsonProvider() {
         this(defaultObjectMapper);
     }
 
-    public JacksonTreeJsonProvider(ObjectMapper objectMapper) {
+    public JacksonJsonNodeJsonProvider(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
