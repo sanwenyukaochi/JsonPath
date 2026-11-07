@@ -2,23 +2,37 @@ package com.jayway.jsonpath.spi;
 
 import com.jayway.jsonpath.spi.impl.JacksonProvider;
 
-public class MappingProviderFactory {
+public abstract class MappingProviderFactory {
 
-    private static MappingProvider mappingProvider;
+    public static MappingProviderFactory factory =
+            new MappingProviderFactory() {
 
-    static {
-        try {
-            Class.forName("tools.jackson.databind.ObjectMapper");
+                private MappingProvider provider = null;
 
-            mappingProvider = new JacksonProvider();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(
-                    "tools.jackson.databind.ObjectMapper not found on classpath. This is an optional dependency needed for POJO conversions.",
-                    e);
-        }
-    }
+                @Override
+                protected MappingProvider create() {
+                    if (this.provider == null) {
+                        synchronized (MappingProviderFactory.class) {
+                            try {
+                                Class.forName("tools.jackson.databind.ObjectMapper");
 
-    public static MappingProvider getInstance() {
-        return mappingProvider;
+                                provider = new JacksonProvider();
+                                return provider;
+                            } catch (ClassNotFoundException e) {
+                                throw new RuntimeException(
+                                        "tools.jackson.databind.ObjectMapper not found on classpath. This is an optional dependency needed for POJO conversions.",
+                                        e);
+                            }
+                        }
+                    } else {
+                        return provider;
+                    }
+                }
+            };
+
+    protected abstract MappingProvider create();
+
+    public static MappingProvider createProvider() {
+        return factory.create();
     }
 }
