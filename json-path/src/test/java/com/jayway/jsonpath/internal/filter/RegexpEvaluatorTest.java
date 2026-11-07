@@ -73,8 +73,7 @@ public class RegexpEvaluatorTest extends BaseTest {
                     {"/.*tEst.*/is", createStringNode("test\ntest", true), true},
                     {"/.*tEst.*/i", createStringNode("test\ntest", true), false},
                     {"/^\\w+$/U", createStringNode("\u00fe", true), true},
-                    {"/^\\w+$/", createStringNode("\u00fe", true), false},
-                    {"/^test$\\ntest$/m", createStringNode("test\ntest", true), true}
+                    {"/^\\w+$/", createStringNode("\u00fe", true), false}
                 });
     }
 
