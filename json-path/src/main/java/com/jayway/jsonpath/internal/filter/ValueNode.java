@@ -226,10 +226,6 @@ public abstract class ValueNode {
             this.compiledPattern = pattern;
         }
 
-        public String getPattern() {
-            return "/" + pattern + "/";
-        }
-
         public Pattern getCompiledPattern() {
             return compiledPattern;
         }
@@ -249,7 +245,13 @@ public abstract class ValueNode {
 
         @Override
         public String toString() {
-            return pattern;
+
+            String flags = "";
+            if ((compiledPattern.flags() & Pattern.CASE_INSENSITIVE) == Pattern.CASE_INSENSITIVE) {
+                flags = "i";
+            }
+
+            return "/" + pattern + "/" + flags;
         }
 
         @Override
