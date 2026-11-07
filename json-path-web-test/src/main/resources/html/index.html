@@ -163,7 +163,7 @@
                     url: "/json/" + val,
                     success: function(data){
                         if(data){
-                            data = JSON.stringify(data, null, '   ');
+                            data = toJsonString(data);
                         }
                         $("#txtJson").val(data);
                     }
@@ -204,7 +204,6 @@
                         }
                         else if(data.result === 1){
                             updateDisplay('glyphicon-align-justify', 'Path is indefinite');
-
                         }
                     }
                 });
@@ -263,7 +262,7 @@
                         var elapsed = new Date().getTime() - start;
 
                         $("#goessner-time").text(elapsed);
-                        $("#goessner-res").hide().text(JSON.stringify(res, null, '   ')).fadeIn();;
+                        $("#goessner-res").hide().text(toJsonString(res)).fadeIn();
 
                         $('.prettyprinted').removeClass('prettyprinted');
 
@@ -273,5 +272,15 @@
             });
 
         });
+
+        var toJsonString = function(src){
+            var str = JSON.stringify(src, null, '   ');
+            if(str){
+                str = str.replace(/": /g, '" : ');
+                str = str.replace(/": \[/g, '" : [');
+                str = str.replace(/": {/g, '" : {');
+            }
+            return str;
+        };
     </script>
 </html>
