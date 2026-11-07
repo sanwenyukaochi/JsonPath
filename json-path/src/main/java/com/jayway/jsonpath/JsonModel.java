@@ -7,6 +7,7 @@ import static org.apache.commons.lang.Validate.notNull;
 
 import com.jayway.jsonpath.internal.ConvertUtils;
 import com.jayway.jsonpath.internal.IOUtils;
+import com.jayway.jsonpath.internal.JsonFormatter;
 import com.jayway.jsonpath.internal.PathToken;
 import com.jayway.jsonpath.spi.JsonProvider;
 import com.jayway.jsonpath.spi.JsonProviderFactory;
@@ -72,7 +73,8 @@ public class JsonModel {
     }
 
     public void print() {
-        System.out.println(toJson());
+        String json = toJson();
+        System.out.println(JsonFormatter.prettyPrint(json));
     }
 
     public boolean hasPath(String jsonPath) {
@@ -135,7 +137,13 @@ public class JsonModel {
     }
 
     public String toJson() {
-        return jsonProvider.toJson(jsonObject);
+        return toJson(false);
+    }
+
+    public String toJson(boolean prettyPrint) {
+        String json = jsonProvider.toJson(jsonObject);
+        if (prettyPrint) return JsonFormatter.prettyPrint(json);
+        else return json;
     }
 
     public String toJson(String jsonPath, Filter... filters) {

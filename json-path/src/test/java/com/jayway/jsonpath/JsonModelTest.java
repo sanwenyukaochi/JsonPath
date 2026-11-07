@@ -62,6 +62,13 @@ public class JsonModelTest {
             """;
 
     @Test
+    public void a_model_can_be_pretty_printed() throws Exception {
+        JsonModel model = JsonModel.model(DOCUMENT);
+
+        model.print();
+    }
+
+    @Test
     public void has_path_validates() throws Exception {
         assertFalse(JsonModel.model(DOCUMENT).hasPath("store.invalid"));
         assertFalse(JsonModel.model(DOCUMENT).hasPath("store.book[0].foo"));
