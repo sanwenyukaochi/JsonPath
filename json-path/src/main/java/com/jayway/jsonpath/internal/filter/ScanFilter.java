@@ -4,7 +4,7 @@ import com.jayway.jsonpath.spi.JsonProvider;
 
 import java.util.List;
 
-public class ScanFilter extends Filter {
+public class ScanFilter extends PathTokenFilter {
 
     public ScanFilter(String condition) {
         super(condition);

@@ -4,7 +4,7 @@ import com.jayway.jsonpath.spi.JsonProvider;
 
 import java.util.List;
 
-public class WildcardFilter extends Filter {
+public class WildcardFilter extends PathTokenFilter {
 
     public WildcardFilter(String condition) {
         super(condition);

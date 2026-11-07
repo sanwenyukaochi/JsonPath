@@ -2,7 +2,7 @@ package com.jayway.jsonpath.internal.filter;
 
 import com.jayway.jsonpath.spi.JsonProvider;
 
-public class PassthroughFilter extends Filter {
+public class PassthroughFilter extends PathTokenFilter {
 
     private boolean isArrayFilter;
 
