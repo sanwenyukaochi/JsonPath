@@ -6,12 +6,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import com.jayway.jsonpath.spi.mapper.MappingException;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.JsonNodeFactory;
 import tools.jackson.databind.node.ObjectNode;
@@ -203,5 +208,35 @@ public class JacksonJsonNodeJsonProviderTest extends BaseTest {
         Data(@JsonProperty("id") final UUID id) {
             this.id = id;
         }
+    }
+
+    @Test
+    public void mapPropertyWithPOJO() {
+        String someJson =
+"""
+{
+  "a": "a",
+  "b": "b"
+}\
+""";
+        ObjectMapper om =
+                JsonMapper.builder().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS).build();
+        Configuration c =
+                Configuration.builder()
+                        .mappingProvider(new JacksonMappingProvider())
+                        .jsonProvider(new JacksonJsonNodeJsonProvider(om))
+                        .build();
+        DocumentContext context = JsonPath.using(c).parse(someJson);
+        String someJsonStr = context.jsonString();
+        DocumentContext altered =
+                context.map(
+                        "$['a', 'b', 'c']",
+                        new MapFunction() {
+                            @Override
+                            public Object map(Object currentValue, Configuration configuration) {
+                                return currentValue;
+                            }
+                        });
+        assertThat(altered.jsonString()).isEqualTo(someJsonStr);
     }
 }
