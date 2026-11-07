@@ -78,7 +78,7 @@ public class PathCompilerTest {
         assertThat(compile("$['1prop']").toString()).isEqualTo("$['1prop']");
         assertThat(compile("$['@prop']").toString()).isEqualTo("$['@prop']");
         assertThat(compile("$[  '@prop'  ]").toString()).isEqualTo("$['@prop']");
-        assertThat(compile("$[\"prop\"]").toString()).isEqualTo("$['prop']");
+        assertThat(compile("$[\"prop\"]").toString()).isEqualTo("$[\"prop\"]");
     }
 
     @Test
