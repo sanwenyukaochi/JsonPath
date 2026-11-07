@@ -52,4 +52,22 @@ public class ExpressionEvalTest {
         assertTrue(ExpressionEvaluator.eval("A", "==", "A"));
         assertTrue(ExpressionEvaluator.eval("B", "!=", "A"));
     }
+
+    @Test
+    public void boolean_eval() throws Exception {
+
+        assertTrue(ExpressionEvaluator.eval(true, "==", "true"));
+        assertTrue(ExpressionEvaluator.eval(false, "==", "false"));
+        assertTrue(ExpressionEvaluator.eval(true, "!=", "false"));
+        assertTrue(ExpressionEvaluator.eval(true, "<>", "false"));
+        assertTrue(ExpressionEvaluator.eval(false, "!=", "true"));
+        assertTrue(ExpressionEvaluator.eval(false, "<>", "true"));
+
+        assertFalse(ExpressionEvaluator.eval(true, "==", "false"));
+        assertFalse(ExpressionEvaluator.eval(false, "==", "true"));
+        assertFalse(ExpressionEvaluator.eval(true, "!=", "true"));
+        assertFalse(ExpressionEvaluator.eval(true, "<>", "true"));
+        assertFalse(ExpressionEvaluator.eval(false, "!=", "false"));
+        assertFalse(ExpressionEvaluator.eval(false, "<>", "false"));
+    }
 }
