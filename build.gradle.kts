@@ -5,14 +5,12 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.jvm.toolchain.JavaToolchainService
 
 description = "Java JsonPath implementation"
+
 plugins {
     id("com.diffplug.spotless") version "8.11.0"
 }
 
 version = "3.0.0"
-
-val developmentJavaVersion = 27
-val minimumJavaVersion = 17
 
 repositories {
     mavenCentral()
@@ -107,18 +105,16 @@ allprojects {
 subprojects {
     apply(plugin = "java-library")
 
-    val javaToolchains = extensions.getByType<JavaToolchainService>()
-
     repositories {
         mavenCentral()
     }
 
     extensions.configure<JavaPluginExtension> {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(developmentJavaVersion))
+            languageVersion.set(JavaLanguageVersion.of(27))
         }
-        sourceCompatibility = JavaVersion.toVersion(minimumJavaVersion)
-        targetCompatibility = JavaVersion.toVersion(minimumJavaVersion)
+        sourceCompatibility = JavaVersion.toVersion(17)
+        targetCompatibility = JavaVersion.toVersion(17)
     }
 
     dependencies {
@@ -155,7 +151,7 @@ subprojects {
 
     tasks.withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
-        options.release.set(minimumJavaVersion)
+        options.release.set(17)
     }
 
     tasks.withType<Test>().configureEach {
@@ -164,7 +160,7 @@ subprojects {
 
         providers.gradleProperty("testJavaVersion").orNull?.toInt()?.let { testJavaVersion ->
             javaLauncher.set(
-                javaToolchains.launcherFor {
+                extensions.getByType<JavaToolchainService>().launcherFor {
                     languageVersion.set(JavaLanguageVersion.of(testJavaVersion))
                 },
             )
