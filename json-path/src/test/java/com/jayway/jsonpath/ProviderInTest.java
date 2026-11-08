@@ -2,6 +2,7 @@ package com.jayway.jsonpath;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.gson.JsonArray;
 import com.jayway.jsonpath.spi.json.GsonJsonProvider;
 import com.jayway.jsonpath.spi.json.Jackson3JsonNodeJsonProvider;
@@ -20,7 +21,6 @@ import com.jayway.jsonpath.spi.mapper.JsonSmartMappingProvider;
 import java.util.List;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
-import tools.jackson.databind.node.ArrayNode;
 
 public class ProviderInTest {
     private final String JSON = "[{\"foo\": \"bar\"}, {\"foo\": \"baz\"}]";

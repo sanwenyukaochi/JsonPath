@@ -6,6 +6,7 @@ description = "Java DSL for easy testing and reading of JSON data"
 version = "3.0.0"
 
 dependencies {
+    compileOnly("com.fasterxml.jackson.core:jackson-databind")
     compileOnly("tools.jackson.core:jackson-databind")
     compileOnly("com.google.code.gson:gson")
     compileOnly("org.json:json")
@@ -14,6 +15,7 @@ dependencies {
     compileOnly("jakarta.json:jakarta.json-api")
     compileOnly("jakarta.json.bind:jakarta.json.bind-api")
     implementation("net.minidev:json-smart")
+    testImplementation("com.fasterxml.jackson.core:jackson-databind")
     testImplementation("tools.jackson.core:jackson-databind")
     testImplementation("com.google.code.gson:gson")
     testImplementation("org.json:json")

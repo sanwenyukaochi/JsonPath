@@ -2,6 +2,9 @@ package com.jayway.jsonpath;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import java.util.Arrays;
@@ -9,9 +12,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedClass;
 import org.junit.jupiter.params.provider.MethodSource;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.StringNode;
 
 @ParameterizedClass
 @MethodSource("testDataSource")
@@ -100,7 +100,7 @@ public class JacksonJsonNodeJsonProviderMapperSupportTest {
                         "$.attr1",
                         objectMapper.readTree("{\"attr1\": \"val1\"}"),
                         objectMapper.readTree("\"val1\""),
-                        StringNode.class,
+                        TextNode.class,
                         objectMapper.readTree(
 """
 {    "attr1": {"attr1": "val1"},    "attr2": "val2"}\
@@ -113,7 +113,7 @@ public class JacksonJsonNodeJsonProviderMapperSupportTest {
                         "$.attr1[*]",
                         objectMapper.readTree("{\"attr1\": \"val1\"}"),
                         objectMapper.readTree("[\"val1\", \"val2\"]"),
-                        StringNode.class,
+                        TextNode.class,
                         objectMapper.readTree(
 """
 {    "attr1": [{"attr1": "val1"}, {"attr1": "val1"}],    "attr2": "val2"}\
@@ -126,7 +126,7 @@ public class JacksonJsonNodeJsonProviderMapperSupportTest {
                         "$.attr1.[?(@.inAttr1 == \"val1a\")].inAttr2",
                         objectMapper.readTree("{\"attr1\": \"val1\"}"),
                         objectMapper.readTree("[\"val2a\", \"val2b\"]"),
-                        StringNode.class,
+                        TextNode.class,
                         objectMapper.readTree(
 """
 {    "attr1": [         {"inAttr1": "val1a", "inAttr2": {"attr1": "val1"}},         {"inAttr1": "val1a", "inAttr2": {"attr1": "val1"}},         {"inAttr1": "val1b", "inAttr2": "val2c"}    ],    "attr2": "val2"}\

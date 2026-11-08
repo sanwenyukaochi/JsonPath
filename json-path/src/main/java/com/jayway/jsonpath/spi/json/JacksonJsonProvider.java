@@ -1,6 +1,10 @@
 package com.jayway.jsonpath.spi.json;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.jayway.jsonpath.InvalidJsonException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -9,10 +13,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import tools.jackson.core.JacksonException;
-import tools.jackson.core.JsonGenerator;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.ObjectReader;
 
 public class JacksonJsonProvider extends AbstractJsonProvider {
 
@@ -44,7 +44,7 @@ public class JacksonJsonProvider extends AbstractJsonProvider {
     public Object parse(String json) throws InvalidJsonException {
         try {
             return objectReader.readValue(json);
-        } catch (JacksonException e) {
+        } catch (IOException e) {
             throw new InvalidJsonException(e, json);
         }
     }
@@ -53,7 +53,7 @@ public class JacksonJsonProvider extends AbstractJsonProvider {
     public Object parse(byte[] json) throws InvalidJsonException {
         try {
             return objectReader.readValue(json);
-        } catch (JacksonException e) {
+        } catch (IOException e) {
             throw new InvalidJsonException(e, new String(json, StandardCharsets.UTF_8));
         }
     }
@@ -62,7 +62,7 @@ public class JacksonJsonProvider extends AbstractJsonProvider {
     public Object parse(InputStream jsonStream, String charset) throws InvalidJsonException {
         try {
             return objectReader.readValue(new InputStreamReader(jsonStream, charset));
-        } catch (IOException | JacksonException e) {
+        } catch (IOException e) {
             throw new InvalidJsonException(e);
         }
     }
@@ -71,13 +71,13 @@ public class JacksonJsonProvider extends AbstractJsonProvider {
     public String toJson(Object obj) {
         StringWriter writer = new StringWriter();
         try {
-            JsonGenerator generator = objectMapper.createGenerator(writer);
+            JsonGenerator generator = objectMapper.getFactory().createGenerator(writer);
             objectMapper.writeValue(generator, obj);
             writer.flush();
             writer.close();
             generator.close();
             return writer.getBuffer().toString();
-        } catch (IOException | JacksonException e) {
+        } catch (IOException e) {
             throw new InvalidJsonException(e);
         }
     }
