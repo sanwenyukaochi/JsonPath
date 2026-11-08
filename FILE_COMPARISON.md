@@ -47,7 +47,7 @@
 - 构建脚本：当前项目采用 Kotlin DSL；标准项目采用 Groovy DSL。
 - 工具链：当前项目使用 Gradle 9.9、JDK 27 编译和 `--release 17`；标准项目使用 Gradle 8.5。
 - 测试与依赖：当前项目采用较新的 JUnit、Hamcrest、Jackson 2/3 等版本，并做必要 API 适配。
-- CI：当前项目验证 Java 17、21、25、27；标准 CI 仅覆盖较早矩阵。
+- CI：当前项目验证 Java 17 和 27，并使用滚动更新的 `ubuntu-latest`；标准 CI 使用不同的版本矩阵与 Runner 配置。
 - 工程增强：开发容器、SDKMAN、Renovate、GitHub 社区文件、架构文档等仅存在于当前项目。
 - 已淘汰流程：`.travis.yml`、`Procfile`、`system.properties` 仅存在于标准项目，当前项目不恢复。
 
