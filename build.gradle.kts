@@ -2,6 +2,7 @@ import com.diffplug.gradle.spotless.SpotlessExtension
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
+import org.gradle.jvm.toolchain.JavaToolchainService
 
 description = "Java JsonPath implementation"
 plugins {
@@ -9,6 +10,9 @@ plugins {
 }
 
 version = "3.0.0"
+
+val developmentJavaVersion = 27
+val minimumJavaVersion = 17
 
 repositories {
     mavenCentral()
@@ -103,14 +107,18 @@ allprojects {
 subprojects {
     apply(plugin = "java-library")
 
+    val javaToolchains = extensions.getByType<JavaToolchainService>()
+
     repositories {
         mavenCentral()
     }
 
     extensions.configure<JavaPluginExtension> {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(17))
+            languageVersion.set(JavaLanguageVersion.of(developmentJavaVersion))
         }
+        sourceCompatibility = JavaVersion.toVersion(minimumJavaVersion)
+        targetCompatibility = JavaVersion.toVersion(minimumJavaVersion)
     }
 
     dependencies {
@@ -146,11 +154,20 @@ subprojects {
 
     tasks.withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
+        options.release.set(minimumJavaVersion)
     }
 
     tasks.withType<Test>().configureEach {
         useJUnitPlatform()
         systemProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug")
+
+        providers.gradleProperty("testJavaVersion").orNull?.toInt()?.let { testJavaVersion ->
+            javaLauncher.set(
+                javaToolchains.launcherFor {
+                    languageVersion.set(JavaLanguageVersion.of(testJavaVersion))
+                },
+            )
+        }
     }
 
     if (rootProject.hasProperty("release")) {
