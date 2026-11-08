@@ -135,6 +135,8 @@ subprojects {
             add("api", "org.hamcrest:hamcrest-library:3.0")
             add("testImplementation", "org.assertj:assertj-core:3.27.7")
             add("testImplementation", "commons-io:commons-io:2.22.0")
+            add("testImplementation", "io.cucumber:cucumber-java:8.0.4")
+            add("testImplementation", "io.cucumber:cucumber-junit-platform-engine:8.0.4")
             add("implementation", "org.slf4j:slf4j-api:2.0.20")
             add("testImplementation", "org.slf4j:slf4j-simple:2.0.20")
         }
