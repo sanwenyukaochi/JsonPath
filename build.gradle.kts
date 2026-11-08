@@ -105,6 +105,8 @@ allprojects {
 subprojects {
     apply(plugin = "java-library")
 
+    val javaToolchains = extensions.getByType<JavaToolchainService>()
+
     repositories {
         mavenCentral()
     }
@@ -160,7 +162,7 @@ subprojects {
 
         providers.gradleProperty("testJavaVersion").orNull?.toInt()?.let { testJavaVersion ->
             javaLauncher.set(
-                extensions.getByType<JavaToolchainService>().launcherFor {
+                javaToolchains.launcherFor {
                     languageVersion.set(JavaLanguageVersion.of(testJavaVersion))
                 },
             )
