@@ -1,10 +1,9 @@
 package com.jayway.jsonpath.spi.mapper;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.TypeRef;
-
-import tools.jackson.databind.JavaType;
-import tools.jackson.databind.ObjectMapper;
 
 public class JacksonMappingProvider implements MappingProvider {
 

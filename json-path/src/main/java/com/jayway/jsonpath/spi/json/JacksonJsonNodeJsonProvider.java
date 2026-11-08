@@ -1,7 +1,14 @@
 package com.jayway.jsonpath.spi.json;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.jayway.jsonpath.InvalidJsonException;
 import com.jayway.jsonpath.JsonPathException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,13 +19,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.ArrayNode;
-import tools.jackson.databind.node.JsonNodeFactory;
-import tools.jackson.databind.node.ObjectNode;
-import tools.jackson.databind.node.StringNode;
 
 public class JacksonJsonNodeJsonProvider extends AbstractJsonProvider {
 
@@ -42,7 +42,7 @@ public class JacksonJsonNodeJsonProvider extends AbstractJsonProvider {
     public Object parse(String json) throws InvalidJsonException {
         try {
             return objectMapper.readTree(json);
-        } catch (JacksonException e) {
+        } catch (IOException e) {
             throw new InvalidJsonException(e, json);
         }
     }
@@ -51,7 +51,7 @@ public class JacksonJsonNodeJsonProvider extends AbstractJsonProvider {
     public Object parse(byte[] json) throws InvalidJsonException {
         try {
             return objectMapper.readTree(json);
-        } catch (JacksonException e) {
+        } catch (IOException e) {
             throw new InvalidJsonException(e, new String(json, StandardCharsets.UTF_8));
         }
     }
@@ -60,7 +60,7 @@ public class JacksonJsonNodeJsonProvider extends AbstractJsonProvider {
     public Object parse(InputStream jsonStream, String charset) throws InvalidJsonException {
         try {
             return objectMapper.readTree(new InputStreamReader(jsonStream, charset));
-        } catch (IOException | JacksonException e) {
+        } catch (IOException e) {
             throw new InvalidJsonException(e);
         }
     }
@@ -193,7 +193,7 @@ public class JacksonJsonNodeJsonProvider extends AbstractJsonProvider {
     public Collection<String> getPropertyKeys(Object obj) {
         List<String> keys = new ArrayList<String>();
 
-        Iterator<String> iter = toJsonObject(obj).propertyNames().iterator();
+        Iterator<String> iter = toJsonObject(obj).fieldNames();
         while (iter.hasNext()) {
             keys.add(iter.next());
         }
@@ -207,8 +207,8 @@ public class JacksonJsonNodeJsonProvider extends AbstractJsonProvider {
         } else if (isMap(obj)) {
             return toJsonObject(obj).size();
         } else {
-            if (obj instanceof StringNode) {
-                StringNode element = (StringNode) obj;
+            if (obj instanceof TextNode) {
+                TextNode element = (TextNode) obj;
                 return element.size();
             }
         }
