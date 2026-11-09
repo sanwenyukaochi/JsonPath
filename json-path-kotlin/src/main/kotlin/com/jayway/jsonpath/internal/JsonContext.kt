@@ -1,14 +1,11 @@
 package com.jayway.jsonpath.internal
 
 import com.jayway.jsonpath.DocumentContext
+import com.jayway.jsonpath.internal.path.PathCompiler
 
 internal class JsonContext(
-    private val jsonDocument: String,
+    private val jsonDocument: Any,
 ) : DocumentContext {
-    override fun <T> read(path: String): T {
-        error(
-            "Path evaluation for '$path' has not been implemented " +
-                "(document length: ${jsonDocument.length})",
-        )
-    }
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> read(path: String): T = PathCompiler.compile(path).evaluate(jsonDocument) as T
 }
