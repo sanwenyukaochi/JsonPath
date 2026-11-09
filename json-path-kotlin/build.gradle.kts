@@ -1,5 +1,13 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     kotlin("jvm") version "2.4.21"
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
 }
 
 description = "Kotlin DSL for easy testing and reading of JSON data"
@@ -23,6 +31,10 @@ dependencies {
     testImplementation("org.apache.tapestry:tapestry-json")
     testImplementation("jakarta.json:jakarta.json-api")
     testImplementation("jakarta.json.bind:jakarta.json.bind-api")
+    testImplementation(platform("io.cucumber:cucumber-bom:8.0.4"))
+    testImplementation("io.cucumber:cucumber-java")
+    testImplementation("io.cucumber:cucumber-junit-platform-engine")
+    testImplementation("org.junit.platform:junit-platform-suite")
     testRuntimeOnly("org.eclipse.parsson:parsson")
     testRuntimeOnly("org.eclipse.yasson:yasson")
 }
