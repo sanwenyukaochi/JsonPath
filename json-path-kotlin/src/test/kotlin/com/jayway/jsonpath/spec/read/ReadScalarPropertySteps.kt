@@ -2,7 +2,9 @@ package com.jayway.jsonpath.spec.read
 
 import com.jayway.jsonpath.JsonPath
 import io.cucumber.java.en.Given
+import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import org.junit.jupiter.api.Assertions.assertEquals
 
 class ReadScalarPropertySteps {
     private lateinit var jsonDocument: String
@@ -20,5 +22,10 @@ class ReadScalarPropertySteps {
             JsonPath
                 .parse(jsonDocument)
                 .read(path)
+    }
+
+    @Then("查询结果应为字符串 {string}")
+    fun queryResultShouldBeString(expected: String) {
+        assertEquals(expected, queryResult)
     }
 }

@@ -1,16 +1,10 @@
 package com.jayway.jsonpath
 
-import com.jayway.jsonpath.internal.JsonContext
+import com.jayway.jsonpath.internal.ParseContextImpl
 
 class JsonPath private constructor() {
     companion object {
         @JvmStatic
-        fun parse(json: String?): DocumentContext {
-            require(!json.isNullOrEmpty()) {
-                "json string can not be null or empty"
-            }
-
-            return JsonContext(json)
-        }
+        fun parse(json: String?): DocumentContext = ParseContextImpl().parse(json)
     }
 }
