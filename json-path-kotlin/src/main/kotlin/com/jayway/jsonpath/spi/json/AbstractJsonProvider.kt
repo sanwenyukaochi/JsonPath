@@ -8,7 +8,7 @@ abstract class AbstractJsonProvider : JsonProvider {
     override fun getArrayIndex(
         obj: Any?,
         idx: Int,
-    ): Any? = (obj as List<*>)[idx]
+    ): Any? = requireNotNull(obj as? List<*>) { "Expected a JSON array" }[idx]
 
     @Deprecated("Use getArrayIndex(obj, idx) instead", ReplaceWith("getArrayIndex(obj, idx)"))
     final override fun getArrayIndex(
@@ -39,7 +39,7 @@ abstract class AbstractJsonProvider : JsonProvider {
         obj: Any?,
         key: String?,
     ): Any? {
-        val map = obj as Map<*, *>
+        val map = requireNotNull(obj as? Map<*, *>) { "Expected a JSON object" }
         return if (!map.containsKey(key)) {
             JsonProvider.UNDEFINED
         } else {
@@ -68,7 +68,7 @@ abstract class AbstractJsonProvider : JsonProvider {
         if (isMap(obj)) {
             (obj as MutableMap<Any?, Any?>).remove(requireNotNull(key) { "A property key or array index is required" }.toString())
         } else {
-            val list = obj as MutableList<Any?>
+            val list = requireNotNull(obj as? MutableList<Any?>) { "Expected a JSON array" }
             val index =
                 if (key is Int) {
                     key
@@ -86,7 +86,7 @@ abstract class AbstractJsonProvider : JsonProvider {
         if (isArray(obj)) {
             throw UnsupportedOperationException()
         }
-        return (obj as Map<*, *>).keys as Collection<String>
+        return requireNotNull(obj as? Map<*, *>) { "Expected a JSON object" }.keys as Collection<String>
     }
 
     override fun length(obj: Any?): Int {
