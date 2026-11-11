@@ -67,7 +67,7 @@ open class LogicalExpressionNode : ExpressionNode {
         @JvmStatic
         fun createLogicalOr(
             left: ExpressionNode,
-            right: ExpressionNode?,
+            right: ExpressionNode,
         ): LogicalExpressionNode = LogicalExpressionNode(left, LogicalOperator.OR, right)
 
         @JvmStatic
@@ -77,7 +77,7 @@ open class LogicalExpressionNode : ExpressionNode {
         @JvmStatic
         fun createLogicalAnd(
             left: ExpressionNode,
-            right: ExpressionNode?,
+            right: ExpressionNode,
         ): LogicalExpressionNode = LogicalExpressionNode(left, LogicalOperator.AND, right)
 
         @JvmStatic
