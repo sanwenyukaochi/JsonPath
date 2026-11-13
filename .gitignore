@@ -5,6 +5,9 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### Kotlin ###
+.kotlin
+
 ### STS ###
 .apt_generated
 .classpath
@@ -19,7 +22,6 @@ bin/
 
 ### IntelliJ IDEA ###
 .idea
-.kotlin
 *.iws
 *.iml
 *.ipr
@@ -36,3 +38,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Mac OS ###
+.DS_Store
