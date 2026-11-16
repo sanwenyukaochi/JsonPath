@@ -31,7 +31,7 @@ dependencies {
     testImplementation("org.apache.tapestry:tapestry-json")
     testImplementation("jakarta.json:jakarta.json-api")
     testImplementation("jakarta.json.bind:jakarta.json.bind-api")
-    testImplementation(platform("io.cucumber:cucumber-bom:8.0.4"))
+    testImplementation(platform("io.cucumber:cucumber-bom:8.1.0"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
     testImplementation("org.junit.platform:junit-platform-suite")
