@@ -129,7 +129,7 @@ subprojects {
             add("implementation", "jakarta.json:jakarta.json-api:2.1.3")
             add("implementation", "jakarta.json.bind:jakarta.json.bind-api:3.0.4")
             add("implementation", "org.eclipse.parsson:parsson:1.1.9")
-            add("implementation", "org.eclipse.yasson:yasson:3.0.5")
+            add("implementation", "org.eclipse.yasson:yasson:3.0.6")
             add("implementation", "com.fasterxml.jackson.core:jackson-databind:2.23.0")
             add("implementation", "tools.jackson.core:jackson-databind:3.3.0")
             add("api", "org.hamcrest:hamcrest-library:3.0")
