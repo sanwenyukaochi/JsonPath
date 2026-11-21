@@ -7,7 +7,7 @@ import org.gradle.jvm.toolchain.JavaToolchainService
 description = "Java JsonPath implementation"
 
 plugins {
-    id("com.diffplug.spotless") version "8.11.0"
+    id("com.diffplug.spotless") version "8.12.0"
 }
 
 version = "3.0.0"
